@@ -7,8 +7,9 @@
 
 import { Context, Devvit,  useState } from "@devvit/public-api";
 import { PinnedPostData, PostId, PostType, PuzzlePostData, UserData } from "../types.js";
-import { PinnedPost } from "./PinnedPost.js";
-import { Engine } from "./engine/Engine.js";
+import { PinnedPost } from "./PinnedPost/PinnedPost.js";
+import { Engine } from "../engine/Engine.js";
+import { PuzzlePost } from "./PuzzlePost/PuzzlePost.js";
 
 
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
@@ -69,7 +70,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
 
         const [postData, userData, gameSettings, puzzle] = await Promise.all([
             getPostData(postType, postId),
-            gameEngine.getUser(username, postId),
+            gameEngine.getUserData(username, postId),
             gameEngine.getGameSettings(),
             gameEngine.getPuzzle(postId)
         ]);
@@ -86,6 +87,17 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         
 
     const postTypes: Record<string, JSX.Element> = {
+
+        puzzlePost:(
+            <PuzzlePost
+            postData ={data.postData}
+            userData ={data.userData}
+            username ={data.username}
+            gameSettings ={data.gameSettings}
+            puzzle = {data.puzzle}
+            />
+        ),
+
         pinned:(
             <PinnedPost
             postData ={data.postData}

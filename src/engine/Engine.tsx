@@ -1,12 +1,55 @@
-import { RedditAPIClient, RedisClient, User } from "@devvit/public-api";
-import { GameSettings, PinnedPostData, PostId, PuzzlePostData, UserData } from "../../types.js";
+import {  RedditAPIClient, RedisClient, User } from "@devvit/public-api";
+import { GameSettings, PinnedPostData, PostId, PuzzlePostData, UserData, PostType } from "../types.js";
 
 
 
 export class Engine {
 
 
+    /* 
+    * Store Settings in Redis
+    */
+
+    async storeGameSettings(gameSettings: GameSettings): Promise<void> {
+        
+        const key = this.keys.gameSettings;
+        await this.redis.hSet(key, gameSettings)
+
+    }
+
+
+
+    /*
+    * Save Post In Reids
+    */
+    async createPinnedPost(postId: PostId): Promise<void> {
+        
+      const key = this.keys.postData(postId);
+
+      await this.redis.hSet(key, {
+            postId,
+            postType: 'pinned'
+        })
+
+    }
+
+    readonly redis: RedisClient;
+    readonly reddit?: RedditAPIClient
+    readonly scheduer?: any;
+
+
+    constructor( context: {
+        redis: RedisClient;
+        reddit?: RedditAPIClient;
+        scheduer?: any;
+    }) {
+        this.redis = context.redis;
+        this.reddit = context.reddit;
+        this.scheduer = context.scheduer;
+    }
+
     
+
     readonly keys = {
         postData: (postId: PostId) => `posts:${postId}`,
         moves: (postId: PostId) => `moves:${postId}`,
@@ -62,21 +105,6 @@ export class Engine {
         return settings as GameSettings; 
     }
   
-    readonly redis: RedisClient;
-    readonly reddit?: RedditAPIClient
-    readonly scheduer?: any;
-
-
-    constructor( context: {
-        redis: RedisClient;
-        reddit?: RedditAPIClient;
-        scheduer?: any;
-    }) {
-        this.redis = context.redis;
-        this.reddit = context.reddit;
-        this.scheduer = context.scheduer;
-    }
-
 
 
     async getPinnedPost(postId: PostId): Promise<PinnedPostData> {
@@ -93,8 +121,17 @@ export class Engine {
 
     }
 
-    getPostType(postId: any): any {
-        throw new Error("Method not implemented.");
+    async getPostType(postId: PostId): Promise<PostType> {
+        
+        const key = this.keys.postData(postId);
+
+        const postType = await this.redis.hGet(key, "postType");
+        const defaultPostType = "pinned";
+
+        return (postType ?? defaultPostType) as PostType
+
+
+
     }
 
     async getPuzzlePost(postId: PostId): Promise<PuzzlePostData> {

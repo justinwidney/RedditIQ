@@ -1,5 +1,5 @@
 import { Context, useState, Devvit } from "@devvit/public-api";
-import { TutorialPage } from "../components/TutorialPage.js";
+import { TutorialPage } from "../../components/TutorialPage.js";
 
 interface PinnedPostProps {
     postData: Record<string, any>;
@@ -15,7 +15,8 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     const [page, setPage] = useState('menu')
 
     const Menu = (
-        <zstack width="100%" height="100%" alignment="top start">
+        <vstack width="100%" height="100%" alignment="center middle">
+            <spacer grow />
             <image
                 imageHeight={128}
                 imageWidth={128}
@@ -31,7 +32,28 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
                 description="chess paint logo"
                 />
 
-            </zstack>
+            <spacer height={16}/>
+
+            <text  size="large" weight="bold">Chess Paint</text>
+
+            <spacer grow />
+
+            <vstack width="100%" alignment="center middle" gap="small">
+
+                <hstack width="100%" alignment="center middle" onPress={() => setPage('tutorial')} backgroundColor="#FFFFFF" padding="small" >
+
+                    <hstack height="100%" width="100%" alignment="center middle" padding="small" >
+                        <text size="large" weight="bold">Tutorial</text>
+                    </hstack>
+
+                </hstack>
+
+
+                </vstack>   
+
+            <spacer grow />
+
+            </vstack>
     )
 
     const onClose = ():void => {
