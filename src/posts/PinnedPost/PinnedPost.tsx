@@ -1,11 +1,16 @@
-import { Context, useState, Devvit } from "@devvit/public-api";
+import { Context, useState, Devvit, useAsync } from "@devvit/public-api";
 import { TutorialPage } from "../../components/TutorialPage.js";
+import { CustomButton } from "../../components/CustomButton.js";
+import { PixelSymbol } from "../../components/PixelSymbol.js";
+import { SolvePageStep } from "../../components/SolvePage.js";
+import { SolvePageRouter } from "../../components/SolvePageRouter.js";
+import { GameSettings, UserData } from "../../types.js";
 
 interface PinnedPostProps {
     postData: Record<string, any>;
-    userData: Record<string, any> | null;
+    userData: UserData | null;
     username: string | null;
-    gameSettings: Record<string, any> | null;
+    gameSettings: GameSettings;
     puzzle: Record<string, any> | null;
 }
 
@@ -13,6 +18,12 @@ interface PinnedPostProps {
 export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Element => {
 
     const [page, setPage] = useState('menu')
+
+
+    
+
+
+
 
     const Menu = (
         <vstack width="100%" height="100%" alignment="center middle">
@@ -32,24 +43,18 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
                 description="chess paint logo"
                 />
 
-            <spacer height={16}/>
 
-            <text  size="large" weight="bold">Chess Paint</text>
+            <PixelSymbol type="Title" scale={3} color="#000000" />
 
             <spacer grow />
+            
+            <vstack alignment="center middle" gap="small">
 
-            <vstack width="100%" alignment="center middle" gap="small">
+            <CustomButton onClick={() => setPage('solve')} text="Solve"  width="256px" height="48px" color="#FFFFFF"/>
 
-                <hstack width="100%" alignment="center middle" onPress={() => setPage('tutorial')} backgroundColor="#FFFFFF" padding="small" >
+            <CustomButton onClick={() => setPage('tutorial')} text="Tutorial"  width="256px" height="48px" color="#FFFFFF"/>
 
-                    <hstack height="100%" width="100%" alignment="center middle" padding="small" >
-                        <text size="large" weight="bold">Tutorial</text>
-                    </hstack>
-
-                </hstack>
-
-
-                </vstack>   
+            </vstack>
 
             <spacer grow />
 
@@ -64,6 +69,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     const pages: Record<string, JSX.Element> = {
         menu: Menu,
         tutorial : <TutorialPage onClose={onClose} />,
+        solve: <SolvePageRouter {...props} onCancel={onClose}/>
     }
 
 

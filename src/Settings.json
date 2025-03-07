@@ -1,5 +1,20 @@
 {
     "pinnedPost":{
         "title":"Chess Paint"
-    }
+    },
+    "boardSize": 8,
+    "colors": [
+        "#FFFFFF",
+        "#b4b4b4",
+        "#ed1c24",
+        "#FFC20E"
+      ],
+      "pieces": [
+        "pawn",
+        "rook",
+        "knight",
+        "bishop",
+        "queen",
+        "king"
+      ]
 }
