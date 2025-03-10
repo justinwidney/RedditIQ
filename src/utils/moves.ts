@@ -122,7 +122,7 @@ export const getRookMoves = (position: number, maxDistance: number = Settings.bo
     
     // Check each direction
     directions.forEach(({ dx, dy }) => {
-      for (let dist = 0; dist <= maxDistance; dist++) {
+      for (let dist = 1; dist <= maxDistance; dist++) {
         const newX = x + (dx * dist);
         const newY = y + (dy * dist);
         

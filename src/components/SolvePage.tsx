@@ -5,6 +5,7 @@ import { ChessPieceType, PieceSymbol } from "./PieceSymbol.js";
 import { CustomButton } from "./CustomButton.js";
 import { splitArray } from "../utils/utils.js";
 import { getMoves, getTraversal } from "../utils/moves.js";
+import { PixelSymbol } from "./PixelSymbol.js";
 
 
 interface Pixel {
@@ -15,6 +16,7 @@ interface Pixel {
 interface SolvePageStepProps {
     //username: string | null;
     //userData: UserData | null;
+    onCancel: () => void;
     onNext: () => void;
     picture?: {
         easy: Pixel[];
@@ -25,6 +27,7 @@ interface ChessMove {
     from: number;
     to: number;
     [key: string]: any;
+    piece: ChessPieceType;
   }
   
   interface drawData {
@@ -38,12 +41,11 @@ interface ChessMove {
 export const SolvePageStep = (
     props: SolvePageStepProps,
     context: Context
+
     ): JSX.Element => {
 
 
     const {onNext, picture} = props;
-
-        
 
     const [currentPosition, setCurrentPosition] = useState<number>(59);
     const [currentColor, setCurrentColor] = useState<number>(1);
@@ -59,42 +61,37 @@ export const SolvePageStep = (
     const pixelSize: Devvit.Blocks.SizeString = `${innerSize / Settings.boardSize}px`;
     const pieceSize: Devvit.Blocks.SizeString = `${innerSize / Settings.boardSize}px`;
  
-    const handlePieceClick = (pieceType: string) => {
-        if (isValidPieceType(pieceType)) {
-          setCurrentPiece(pieceType);
-        }
-      
-        const newData = [...drawingData];
+    const handlePieceClick = (pieceType: ChessPieceType) => {
+
+        setCurrentPiece(pieceType);
+
         const newMoves = getMoves(pieceType, currentPosition);
-      
         setHighlightedMoves(newMoves);
-        setDrawingData(newData);
-      
-      };
-      
-      const handlePixelClick = (index:number) => {
 
         const newData = [...drawingData];
+        setDrawingData(newData);
         
-   
-        const availableMoves = getMoves(currentPiece, currentPosition);
+      };
       
+    const handlePixelClick = (index:number) => {
+
+        const newData = [...drawingData];
+        const availableMoves = getMoves(currentPiece, currentPosition);
+
         // Ignore bad clicks
         if (!availableMoves.includes(index)) {
           return
         }
       
         const traversal = getTraversal(currentPiece, currentPosition, index)
-      
         const newMove : ChessMove = {
           from : traversal[0],
-          to : traversal[traversal.length - 1]
+          to : traversal[traversal.length - 1],
+          piece : currentPiece as ChessPieceType
         }
       
         setMoves([...moves, newMove]);
       
-        console.log(moves, "Moves so far:")
-        
         // If we're just starting (no position yet) or clicking on a possible move
         if (currentPosition === null || traversal.includes(index)) {
           // If this is a move (not initial placement), draw at the destination
@@ -121,7 +118,30 @@ export const SolvePageStep = (
         setDrawingData(newData);
       };
       
+    const handleUndo = () => {
 
+        const newData = [...drawingData];
+
+        if (moves.length === 0) {
+            return;
+        }
+
+        const lastMove = moves[moves.length - 1];
+        const traversal = getTraversal(lastMove.piece, lastMove.to, lastMove.from);
+
+        traversal.forEach((moveIndex) => {
+            newData[moveIndex].drawn = false;
+        });
+
+        console.log(lastMove)
+
+        setCurrentPiece(lastMove.piece);
+        setCurrentPosition(lastMove.from);
+        setHighlightedMoves(getMoves(currentPiece, lastMove.from));
+        setMoves(moves.slice(0, moves.length - 1));
+        setDrawingData(newData);
+
+    }   
 
 
     const piecePalette = (
@@ -169,13 +189,14 @@ export const SolvePageStep = (
           backgroundColor={
             pixel.color === -2 ? "#000000" :
             currentPosition === index ? Settings.colors[2] :
-            highlightedMoves.includes(index) ? Settings.colors[3] : 
             pixel.drawn === true ? Settings.colors[pixel.color] : 
             "transparent"
           }
     
         > 
-    
+
+        {highlightedMoves.includes(index) && !pixel.drawn && pixel.color!== -2 && <PixelSymbol type="available" scale={2} color="#0000FF" /> }
+          
     
         {index === currentPosition && isValidPieceType(currentPiece) && <PieceSymbol type={currentPiece} color='black' /> }
     
@@ -210,10 +231,11 @@ export const SolvePageStep = (
             <spacer grow />
     
             <CustomButton
-              width="80px"
+              width="32px"
+             height="32px"
              text="close"
               onClick={() => {
-                props.onNext(drawingData);
+                props.onCancel();
               }}
             />
           </hstack>
@@ -230,6 +252,17 @@ export const SolvePageStep = (
               {grid}
             </zstack>
           <spacer grow />
+          <hstack width="100%" alignment="center middle">
+            <CustomButton
+                width="32px"
+                height="32px"
+                text="redo"
+                onClick={ () => {
+                    console.log('handleUndo called at:', new Date().getTime());
+                    handleUndo()}
+                }
+            />
+            </hstack>
         </vstack>
       );
 

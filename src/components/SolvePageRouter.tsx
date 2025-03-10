@@ -41,6 +41,7 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
             {...props}
             onNext={() => setCurrentStep('tutorial')}
             picture={pictureOptionsData}
+            onCancel={props.onCancel}
         />,
     }
 

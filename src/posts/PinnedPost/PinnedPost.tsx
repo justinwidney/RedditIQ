@@ -62,6 +62,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     )
 
     const onClose = ():void => {
+        console.log('closing')
         setPage('menu')
     }
 

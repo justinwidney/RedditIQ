@@ -7,7 +7,7 @@ import piecesData from '../data/pieces.json';
 
 export type SupportedPieces = keyof typeof Pieces;
 
-export type ChessPieceType = "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
+export type ChessPieceType = "pawn" | "rook" | "knight" | "bishop" | "queen" | "king" | "available";
 
 const Pieces: Record<ChessPieceType, PieceData> = piecesData as Record<ChessPieceType, PieceData>;
 
@@ -50,15 +50,15 @@ export function PieceSymbol({animate = false, ...props}: PieceSymbolProps): JSX.
     // Create SVG paths with multiple colors
     const pathElements = paths.map((pathData, index) => {
       // If preserveColors is false, use the provided color for all paths
-      const fillColor = pathData.color;
+
       
       return `<path
         d="${pathData.path}"
-        stroke="${fillColor}"
-        stroke-width="1"
-        fill="none"
+        stroke="${pathData.color}"
+        fill="${pathData.color}"
       />`;
     }).join('');
+
 
     const animationStyle = animate ? 
     `<style>
@@ -74,10 +74,20 @@ export function PieceSymbol({animate = false, ...props}: PieceSymbolProps): JSX.
       }
     </style>` : '';
 
-    const pathsWithAnimation = animate ? 
-    `<g class="animated">${pathElements}</g>` : 
-    pathElements;
+    const pathsWithAnimation = animate ? `<g class="animated">${pathElements}</g>` : pathElements;
 
+
+    const svgString = `<svg
+      width="${width}"
+          height="${height}"
+          viewBox="0 0 16 16"
+          xmlns="http://www.w3.org/2000/svg"
+          shape-rendering="crispEdges">
+          ${pathsWithAnimation}
+        </svg>`;
+
+        const base64Svg = btoa(svgString);
+        const svgUrl = `data:image/svg+xml;base64,${base64Svg}`;
 
   return (
     <image
@@ -86,22 +96,8 @@ export function PieceSymbol({animate = false, ...props}: PieceSymbolProps): JSX.
       height={scaledHeight}
       width={scaledWidth}
       description={type}
-      
-
-      
       resizeMode="scale-down"
-      url={`data:image/svg+xml,
-        <svg
-          width="${width}"
-          height="${height}"
-          viewBox="0 0 ${Settings.boardSize*2} ${Settings.boardSize*2}"
-          xmlns="http://www.w3.org/2000/svg"
-          shape-rendering="crispEdges"
-        >
-        ${animationStyle}
-        ${pathsWithAnimation}
-        </svg>
-      `}
+      url={svgUrl}
     />
   );
 }

@@ -4,7 +4,49 @@ import { GameSettings, PinnedPostData, PostId, PuzzlePostData, UserData, PostTyp
 
 
 export class Engine {
+    addPuzzle(difficulty: any, data: any) {
+        throw new Error('Method not implemented.');
+    }
 
+
+    
+    constructor( context: {
+        redis: RedisClient;
+        reddit?: RedditAPIClient;
+        scheduer?: any;
+    }) {
+        this.redis = context.redis;
+        this.reddit = context.reddit;
+        this.scheduer = context.scheduer;
+    }
+
+    
+
+    readonly keys = {
+        postData: (postId: PostId) => `posts:${postId}`,
+        moves: (postId: PostId) => `moves:${postId}`,
+        userData: (username: string) => `users:${username}`,
+        postSolved: (postId: PostId) => `posts:${postId}:solved`,
+        postSkipped: (postId: PostId) => `posts:${postId}:skipped`,
+        gameSettings: 'game-settings',
+        difficulties: 'difficulties',
+        puzzle: (puzzleName: string) => `puzzle:${puzzleName}`,
+        
+    }
+
+
+
+    async getPuzzlesDifficulties(): Promise<string[]> {
+
+        const data = (
+            await this.redis.zRange(this.keys.difficulties, 0, -1, {
+                by: 'rank',
+                reverse: true
+            })) ?? [];
+            
+        return data.map( (value) => value.member)
+    }
+        
 
     /* 
     * Store Settings in Redis
@@ -33,32 +75,56 @@ export class Engine {
 
     }
 
+    /*
+    * Get Post Data
+    */
+
+    async getPinnedPost(postId: PostId): Promise<PinnedPostData> {
+        
+        const key = this.keys.postData(postId);
+        const postType = await this.redis.hGet(key, "postType");
+
+        return {
+            postId: postId,
+            postType: postType ?? "pinned",
+        }
+
+
+
+    }
+
+
+
     readonly redis: RedisClient;
     readonly reddit?: RedditAPIClient
     readonly scheduer?: any;
 
 
-    constructor( context: {
-        redis: RedisClient;
-        reddit?: RedditAPIClient;
-        scheduer?: any;
-    }) {
-        this.redis = context.redis;
-        this.reddit = context.reddit;
-        this.scheduer = context.scheduer;
-    }
 
+
+
+
+
+
+    /*
+    * Save Puzzle into Redis
+    */
     
+    async savePuzzle(puzzleName: string, puzzle: number[]): Promise<void> {
 
-    readonly keys = {
-        postData: (postId: PostId) => `posts:${postId}`,
-        moves: (postId: PostId) => `moves:${postId}`,
-        userData: (username: string) => `users:${username}`,
-        postSolved: (postId: PostId) => `posts:${postId}:solved`,
-        postSkipped: (postId: PostId) => `posts:${postId}:skipped`,
-        gameSettings: 'game-settings'
-        
+        const json = JSON.stringify(puzzle);
+        const key = this.keys.puzzle(puzzleName);
+
+        await Promise.all([
+            this.redis.set(key, json),
+            this.redis.zAdd(this.keys.difficulties, {
+                member: puzzleName,
+                score: Date.now() 
+            })
+        ]);
+
     }
+
 
     /*
     * Get Puzzle Info for Board
@@ -105,21 +171,6 @@ export class Engine {
         return settings as GameSettings; 
     }
   
-
-
-    async getPinnedPost(postId: PostId): Promise<PinnedPostData> {
-        
-        const key = this.keys.postData(postId);
-        const postType = await this.redis.hGet(key, "postType");
-
-        return {
-            postId: postId,
-            postType: postType ?? "pinned",
-        }
-
-
-
-    }
 
     async getPostType(postId: PostId): Promise<PostType> {
         
