@@ -2,6 +2,11 @@ import { Context, Devvit, useState } from "@devvit/public-api";
 import { Engine } from "../engine/Engine.js"
 import { GameSettings, UserData } from "../types.js";
 import { SolvePageStep } from "./SolvePage.js";
+import { UpvotesPage } from "./Games/Upvotes.js";
+import { SubredditGuessPage } from "./Games/SubredditGuess.js";
+import { TriviaPage } from "./Games/Trivia.js";
+import { CelebPage } from "./Games/CelebGuess.js";
+import { PastaPage } from "./Games/PastaPage.js";
 
 interface SolvePageRouterProps {
     username: string | null;
@@ -32,11 +37,16 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
   
 
     const service = new Engine(context);
-    const [currentStep, setCurrentStep] = useState<string>('solve');
+    const [currentStep, setCurrentStep] = useState<string>('copyPasta');
     const [drawing, setDrawing] = useState<number[]>([]);
 
 
     const steps: Record<string, JSX.Element> = {
+        copyPasta: <PastaPage {...props} onComplete={props.onCancel} />,
+        celebGuess: <CelebPage {...props} onComplete={props.onCancel} />,
+        trivia: <TriviaPage {...props} onComplete={props.onCancel} />,
+        subredditGuess: <SubredditGuessPage {...props} onComplete={props.onCancel} />,
+        upvotes: <UpvotesPage {...props} onComplete={props.onCancel} />,
         solve: <SolvePageStep
             {...props}
             onNext={() => setCurrentStep('tutorial')}

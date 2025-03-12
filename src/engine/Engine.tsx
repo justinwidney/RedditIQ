@@ -1,9 +1,23 @@
 import {  RedditAPIClient, RedisClient, User } from "@devvit/public-api";
 import { GameSettings, PinnedPostData, PostId, PuzzlePostData, UserData, PostType } from "../types.js";
 
-
+export type ScoreBoardEntry = {
+    member: string;
+    score: number;
+    description?: string;
+  };
+  
 
 export class Engine {
+
+
+
+    static getLeaderboard( maxLength: number = 10): PromiseLike<ScoreBoardEntry[]> {
+        throw new Error("Method not implemented.");
+    }
+    static getUserScore(username: string | null):  Promise<{ rank: number; score: number; }> {
+        throw new Error("Method not implemented.");
+    }
     addPuzzle(difficulty: any, data: any) {
         throw new Error('Method not implemented.');
     }

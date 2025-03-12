@@ -16,5 +16,8 @@
         "bishop",
         "queen",
         "king"
-      ]
+      ],
+      "drawTimeEasy": 20,
+      "canvasWidth": 16,
+      "canvasHeight": 16
 }
