@@ -1,4 +1,4 @@
-import { Context, Devvit, JSONObject, useState, TextAreaWidget } from "@devvit/public-api";
+import { Context, Devvit, JSONObject, useState, TextAreaWidget, useForm } from "@devvit/public-api";
 import { UserData } from "../../types.js";
 import { CustomButton } from "../CustomButton.js";
 
@@ -65,7 +65,6 @@ export const SubredditGuessPage = (
   ]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [userInput, setUserInput] = useState("");
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -74,28 +73,11 @@ export const SubredditGuessPage = (
 
   const currentQuestion = questions[currentIndex];
 
-  const handleSubmit = () => {
-    // Clean up and normalize the input for comparison
-    const cleanedInput = userInput.trim().toLowerCase();
-    const cleanedAnswer = currentQuestion.answer.toLowerCase();
-    
-    // Check if the answer is correct
-    const correct = cleanedInput === cleanedAnswer || 
-                   `r/${cleanedInput}` === cleanedAnswer || 
-                   cleanedInput === `r/${cleanedAnswer}`;
-    
-    setIsCorrect(correct);
-    if (correct) {
-      setScore(score + 1);
-    }
-    
-    setShowResult(true);
-  };
+  
 
   const handleNextQuestion = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
-      setUserInput("");
       setShowResult(false);
       setShowHint(false);
       setHintIndex(0);
@@ -105,16 +87,48 @@ export const SubredditGuessPage = (
     }
   };
 
-  const showNextHint = () => {
-    if (hintIndex < currentQuestion.hints.length - 1) {
-      setHintIndex(hintIndex + 1);
+
+// Handle selecting an option for a blank
+const handleOptionSelect = (option : string ) => {
+
+    // Clean up and normalize the input for comparison
+    const cleanedInput = option.trim().toLowerCase();
+    const cleanedAnswer = currentQuestion.answer.toLowerCase();
+    
+    console.log(cleanedInput, cleanedAnswer);
+
+    // Check if the answer is correct
+    const correct = cleanedInput === cleanedAnswer || 
+                  `r/${cleanedInput}` === cleanedAnswer || 
+                  cleanedInput === `r/${cleanedAnswer}`;
+    
+    setIsCorrect(correct);
+    if (correct) {
+      setScore(score + 1);
     }
-    setShowHint(true);
-  };
+    
+    setShowResult(true);
+};
 
-  
+  const myForm = useForm(
+    () => {
+      return {
+        fields: [
+          {
+            type: 'string',
+            name: 'answer',
+            label: 'Pick an option',
+          },
+        ],
+   
+      } 
+    },
+    (values) => {
+      handleOptionSelect(values.answer);
+    }
+  );
 
- 
+
 
   return (
     <vstack width="100%" height="100%" padding="large" backgroundColor="#F8F9FA">
@@ -146,17 +160,8 @@ export const SubredditGuessPage = (
           width="200px"
         />
         
-        <spacer size="large" />
         
-        {showHint && (
-          <vstack padding="medium" gap="small" alignment="middle center">
-            <text weight="bold">Hint:</text>
-            {currentQuestion.hints.slice(0, hintIndex + 1).map((hint, index) => (
-              <text>{hint}</text>
-            ))}
-          </vstack>
-        )}
-        
+      
         <spacer size="medium" />
         
         {!showResult ? (
@@ -169,18 +174,13 @@ export const SubredditGuessPage = (
             </hstack>
             
             <hstack gap="medium">
-              <CustomButton
-                width="120px"
-                height="40px"
-                text="close"
-                onClick={showNextHint}
-              />
+            
               
               <CustomButton
                 width="120px"
                 height="40px"
                 text="redo"
-                onClick={handleSubmit}
+                onClick={ ()=>    context.ui.showForm(myForm)}
               />
             </hstack>
           </vstack>

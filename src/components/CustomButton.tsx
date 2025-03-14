@@ -1,6 +1,6 @@
 import { Devvit } from "@devvit/public-api";
 import { PixelSymbol, SupportedSymbols } from "./PixelSymbol.js";
-
+import Settings  from "../Settings.json"
 
 
 const styles = {
@@ -44,7 +44,7 @@ export const CustomButton = (props: ButtonProps): JSX.Element => {
 
     return (
         <hstack width={width}  height={height } alignment="center middle" gap="small" onPress={onClick} backgroundColor={style.borderColor}>
-            <hstack width="100%" height="100%" alignment="center middle" backgroundColor={style.backgroundColor} padding="small" >
+            <hstack width="100%" height="100%" alignment="center middle" backgroundColor={Settings.theme.primary} padding="small" >
 
                 {icon ? <image url="background.png" imageHeight={30} imageWidth={30}  /> : null }
                 {text ? <PixelSymbol type={text} scale={2} color={style.color} /> : null }

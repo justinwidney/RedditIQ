@@ -1,6 +1,9 @@
-import { Context, Devvit, JSONObject, useState } from "@devvit/public-api";
+import { Context, Devvit, JSONObject, useInterval, useState } from "@devvit/public-api";
 import { UserData } from "../../types.js";
 import { CustomButton } from "../CustomButton.js";
+import { PixelText } from "../PixelText.js";
+import { ProgressBar } from "../ProgressBar.js";
+import Settings from '../../Settings.json';
 
 interface UpvotesPageProps {
   onComplete: (score: number) => void;
@@ -25,6 +28,7 @@ export const UpvotesPage = (
   props: UpvotesPageProps,
   context: Context
 ): JSX.Element => {
+
   const { onComplete, onCancel, userData } = props;
   
   // Sample post comparisons - in a real app, these would come from an API or database
@@ -72,6 +76,20 @@ export const UpvotesPage = (
   const [showResults, setShowResults] = useState(false);
   const [selectedPost, setSelectedPost] = useState<'A' | 'B' | null>(null);
 
+  const [nextQuestionTime, setNextQuestionTime] = useState(100000) // Large number ;
+
+  // Timer to automatically move to the next question
+  useInterval(() => {
+
+    setNextQuestionTime( (nextQuestionTime) => nextQuestionTime - 500)
+    const remainingTime = nextQuestionTime - 500;
+    
+    if (remainingTime <= 0) {
+      handleNextQuestion();
+      setNextQuestionTime(100000);
+    }
+  }, 500).start();
+  
   const currentComparison = comparisons[currentIndex];
 
   const handleSelection = (choice: 'A' | 'B') => {
@@ -87,6 +105,8 @@ export const UpvotesPage = (
     if (correct) {
       setScore(score + 1);
     }
+
+    setNextQuestionTime(1500)
     
     setShowResults(true);
   };
@@ -105,14 +125,16 @@ export const UpvotesPage = (
   const renderPostCard = (post: PostComparison['postA'], label: string, isSelected: boolean) => {
     return (
       <vstack 
-        backgroundColor={isSelected ? "rgba(255, 140, 0, 0.2)" : "white"}
-        borderColor={isSelected ? "orange" : "none"}
+        backgroundColor={isSelected ? "rgba(255, 140, 0, 0.2)" : Settings.theme.secondary}
+        borderColor={isSelected ? "orange" : "#000000"}
         border={isSelected ? "thick" : "thin"}
-        cornerRadius="medium"
         padding="medium"
         width="48%"
         onPress={() => handleSelection(label as 'A' | 'B')}
       >
+        <PixelText scale={1} color="#000000">{post.title}</PixelText>
+        <spacer size="small" />
+        <zstack border="thin" borderColor="#000000">
         <image
           url={post.image}
           imageHeight={250}
@@ -120,7 +142,7 @@ export const UpvotesPage = (
           height="150px"
           width="100%"
         />
-        <text size="medium" weight="bold" alignment="center">{post.title}</text>
+        </zstack>
         
         {showResults && (
           <text color="gray" alignment="center">
@@ -132,23 +154,17 @@ export const UpvotesPage = (
   };
 
   return (
-    <vstack width="100%" height="100%" padding="large" backgroundColor="#F8F9FA">
-      <hstack width="100%" alignment="middle">
-        <text size="xlarge" weight="bold">Upvote Showdown</text>
-        <spacer grow />
-        <CustomButton
-          width="32px"
-          height="32px"
-          text="close"
-          onClick={onCancel}
-        />
+    <vstack width="100%" height="100%" padding="large" backgroundColor={Settings.theme.background}>
+      <hstack width="100%" alignment="middle center">
+        <PixelText scale={3}> Upvotes</PixelText>
       </hstack>
       
       <spacer size="large" />
       
-      <text alignment="center" size="large">
-        Which post received more upvotes?
-      </text>
+      <vstack alignment="center middle" >
+
+        <ProgressBar width={256} onComplete={onCancel} />
+      </vstack>
       
       <spacer size="large" />
       
@@ -176,13 +192,7 @@ export const UpvotesPage = (
               (selectedPost === 'B' && currentComparison.postB.upvotes > currentComparison.postA.upvotes)) 
               ? "Correct!" : "Wrong!"}
           </text>
-          
-          <CustomButton
-            width="150px"
-            height="40px"
-            text={currentIndex < comparisons.length - 1 ? "close" : "redo"}
-            onClick={handleNextQuestion}
-          />
+         
         </vstack>
       )}
     </vstack>

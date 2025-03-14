@@ -2,6 +2,12 @@
     "pinnedPost":{
         "title":"Chess Paint"
     },
+    "theme":{
+      "primary": "#FF9D00",
+      "secondary": "#D9D9D9",
+      "shadow": "#D9D9D9",
+      "background": "#EDECEC"
+    },
     "boardSize": 8,
     "colors": [
         "#FFFFFF",

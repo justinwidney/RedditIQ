@@ -7,6 +7,8 @@ import { SubredditGuessPage } from "./Games/SubredditGuess.js";
 import { TriviaPage } from "./Games/Trivia.js";
 import { CelebPage } from "./Games/CelebGuess.js";
 import { PastaPage } from "./Games/PastaPage.js";
+import { PixelText } from "./PixelText.js";
+import { HistorianPage } from "./Games/Historian.js";
 
 interface SolvePageRouterProps {
     username: string | null;
@@ -37,11 +39,12 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
   
 
     const service = new Engine(context);
-    const [currentStep, setCurrentStep] = useState<string>('copyPasta');
+    const [currentStep, setCurrentStep] = useState<string>('trivia');
     const [drawing, setDrawing] = useState<number[]>([]);
 
 
     const steps: Record<string, JSX.Element> = {
+        historian: <HistorianPage {...props} onComplete={props.onCancel} />,
         copyPasta: <PastaPage {...props} onComplete={props.onCancel} />,
         celebGuess: <CelebPage {...props} onComplete={props.onCancel} />,
         trivia: <TriviaPage {...props} onComplete={props.onCancel} />,
@@ -56,7 +59,12 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
     }
 
     return(
-        <vstack width="100%" height="100%">
+        <vstack width="100%" height="100%" backgroundColor="#3A3A3A">
+
+            <hstack width="100%" height="5%" backgroundColor="#D9D9D9" padding="small">
+                <PixelText color="#000000"> SnooIQ </PixelText>
+              </hstack>
+            
             {steps[currentStep] || <text>Invalid step</text>}
         </vstack>
     )
