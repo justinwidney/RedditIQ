@@ -39,7 +39,7 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
   
 
     const service = new Engine(context);
-    const [currentStep, setCurrentStep] = useState<string>('trivia');
+    const [currentStep, setCurrentStep] = useState<string>('subredditGuess');
     const [drawing, setDrawing] = useState<number[]>([]);
 
 
@@ -59,15 +59,29 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
     }
 
     return(
-        <vstack width="100%" height="100%" backgroundColor="#3A3A3A">
+      <zstack width="100%" height="100%" alignment="top start">
+         <image 
+          imageHeight={1024}
+          imageWidth={2048}
+          height="100%"
+          width="100%"
+          url="classroom.png"
+          description="custom background"
+          resizeMode="cover"  
+          />
+        <vstack width="100%" height="100%" >
 
             <hstack width="100%" height="5%" backgroundColor="#D9D9D9" padding="small">
-                <PixelText color="#000000"> SnooIQ </PixelText>
+                <PixelText color="#000000"> RedditIQ </PixelText>
               </hstack>
             
             {steps[currentStep] || <text>Invalid step</text>}
         </vstack>
+        </zstack>
+
     )
+
+   
 
 
 }

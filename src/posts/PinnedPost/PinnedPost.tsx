@@ -45,15 +45,14 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
 
             <spacer size="small"/>
 
-            <PixelText scale={2} color="#FFFFFF">Test your knowledge</PixelText>
 
             <spacer grow />
             
             <vstack alignment="center middle" gap="small">
 
-            <CustomButton onClick={() => setPage('solve')} text="Solve"  width="256px" height="48px" color="#FFFFFF"/>
+            <CustomButton onClick={() => setPage('solve')} label="Play Game"  width="256px" height="48px" color="#FFFFFF"/>
 
-            <CustomButton onClick={() => setPage('tutorial')} text="Tutorial"  width="256px" height="48px" color="#FFFFFF"/>
+            <CustomButton onClick={() => setPage('tutorial')} label="Tutorial" width="256px" height="48px" color="#FFFFFF"/>
 
             </vstack>
 

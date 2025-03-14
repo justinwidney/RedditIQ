@@ -27,16 +27,18 @@ export const OptionItem = (props: OptionItemProps) => {
         : selectedOption === index
           ? "rgba(0, 0, 255, 0.1)"  // Selected blue
           : "white";  // Default white
-  
+
+
     return (
       <vstack 
         width="50%" 
         padding="medium"
-        backgroundColor={backgroundColor}
+        backgroundColor="#24610a" 
+        borderColor="#9c5a3c"
         border="thick"
         onPress={() => onSelect(index)}
       >
-        <PixelText scale={2} color="#000000">{option}</PixelText>
+        <PixelText scale={2} color="#FFFFFF">{option}</PixelText>
       </vstack>
     );
   };

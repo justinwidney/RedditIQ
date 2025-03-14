@@ -1,6 +1,7 @@
 import { Devvit } from "@devvit/public-api";
 import { PixelSymbol, SupportedSymbols } from "./PixelSymbol.js";
 import Settings  from "../Settings.json"
+import { PixelText } from "./PixelText.js";
 
 
 const styles = {
@@ -24,13 +25,15 @@ const styles = {
 
 
 interface ButtonProps {
-    text?: SupportedSymbols;
+    text?: string;
     onClick: () => void;
     width?: Devvit.Blocks.SizeString;
     height?:  Devvit.Blocks.SizeString;
     color?: string;
     icon?: string;
     appearance?: 'primary' | 'secondary' | 'tertiary';
+    label?: string;
+
 }
 
 
@@ -38,16 +41,18 @@ interface ButtonProps {
 
 export const CustomButton = (props: ButtonProps): JSX.Element => {
 
-    const {text, onClick, width = 20, height = 20, color, icon, appearance} = props;
+    const {text, label, onClick, width = 20, height = 20, color, icon, appearance} = props;
     const style = styles[appearance || 'primary']
 
+
+    console.log(text)
 
     return (
         <hstack width={width}  height={height } alignment="center middle" gap="small" onPress={onClick} backgroundColor={style.borderColor}>
             <hstack width="100%" height="100%" alignment="center middle" backgroundColor={Settings.theme.primary} padding="small" >
 
                 {icon ? <image url="background.png" imageHeight={30} imageWidth={30}  /> : null }
-                {text ? <PixelSymbol type={text} scale={2} color={style.color} /> : null }
+                {label ? <PixelText color="#000000">{label}</PixelText> : null}
 
         </hstack>
         </hstack>   

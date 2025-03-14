@@ -1,6 +1,7 @@
 import { Context, Devvit, JSONObject, useState , useForm, FormOnSubmitEvent } from "@devvit/public-api";
 import { UserData } from "../../types.js";
 import { CustomButton } from "../CustomButton.js";
+import { ProgressBar } from "../ProgressBar.js";
 
 interface PastaPageProps {
   onComplete: (score: number) => void;
@@ -216,7 +217,7 @@ const handleOptionSelect = (option :string[] ) => {
 
   return (
     <vstack width="100%" height="100%" padding="large" backgroundColor="#F8F9FA">
-      <hstack width="100%" alignment="middle center">
+      <vstack width="100%" alignment="middle center">
       <image
                 imageHeight={64}
                 imageWidth={128}
@@ -254,9 +255,13 @@ const handleOptionSelect = (option :string[] ) => {
                         </svg>`}
                 description="chess paint logo"
                 />
-      </hstack>
+
+
+        <ProgressBar width={256} onComplete={onCancel} />
+        
+      </vstack>
       
-      
+      <spacer size="large" />
       
       <vstack 
         padding="large"
@@ -274,28 +279,20 @@ const handleOptionSelect = (option :string[] ) => {
       <spacer size="large" />
       
       {!showResult ? (
-        <CustomButton
-          width="150px"
-          height="40px"
-          text="Solve"
-          onClick={handleSubmit}
+           <vstack gap="medium" alignment="middle center">
+          <CustomButton
+            width="150px"
+            height="40px"
+            label="Submit"
+            onClick={handleSubmit}
         />
+      </vstack>
       ) : (
         <vstack gap="medium" alignment="middle center">
           <text size="medium">
             You got {correctCount} out of {currentQuestion.blanks.length} correct!
           </text>
-          
-          <text size="small" color="gray">
-            Reference: {currentQuestion.reference}
-          </text>
-          
-          <CustomButton
-            width="150px"
-            height="40px"
-            text={currentIndex < questions.length - 1 ? "redo" : "Solve"}
-            onClick={handleNextQuestion}
-          />
+        
         </vstack>
       )}
     </vstack>

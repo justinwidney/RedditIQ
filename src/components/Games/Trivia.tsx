@@ -112,7 +112,7 @@ export const TriviaPage = (
   };
 
   return (
-    <vstack width="100%" height="100%" padding = "large" backgroundColor={Settings.theme.background}>
+    <vstack width="100%" height="100%" padding = "large" >
      <hstack width="100%" alignment="middle center">
 
      <image
@@ -150,11 +150,12 @@ export const TriviaPage = (
       
       <vstack 
         padding="medium"
-        backgroundColor="white" 
+        backgroundColor="#24610a" 
+        borderColor="#9c5a3c"
         border="thick"
         width="100%"
       >
-        <PixelText scale={2} color="#000000">{currentQuestion.question}</PixelText>
+        <PixelText scale={2} color="#FFFFFF">{currentQuestion.question}</PixelText>
       </vstack>
       
       <spacer size="large" />
