@@ -25,7 +25,7 @@ const styles = {
 
 
 interface ButtonProps {
-    text?: string;
+    textSize?: number;
     onClick: () => void;
     width?: Devvit.Blocks.SizeString;
     height?:  Devvit.Blocks.SizeString;
@@ -41,18 +41,17 @@ interface ButtonProps {
 
 export const CustomButton = (props: ButtonProps): JSX.Element => {
 
-    const {text, label, onClick, width = 20, height = 20, color, icon, appearance} = props;
+    const {textSize, label, onClick, width = 20, height = 20, color, icon, appearance} = props;
     const style = styles[appearance || 'primary']
 
 
-    console.log(text)
 
     return (
         <hstack width={width}  height={height } alignment="center middle" gap="small" onPress={onClick} backgroundColor={style.borderColor}>
             <hstack width="100%" height="100%" alignment="center middle" backgroundColor={Settings.theme.primary} padding="small" >
 
                 {icon ? <image url="background.png" imageHeight={30} imageWidth={30}  /> : null }
-                {label ? <PixelText color="#000000">{label}</PixelText> : null}
+                {label ? <PixelText scale={textSize} color="#000000">{label}</PixelText> : null}
 
         </hstack>
         </hstack>   

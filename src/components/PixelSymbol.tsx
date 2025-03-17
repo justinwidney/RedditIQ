@@ -51,7 +51,6 @@ export function PixelSymbol(props: PixelSymbolProps): JSX.Element {
           <path
             d="${symbol.path}"
             fill="${color}"
-            stroke="${color}"
             fill-rule="evenodd"
             clip-rule="evenodd"
           />
