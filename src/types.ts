@@ -5,6 +5,7 @@
 */
 
 export type PostId = `t3_${string}`;
+export type usernameID = `t1_${string}`;
 
 export enum PostType {
     PUZZLE = 'Puzzle',
@@ -15,6 +16,12 @@ export type GameSettings = {
     subredditName: string;
     
 }
+
+interface PostData {
+    postId: PostId
+    postTitle: string;
+  }
+  
 
 export type UserData ={
     score: number;
@@ -37,3 +44,4 @@ export type PuzzlePostData = {
     puzzle: string;
     solution: string;
 }
+

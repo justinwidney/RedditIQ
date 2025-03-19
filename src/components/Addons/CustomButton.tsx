@@ -1,6 +1,6 @@
 import { Devvit } from "@devvit/public-api";
 import { PixelSymbol, SupportedSymbols } from "./PixelSymbol.js";
-import Settings  from "../Settings.json"
+import Settings  from "../../Settings.json"
 import { PixelText } from "./PixelText.js";
 
 

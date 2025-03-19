@@ -1,10 +1,10 @@
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
-import Settings from '../Settings.json';
+import Settings from '../../Settings.json';
 
 interface ProgressBarProps {
   width: number;
-  onComplete: () => void;
+  onComplete?: () => void;
 }
 
 export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
@@ -13,6 +13,7 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
   const [startTime] = useState(Date.now());
   const drawingTime = Settings.drawTimeEasy || 60;
   const [percentage, setPercentage] = useState<number>(0);
+  const {onComplete}  = props;
 
   useInterval(() => {
     setElapsedTime(Date.now() - startTime);
@@ -24,7 +25,7 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
     console.log(remainingPercentage);
 
 
-    if (remainingTime <= 0) props.onComplete();
+    if (remainingTime <= 0) if(onComplete) onComplete();
   }, 500).start();
 
   const barSize: Devvit.Blocks.SizePercent = `${percentage}%`;

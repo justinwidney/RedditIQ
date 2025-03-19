@@ -100,12 +100,12 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
 
         pinned:(
             <PinnedPost
-            postData ={data.postData}
-            userData ={data.userData}
-            username ={data.username}
-            gameSettings ={data.gameSettings}
-            puzzle = {data.puzzle}
-            />
+                postData={data.postData}
+                userData={data.userData}
+                username={data.username} 
+                gameSettings={{
+                    subredditName: ""
+                }}            />
         )
         }
 

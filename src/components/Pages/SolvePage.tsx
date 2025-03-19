@@ -1,11 +1,11 @@
 import { Context, Devvit, useState } from "@devvit/public-api";
-import { UserData } from "../types.js";
-import  Settings  from "../Settings.json";
-import { ChessPieceType, PieceSymbol } from "./PieceSymbol.js";
-import { CustomButton } from "./CustomButton.js";
-import { splitArray } from "../utils/utils.js";
-import { getMoves, getTraversal } from "../utils/moves.js";
-import { PixelSymbol } from "./PixelSymbol.js";
+import { UserData } from "../../types.js";
+import  Settings  from "../../Settings.json";
+import { CustomButton } from "../Addons/CustomButton.js";
+import { splitArray } from "../../utils/utils.js";
+import { getMoves, getTraversal } from "../../utils/moves.js";
+import { ChessPieceType, PieceSymbol } from "../Addons/PieceSymbol.js";
+import { PixelSymbol } from "../Addons/PixelSymbol.js";
 
 
 interface Pixel {

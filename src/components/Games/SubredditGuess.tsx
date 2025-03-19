@@ -1,14 +1,14 @@
 import { Context, Devvit, JSONObject, useState, TextAreaWidget, useForm } from "@devvit/public-api";
 import { UserData } from "../../types.js";
-import { CustomButton } from "../CustomButton.js";
-import { PixelText } from "../PixelText.js";
-import { PixelSymbol } from "../PixelSymbol.js";
-import { PieceSymbol } from "../PieceSymbol.js";
+import { CustomButton } from "../Addons/CustomButton.js";
+import { PixelText } from "../Addons/PixelText.js";
+import { PixelSymbol } from "../Addons/PixelSymbol.js";
 
 interface SubredditPageProps {
   onComplete: (score: number) => void;
   onCancel: () => void;
   userData: UserData | null;
+  setScore: ((value: number | ((prevState: number) => number)) => void);  
 }
 
 interface SubredditQuestion extends JSONObject {
@@ -39,7 +39,7 @@ export const SubredditGuessPage = (
   props: SubredditPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData } = props;
+  const { onComplete, onCancel, userData, setScore } = props;
 
   const {ui, reddit} = context;
   
@@ -68,7 +68,6 @@ export const SubredditGuessPage = (
   ]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -86,7 +85,7 @@ export const SubredditGuessPage = (
       setHintIndex(0);
     } else {
       // We've reached the end of the questions
-      onComplete(score);
+      onComplete(0);
     }
   };
 
@@ -107,7 +106,8 @@ const handleOptionSelect = (option : string ) => {
     
     setIsCorrect(correct);
     if (correct) {
-      setScore(score + 1);
+      setScore(prevScore => prevScore + 1);
+      onComplete(0)
     }
     
     setShowResult(true);

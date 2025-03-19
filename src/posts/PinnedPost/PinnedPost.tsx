@@ -1,18 +1,22 @@
 import { Context, useState, Devvit, useAsync } from "@devvit/public-api";
-import { TutorialPage } from "../../components/TutorialPage.js";
-import { CustomButton } from "../../components/CustomButton.js";
-import { PixelSymbol } from "../../components/PixelSymbol.js";
-import { SolvePageStep } from "../../components/SolvePage.js";
-import { SolvePageRouter } from "../../components/SolvePageRouter.js";
-import { GameSettings, UserData } from "../../types.js";
-import { PixelText } from "../../components/PixelText.js";
+import { TutorialPage } from "../../components/Pages/TutorialPage.js";
+import { CustomButton } from "../../components/Addons/CustomButton.js";
 
+import { SolvePageRouter } from "../../components/SolvePageRouter.js";
+import { GameSettings, PostId, PuzzlePostData, UserData } from "../../types.js";
+import { Engine } from "../../engine/Engine.js";
+
+
+type PostData = {
+    postId: PostId;
+    postType: string;
+  };
+  
 interface PinnedPostProps {
-    postData: Record<string, any>;
+    postData: PostData
     userData: UserData | null;
     username: string | null;
     gameSettings: GameSettings;
-    puzzle: Record<string, any> | null;
 }
 
 
@@ -20,9 +24,20 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
 
     const [page, setPage] = useState('menu')
 
+    const engine = new Engine(context);
 
+
+    const { data: user, loading } = useAsync<{
+        rank: number;
+        score: number;
+      }>(async () => {
+        return await engine.getUserScore(props.username);
+      });
     
-
+      if (user === null || loading) {
+        return <> loading ...</>
+      }
+    
 
 
 
@@ -70,7 +85,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
     const pages: Record<string, JSX.Element> = {
         menu: Menu,
         tutorial : <TutorialPage onClose={onClose} />,
-        solve: <SolvePageRouter {...props} onCancel={onClose}/>
+        solve: <SolvePageRouter {...props} onCancel={onClose} />
     }
 
 

@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-import Glyphs from '../data/glyphs.json';
-import Settings from '../Settings.json';
+import Glyphs from '../../data/glyphs.json';
+import Settings from '../../Settings.json';
 
 type SupportedGlyphs = keyof typeof Glyphs;
 

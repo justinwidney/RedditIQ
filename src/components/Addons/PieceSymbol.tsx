@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-import Settings from '../Settings.json';
-import piecesData from '../data/pieces.json';
+import Settings from '../../Settings.json';
+import piecesData from '../../data/pieces.json';
 
 
 

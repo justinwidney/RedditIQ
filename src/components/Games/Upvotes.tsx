@@ -1,14 +1,16 @@
 import { Context, Devvit, JSONObject, useInterval, useState } from "@devvit/public-api";
 import { UserData } from "../../types.js";
-import { CustomButton } from "../CustomButton.js";
-import { PixelText } from "../PixelText.js";
-import { ProgressBar } from "../ProgressBar.js";
+
 import Settings from '../../Settings.json';
+import { PixelText } from "../Addons/PixelText.js";
+import { ProgressBar } from "../Addons/ProgressBar.js";
 
 interface UpvotesPageProps {
   onComplete: (score: number) => void;
   onCancel: () => void;
   userData: UserData | null;
+  setScore: ((value: number | ((prevState: number) => number)) => void);
+
 }
 
 interface PostComparison extends JSONObject {
@@ -29,7 +31,7 @@ export const UpvotesPage = (
   context: Context
 ): JSX.Element => {
 
-  const { onComplete, onCancel, userData } = props;
+  const { onComplete, onCancel, userData, setScore } = props;
   
   // Sample post comparisons - in a real app, these would come from an API or database
   const [comparisons] = useState<PostComparison[]>([
@@ -72,7 +74,6 @@ export const UpvotesPage = (
   ]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [score, setScore] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [selectedPost, setSelectedPost] = useState<'A' | 'B' | null>(null);
 
@@ -103,7 +104,7 @@ export const UpvotesPage = (
       (choice === 'B' && postBUpvotes > postAUpvotes);
     
     if (correct) {
-      setScore(score + 1);
+      setScore(prevScore => prevScore + 1);
     }
 
     setNextQuestionTime(1500)
@@ -118,7 +119,7 @@ export const UpvotesPage = (
       setSelectedPost(null);
     } else {
       // We've reached the end of the questions
-      onComplete(score);
+      onComplete(0);
     }
   };
 

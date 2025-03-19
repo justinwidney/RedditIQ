@@ -1,15 +1,17 @@
 import { Context, Devvit, JSONObject, useInterval, useState } from "@devvit/public-api";
 import { UserData } from "../../types.js";
-import { CustomButton } from "../CustomButton.js";
+import { CustomButton } from "../Addons/CustomButton.js";
 import { OptionItem } from "./TriviaOption.js";
-import { PixelText } from "../PixelText.js";
-import { ProgressBar } from "../ProgressBar.js";
+
 import Settings from '../../Settings.json';
+import { ProgressBar } from "../Addons/ProgressBar.js";
+import { PixelText } from "../Addons/PixelText.js";
 
 interface TriviaPageProps {
-  onComplete: (score: number) => void;
+  onComplete: (score:number) => void;
   onCancel: () => void;
   userData: UserData | null;
+  setScore: ((value: number | ((prevState: number) => number)) => void);
 }
 
 interface TriviaQuestion extends JSONObject {
@@ -22,7 +24,7 @@ export const TriviaPage = (
   props: TriviaPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData } = props;
+  const { onComplete, onCancel, userData, setScore } = props;
   
   // Sample trivia questions
   const [questions] = useState<TriviaQuestion[]>([
@@ -55,7 +57,6 @@ export const TriviaPage = (
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15); // 15 seconds per question
   const [timerActive, setTimerActive] = useState(true);
@@ -77,22 +78,22 @@ export const TriviaPage = (
 
 
   const handleOptionSelect = (index: number) => {
-    
-    if (!showResult) {
-      setSelectedOption(index);
-    }
 
-    handleSubmit();
-    setNextQuestionTime(1000)
+    console.log("Option Selected: ", index);
+
+    setSelectedOption(index);
+    
+    handleSubmit(index);
+    setNextQuestionTime(1500)
 
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (index:number) => {
     setTimerActive(false);
-    
+
     // Check if the answer is correct
-    if (selectedOption === currentQuestion.correctAnswer) {
-      setScore(score + 1);
+    if (index === currentQuestion.correctAnswer) {
+      setScore( prev => prev + 1);
     }
     
     setShowResult(true);
@@ -107,7 +108,7 @@ export const TriviaPage = (
       setTimerActive(true);
     } else {
       // We've reached the end of the questions
-      onComplete(score);
+      onComplete(0);
     }
   };
 

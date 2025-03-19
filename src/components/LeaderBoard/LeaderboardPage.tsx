@@ -1,5 +1,5 @@
 import { Devvit, Context, useAsync } from "@devvit/public-api";
-import { CustomButton } from "../CustomButton.js";
+import { CustomButton } from "../Addons/CustomButton.js";
 import { PixelSymbol } from "../PixelSymbol.js";
 import { Engine } from "../../engine/Engine.js";
 import { LeaderboardRow } from "./LeaderBoardRow.js";

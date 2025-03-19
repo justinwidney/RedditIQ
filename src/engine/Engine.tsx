@@ -1,5 +1,8 @@
-import {  RedditAPIClient, RedisClient, User } from "@devvit/public-api";
-import { GameSettings, PinnedPostData, PostId, PuzzlePostData, UserData, PostType } from "../types.js";
+import {  RedditAPIClient, RedisClient, Scheduler, User } from "@devvit/public-api";
+import { GameSettings, PinnedPostData, PostId, PuzzlePostData, UserData, PostType, usernameID } from "../types.js";
+import Settings from "../Settings.json"
+import { PostData } from "../components/SolvePageRouter.js";
+import { Devvit } from '@devvit/public-api';
 
 export type ScoreBoardEntry = {
     member: string;
@@ -10,33 +13,25 @@ export type ScoreBoardEntry = {
 
 export class Engine {
 
+    readonly redis: RedisClient;
+    readonly reddit?: RedditAPIClient
+    readonly scheduler?: Scheduler;
 
-
-    static getLeaderboard( maxLength: number = 10): PromiseLike<ScoreBoardEntry[]> {
-        throw new Error("Method not implemented.");
-    }
-    static getUserScore(username: string | null):  Promise<{ rank: number; score: number; }> {
-        throw new Error("Method not implemented.");
-    }
-    addPuzzle(difficulty: any, data: any) {
-        throw new Error('Method not implemented.');
-    }
-
-
-    
     constructor( context: {
         redis: RedisClient;
         reddit?: RedditAPIClient;
-        scheduer?: any;
+        scheduler?: Scheduler;
     }) {
         this.redis = context.redis;
         this.reddit = context.reddit;
-        this.scheduer = context.scheduer;
+        this.scheduler = context.scheduler;
     }
 
-    
+    readonly tags = {
+        scores: 'default',
+      };
 
-    readonly keys = {
+      readonly keys = {
         postData: (postId: PostId) => `posts:${postId}`,
         moves: (postId: PostId) => `moves:${postId}`,
         userData: (username: string) => `users:${username}`,
@@ -45,8 +40,159 @@ export class Engine {
         gameSettings: 'game-settings',
         difficulties: 'difficulties',
         puzzle: (puzzleName: string) => `puzzle:${puzzleName}`,
-        
+        postUserGuessCounter: (postId: PostId) => `user-guess-counter:${postId}`,
+        scores: `score:${this.tags.scores}`,
+        guessScores: (postId: string) => `post:${postId}:guessScores`
     }
+
+
+    // Return Completed Play Counts
+
+    async getPlayerCount(postId: PostId): Promise<number> {
+
+        console.log("Getting Player Count");
+        const key = this.keys.postUserGuessCounter(postId);
+        return await this.redis.zCard(key);
+      }
+      
+      /***
+       * 
+       *  Get the gueses for a post 
+       * 
+       */
+
+
+      async saveGuessScore(postId: PostId, guess: string, username: string): Promise<void> {
+        await this.redis.hSet(this.keys.guessScores(postId), { [username]: guess });
+    }
+
+      
+      async getGuessScores(postId: PostId): Promise<{ [guess: string]: string[] }> {
+        const key = this.keys.guessScores(postId);
+        const data = await this.redis.hGetAll(key);
+
+        console.log(data, "Data for guesses");
+
+        const parsedData: { [guess: string]: usernameID[] } = {};
+        Object.entries(data).forEach(([guess, commentId]) => {
+          if (!parsedData[guess]) {
+            parsedData[guess] = [];
+          }
+          parsedData[guess].push(commentId as usernameID);
+        });
+    
+        return parsedData;
+      }
+  
+      
+      async getGuessScore(postId: PostId, username: string): Promise<string | undefined> {
+        const key = this.keys.guessScores(postId);
+        return await this.redis.hGet(key, username);
+    }
+    
+
+
+
+
+      
+
+      async submitGuess(event: {
+        postData: PostData ;
+        username: string;
+        guess: string;
+      }): Promise<number> {
+
+        if (!this.reddit || !this.scheduler) {
+          console.error('Reddit API client or Scheduler not available in Service');
+          return 0;
+        }
+
+            // Increment the user's guess count
+            this.redis.zIncrBy(
+              this.keys.postUserGuessCounter(event.postData.postId),
+              event.username, // Member
+              1, // Score increment
+            )
+                
+          
+          const userPoints = 1;
+
+           this.redis.zAdd(this.keys.postSolved(event.postData.postId), {
+              member: event.username,
+              score: Date.now(),
+           })
+      
+
+            this.incrementUserScore(event.username, userPoints)
+       
+
+          this.saveGuessScore(event.postData.postId, event.guess, event.username);
+
+
+        //await Promise.all(promises);
+
+
+        return userPoints;
+      }
+
+
+      async incrementUserScore(username: string, amount: number): Promise<number> {
+
+      if (this.scheduler === undefined) {
+        console.error('Scheduler not available in Service');
+        return 0;
+      }
+      const key = this.keys.scores;
+      //const prevScore = (await this.redis.zScore(key, username)) ?? 0;
+      const nextScore = await this.redis.zIncrBy(key, username, amount)
+     
+  
+      return nextScore;
+    }
+
+
+
+
+
+
+    static getLeaderboard( maxLength: number = 10): PromiseLike<ScoreBoardEntry[]> {
+        throw new Error("Method not implemented.");
+    }
+
+
+    async getUserScore(username: string | null): Promise<{
+        rank: number;
+        score: number;
+      }> {
+        const defaultValue = { rank: -1, score: 0 };
+        if (!username) return defaultValue;
+        try {
+          const [rank, score] = await Promise.all([
+  
+            this.redis.zRank(this.keys.scores, username),
+            // TODO: Remove .zScore when .zRank supports the WITHSCORE option
+            this.redis.zScore(this.keys.scores, username),
+          ]);
+          return {
+            rank: rank === undefined ? -1 : rank,
+            score: score === undefined ? 0 : score,
+          };
+        } catch (error) {
+          if (error) {
+            console.error('Error fetching user score board entry', error);
+          }
+          return defaultValue;
+        }
+      }
+
+
+    addPuzzle(difficulty: any, data: any) {
+        throw new Error('Method not implemented.');
+    }
+
+
+    
+
 
 
 
@@ -106,13 +252,6 @@ export class Engine {
 
 
     }
-
-
-
-    readonly redis: RedisClient;
-    readonly reddit?: RedditAPIClient
-    readonly scheduer?: any;
-
 
 
 

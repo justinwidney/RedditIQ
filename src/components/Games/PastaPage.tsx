@@ -1,12 +1,13 @@
 import { Context, Devvit, JSONObject, useState , useForm, FormOnSubmitEvent } from "@devvit/public-api";
 import { UserData } from "../../types.js";
-import { CustomButton } from "../CustomButton.js";
-import { ProgressBar } from "../ProgressBar.js";
+import { CustomButton } from "../Addons/CustomButton.js";
+import { ProgressBar } from "../Addons/ProgressBar.js";
 
 interface PastaPageProps {
   onComplete: (score: number) => void;
   onCancel: () => void;
   userData: UserData | null;
+  setScore: ((value: number | ((prevState: number) => number)) => void);
 }
 
 interface PastaQuestion extends JSONObject{
@@ -20,7 +21,7 @@ export const PastaPage = (
   props: PastaPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData } = props;
+  const { onComplete, onCancel, userData, setScore } = props;
   
   // Sample reddit pasta questions with blanks
   const [questions] = useState<PastaQuestion[]>([
@@ -59,7 +60,6 @@ export const PastaPage = (
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInputs, setUserInputs] = useState<string[]>(Array(questions[0].blanks.length).fill(""));
-  const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [activeBlankIndex, setActiveBlankIndex] = useState<number | null>(null);
@@ -77,16 +77,13 @@ export const PastaPage = (
     });
     
     setCorrectCount(correct);
-    
-    // Award points based on percentage correct
-    const percentCorrect = correct / currentQuestion.blanks.length;
-    if (percentCorrect >= 0.75) {
-      setScore(score + 1); // Full point if 75%+ correct
-    } else if (percentCorrect >= 0.5) {
-      setScore(score + 0.5); // Half point if 50%+ correct
-    }
-    
+
+    let pointsEarned = (3 / currentQuestion.blanks.length) * correct
+    setScore(prevScore => prevScore + pointsEarned);
+    onComplete(0);
+
     setShowResult(true);
+
   };
 
   const handleNextQuestion = () => {
@@ -257,7 +254,7 @@ const handleOptionSelect = (option :string[] ) => {
                 />
 
 
-        <ProgressBar width={256} onComplete={onCancel} />
+        <ProgressBar width={256}  />
         
       </vstack>
       

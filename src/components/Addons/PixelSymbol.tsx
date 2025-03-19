@@ -15,7 +15,7 @@ export type SupportedSymbols = keyof typeof Symbols
 
 
 import { Devvit } from "@devvit/public-api";
-import Symbols from "../data/Symbols.json"
+import Symbols from "../../data/Symbols.json"
 
 export function PixelSymbol(props: PixelSymbolProps): JSX.Element {
 
