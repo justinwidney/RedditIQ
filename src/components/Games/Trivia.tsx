@@ -1,14 +1,14 @@
 import { Context, Devvit, JSONObject, useInterval, useState } from "@devvit/public-api";
-import { UserData } from "../../types.js";
-import { CustomButton } from "../Addons/CustomButton.js";
+import { GameProps, GameScore, UserData } from "../../types.js";
 import { OptionItem } from "./TriviaOption.js";
 
 import Settings from '../../Settings.json';
 import { ProgressBar } from "../Addons/ProgressBar.js";
 import { PixelText } from "../Addons/PixelText.js";
+import { indexToLetter } from "../../utils/utils.js";
 
 interface TriviaPageProps {
-  onComplete: (score:number) => void;
+  onComplete: () => void;
   onCancel: () => void;
   userData: UserData | null;
   setScore: ((value: number | ((prevState: number) => number)) => void);
@@ -21,10 +21,10 @@ interface TriviaQuestion extends JSONObject {
 }
 
 export const TriviaPage = (
-  props: TriviaPageProps,
+  props: GameProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess } = props;
   
   // Sample trivia questions
   const [questions] = useState<TriviaQuestion[]>([
@@ -55,11 +55,13 @@ export const TriviaPage = (
     }
   ]);
 
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15); // 15 seconds per question
   const [timerActive, setTimerActive] = useState(true);
+  const [submitted, setSubmitted] = useState(false);
 
   const currentQuestion = questions[currentIndex];
   const [nextQuestionTime, setNextQuestionTime] = useState(10000);
@@ -79,13 +81,14 @@ export const TriviaPage = (
 
   const handleOptionSelect = (index: number) => {
 
-    console.log("Option Selected: ", index);
+    if (!submitted){  
+      setSelectedOption(index);
+      handleSubmit(index);
+      setNextQuestionTime(1500)
+      setUserGuess(prevState => [...prevState, indexToLetter(index) as GameScore])
+    }
 
-    setSelectedOption(index);
-    
-    handleSubmit(index);
-    setNextQuestionTime(1500)
-
+    setSubmitted(true);
   };
 
   const handleSubmit = (index:number) => {
@@ -99,6 +102,17 @@ export const TriviaPage = (
     setShowResult(true);
   };
 
+
+  const onFinish = () => {
+
+      for(let i = 0; i < currentIndex-questions.length; i++){
+        setUserGuess(prevState => [...prevState, "N" as GameScore])
+      }
+      
+      onComplete();
+  }
+
+
   const handleNextQuestion = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex( (currentIndex) => currentIndex + 1);
@@ -106,9 +120,10 @@ export const TriviaPage = (
       setShowResult(false);
       setTimeLeft(15);
       setTimerActive(true);
+      setSubmitted(false);
     } else {
       // We've reached the end of the questions
-      onComplete(0);
+      onFinish();
     }
   };
 
@@ -121,7 +136,7 @@ export const TriviaPage = (
                 imageWidth={128}
                 width="256px"
                 height="128px"
-     url={`data:image/svg+xml,
+                url={`data:image/svg+xml,
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 128 64" shape-rendering="crispEdges">
                     <path stroke="#4a2b0a" d="M35 7h4M35 8h4M31 9h5M38 9h3M31 10h4M39 10h2M27 11h5M40 11h3M27 12h4M40 12h3M23 13h5M42 13h3M23 14h4M43 14h2M19 15h5M44 15h3M19 16h4M45 16h2M15 17h5M46 17h3M15 18h4M47 18h2M11 19h5M48 19h3M11 20h4M49 20h2M7 21h5M49 21h4M7 22h4M49 22h4M5 23h3M51 23h4M5 24h2M51 24h4M5 25h2M53 25h2M5 26h2M53 26h2M5 27h2M5 28h2M5 29h2M5 30h2M5 31h2M5 32h2M5 33h2M5 34h2M5 35h2M53 35h2M5 36h2M53 36h2M5 37h2M49 37h4M5 38h2M49 38h4M5 39h2M45 39h4M5 40h2M45 40h4M5 41h2M41 41h4M5 42h3M41 42h4M7 43h2M37 43h4M8 44h1M37 44h4M9 45h2M33 45h4M9 46h2M33 46h4M11 47h2M29 47h4M11 48h2M29 48h4M13 49h2M25 49h4M13 50h2M25 50h4M15 51h10M15 52h10" />
                     <path stroke="#5e350b" d="M36 9h2M35 10h4M32 11h8M31 12h9M28 13h14M27 14h16M24 15h20M23 16h22M20 17h26M19 18h28M16 19h32M15 20h34M12 21h37M11 22h38M8 23h43M7 24h44M7 25h46M7 26h46M9 27h42M9 28h42M9 29h38M9 30h38M11 31h32M11 32h32M13 33h26M13 34h26M15 35h20M15 36h20M15 37h16M15 38h16M17 39h10M17 40h10M19 41h4M19 42h4" />
@@ -141,7 +156,7 @@ export const TriviaPage = (
       
       <vstack alignment="center middle" >
 
-        <ProgressBar width={256} onComplete={onCancel} />
+        <ProgressBar width={256} onComplete={onFinish} />
       </vstack>
       
       

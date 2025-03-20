@@ -1,22 +1,54 @@
 import { Context, Devvit, useAsync, useState } from "@devvit/public-api";
 import { PixelText } from "../Addons/PixelText.js";
 import { Engine } from "../../engine/Engine.js";
-import { PostId, PuzzlePostData } from "../../types.js";
 import { PostData } from "../SolvePageRouter.js";
+import { abbreviateNumber, calculateScore } from "../../utils/utils.js";
+import Settings from "../../Settings.json";
 
 
 
+
+function processGuessData(guesses: { [guess: string]: string[] }) {
+  const total = Object.keys(guesses).length;
+  const groups: Record<number, ScoreGroup> = {};
+
+  // Process guesses and group by score
+  Object.entries(guesses).forEach(([username, guessArray]) => {
+    if (!guessArray || !guessArray.length) return;
+
+    const sep = guessArray[0].split(',');
+    const score = calculateScore(sep);
+    
+    if (!groups[score]) {
+      groups[score] = { count: 0, answers: [] };
+    }
+    
+    groups[score].count++;
+    groups[score].answers.push({ username, guessString: guessArray[0] });
+  });
+  
+  // Sort scores in descending order
+  const sorted = Object.keys(groups)
+    .map(Number)
+    .sort((a, b) => b - a);
+  
+  return { scoreGroups: groups, sortedScores: sorted, totalGuesses: total };
+}
+
+
+
+interface ScoreGroup {
+  count: number;
+  answers: Array<{
+    username: string;
+    guessString: string;
+  }>;
+}
 
 interface StatsPageProps {
   postData: PostData;
-  username: any;
+  username: string;
   puzzleName: string;
-  playerCount: number;
-  scoreBuckets: {
-    label: string;
-    count: number;
-    maxCount: number;
-  }[];
   onBack: () => void;
 }
 
@@ -24,15 +56,12 @@ export const StatsPage = (
   props: StatsPageProps,
   context: Context
 ): JSX.Element => {
-  const { puzzleName, scoreBuckets, onBack } = props;
-  
-  // Calculate the maximum width for the progress bars
-  const maxBarWidth = 300;
 
+  const { puzzleName,  onBack } = props;
+  const engine = new Engine(context);
+  const rowCount = 6;
 
-
-  const service = new Engine(context);
-
+  const rowHeight: Devvit.Blocks.SizeString = `${100 / rowCount}%`;
 
   const { data, loading } = useAsync<{
     playerCount: number;
@@ -44,14 +73,11 @@ export const StatsPage = (
 
     if (!props.username) return empty;
 
-    console.log("starting to get data")
-
-
     try {
 
-      const players = await service.getPlayerCount(props.postData.postId);
-      const guessScores = await service.getGuessScores(props.postData.postId);
-      const userGuess = await service.getGuessScore(props.postData.postId, props.username)
+      const players = await engine.getPlayerCount(props.postData.postId);
+      const guessScores = await engine.getGuessScores(props.postData.postId);
+      const userGuess = await engine.getGuessScore(props.postData.postId, props.username)
 
       return {
         playerCount: players,
@@ -73,12 +99,60 @@ export const StatsPage = (
   }
 
   
-
-  const playerCount =  data.playerCount 
-
-  console.log(data);
+  console.log(data.guesses)
 
   
+  const { scoreGroups, sortedScores, totalGuesses } = processGuessData(data.guesses);
+
+  // Create score visualization components
+  const topGuesses = sortedScores.map((score, index) => {
+    const group = scoreGroups[score];
+    const count = group.count;
+    const percentage = Math.round((count / totalGuesses) * 100) || 0;
+    
+    return (
+      <zstack
+        key={`score-${index}`}
+        height={rowHeight}
+        width="100%"
+        alignment="top start"
+        backgroundColor="rgba(255, 255, 255, 0.2)"
+      >
+        {/* Progress Bar */}
+        <hstack width={`${percentage}%`} height="100%" backgroundColor="white" />
+        {/* Score */}
+        <hstack height="100%" width="100%" alignment="start middle">
+          <spacer width="12px" />
+          <PixelText
+            color={Settings.theme.primary}
+            scale={2}
+          >
+            {score.toLocaleString()}
+          </PixelText>
+        </hstack>
+        {/* Metadata */}
+        <hstack height="100%" width="100%" alignment="end middle">
+          <PixelText scale={1.5} color={Settings.theme.secondary}>
+            {count.toString()}
+          </PixelText>
+          <spacer width="12px" />
+          <PixelText scale={2} color={Settings.theme.primary}>
+            {`${percentage}%`}
+          </PixelText>
+          <spacer width="12px" />
+        </hstack>
+      </zstack>
+    );
+  });
+
+
+  const placeholderRows = Array.from({ length: rowCount - 0 }).map(
+    (_value, _index) => (
+      <zstack height={rowHeight} width="100%" backgroundColor="rgba(255, 255, 255, 0.2)" />
+    )
+  );
+
+
   return (
     <vstack width="100%" height="100%" padding="medium" backgroundColor="#2ecc71" alignment="center top" gap="medium">
       {/* Header with puzzle name */}
@@ -87,80 +161,28 @@ export const StatsPage = (
         <PixelText scale={1.5} color="white">Statistics</PixelText>
       </vstack>
       
-      {/* Container for score distribution */}
-      <vstack 
-        width="80%" 
-        padding="large" 
-        backgroundColor="white" 
-        cornerRadius="medium" 
-        border="thick" 
-        borderColor="black"
-        gap="medium"
-        alignment="middle center"
-      >
-        <PixelText scale={1.5} color="black">Score Distribution</PixelText>
-        
-        <spacer size="small" />
-        
-        {/* Score buckets with progress bars */}
-        {scoreBuckets.map((bucket, index) => {
-          // Calculate the width of this particular progress bar
-          const percentage = bucket.count / bucket.maxCount;
-          const barWidth = Math.max(10, Math.floor(percentage * maxBarWidth));
-          
-          return (
-            <hstack width="100%" gap="medium" alignment="start middle">
-              {/* Label for the score range */}
-              <hstack width="80px" alignment="end middle">
-                <text>{bucket.label}</text>
-              </hstack>
-              
-              {/* Progress bar container */}
-              <hstack width={`${maxBarWidth}px`} height="25px" alignment="start middle">
-                <hstack 
-                  width={`${barWidth}px`} 
-                  height="100%" 
-                  backgroundColor="#3498db" 
-                  cornerRadius="small"
-                  alignment="end middle"
-                  padding="xsmall"
-                >
-                  {barWidth > 30 && (
-                    <text size="small" color="white">
-                      {bucket.count}
-                    </text>
-                  )}
-                </hstack>
-                
-                {barWidth <= 30 && (
-                  <text size="small" color="black" >
-                    {bucket.count}
-                  </text>
-                )}
-              </hstack>
-            </hstack>
-          );
-        })}
-      </vstack>
-      
-      {/* Player count information */}
-      <vstack 
-        width="80%" 
-        padding="large" 
-        backgroundColor="white" 
-        cornerRadius="medium" 
-        border="thick" 
-        borderColor="black"
-        alignment="middle center"
-      >
-        <PixelText scale={1.5} color="black">
-          {playerCount.toLocaleString()}
-        </PixelText>
-        <text size="large">players have attempted this puzzle</text>
-      </vstack>
-      
+        <hstack width="100%" grow>
+          <spacer width="24px" />
+          <vstack grow gap="small">
+            {topGuesses}
+            {placeholderRows}
+          </vstack>
+          <spacer width="24px" />
+        </hstack>
 
+        <spacer height="24px" />
+
+        {/* Metadata */}
+        <hstack alignment="middle center">
+          <PixelText
+            scale={1.5}
+            color={Settings.theme.secondary}
+          >{`${abbreviateNumber(data.playerCount)} player${data.playerCount === 1 ? '' : 's'}`}
+          </PixelText>
+        </hstack>
     </vstack>
   );
 };
+
+
 

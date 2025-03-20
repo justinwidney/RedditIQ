@@ -1,6 +1,6 @@
 import { Context, Devvit, useState } from "@devvit/public-api";
 import { Engine } from "../engine/Engine.js"
-import { GameSettings, PostId, PuzzlePostData, UserData } from "../types.js";
+import { CompositeScore, GameScore, GameSettings, GradedScore, PostId, PuzzlePostData, UserData } from "../types.js";
 import { SolvePageStep } from "./Pages/SolvePage.js";
 import { UpvotesPage } from "./Games/Upvotes.js";
 import { SubredditGuessPage } from "./Games/SubredditGuess.js";
@@ -11,6 +11,7 @@ import { HistorianPage } from "./Games/Historian.js";
 import { PageCarousel } from "./RandomizePage.js";
 import { PixelText } from "./Addons/PixelText.js";
 import { StatsPage } from "./Pages/ScorePage.js";
+import { formatCompositeScore } from "../utils/utils.js";
 
 
 export interface PostData {
@@ -24,82 +25,87 @@ interface SolvePageRouterProps {
     userData: UserData | null;
     onCancel: () => void;
     postData: PostData;
+    questions: string;
   }
 
+
+/**
+ * Router component that manages game flow between different mini-games
+ */
 export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): JSX.Element => {
 
-    const [stepList] = useState<number[]>([1,1])
-    const [score, setScore] = useState<number>(0)
+    const questionList = props.questions.split(',').map(Number)
 
-    const postId = props.postData.postId;
-    const isSolved = !!props.userData?.solved;
+    const [stepList] = useState<number[]>(questionList.length > 0 ? questionList : [0,1,2,3,4,5])
+    const [score, setScore] = useState<number>(0)
+    const [userGuess, setUserGuess] = useState<GameScore[]>([]);
+    const [targetIndex, setTargetIndex] = useState<number>(0);
+    const [currentStep, setCurrentStep] = useState<string>('randomize');
 
     const engine = new Engine(context);
 
-
-
-    const guess = "A,A,A,B,C,D"
-
+    // id Values
+    const postId = props.postData.postId;
+    const isSolved = !!props.userData?.solved;
+    const isLastQuestion = targetIndex >= stepList.length;
 
     const onCompleteRandomize = (pageName:string) => {
       setCurrentStep(pageName)
       setTargetIndex(targetIndex + 1)
-
-
-
     }
 
 
-    async function onGuessHandler(guess: string, ): Promise<void> {
+    async function onGuessHandler(guess: GameScore | GameScore[]): Promise<void> {
       if (!props.postData || !props.username) {
-        return;
+          return;
       }
-  
-      // Submit guess to the server
-      const points = await engine.submitGuess({
-        postData: props.postData,
-        username: props.username,
-        guess,
-      });
-  
-      setCurrentStep('score');
-    
+      
+      try {
+        // Ensure guess is an array before formatting
+        const guessArray = Array.isArray(guess) ? guess : [guess];
+        const userGuess = formatCompositeScore(guessArray);
+        
+        const points = await engine.submitGuess({
+            postData: props.postData,
+            username: props.username,
+            guess: userGuess,
+        });
+     
+        props.onCancel();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
+    const onCompletePage = async (): Promise<void> => {
+
+      // Game OVER
+      if(isLastQuestion) {
+          if (props.username) {
+              const guessToSubmit = Array.isArray(userGuess) ? userGuess : [userGuess];
+              await onGuessHandler(guessToSubmit);
+          }
+      } else {
+          setCurrentStep('randomize');
+      }
     }
 
 
-    const onCompletePage = async (calcScore:number) =>{
 
-      if(targetIndex >= stepList.length ){
-
-        if (props.username){
-            await onGuessHandler(guess)
-        }
-
-      }
-
-      else {
-      setScore(score + calcScore)
-      setCurrentStep('randomize')
-      }
-    }
-
-
-    const [targetIndex, setTargetIndex] = useState<number>(0);
-
-    const [currentStep, setCurrentStep] = useState<string>('randomize');
 
 
     const steps: Record<string, JSX.Element> = {
-        historian: <HistorianPage {...props} onComplete={onCompletePage} setScore={setScore} />,
-        copyPasta: <PastaPage {...props} onComplete={onCompletePage} setScore={setScore} />,
-        celebGuess: <CelebPage {...props} onComplete={onCompletePage} setScore={setScore} />,
-        trivia: <TriviaPage {...props} onComplete={onCompletePage} setScore={setScore}  />,
-        subredditGuess: <SubredditGuessPage {...props} onComplete={onCompletePage} setScore={setScore}/>,
-        upvotes: <UpvotesPage {...props} onComplete={onCompletePage} setScore={setScore} />,
-        randomize: <PageCarousel {...props} onComplete={onCompleteRandomize} targetPageIndex={stepList[targetIndex]}/>,
-        score: <StatsPage puzzleName={"Puzzle #1"} playerCount={25} scoreBuckets={[]} onBack={function (): void {
-          throw new Error("Function not implemented.");
-        } } {...props} />
+      // GAMES
+      celebGuess: <CelebPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
+      trivia: <TriviaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
+      subredditGuess: <SubredditGuessPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
+      copyPasta: <PastaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
+      upvotes: <UpvotesPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
+      historian: <HistorianPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
+ 
+      // RANDOMIZER
+      randomize: <PageCarousel {...props} onComplete={onCompleteRandomize} targetPageIndex={stepList[targetIndex]}/>,
     }
 
     return(
@@ -135,7 +141,12 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
 
               </hstack>
             
-            {steps[currentStep] || <text>Invalid step</text>}
+            {steps[currentStep] 
+            ||   
+            <vstack alignment="center middle">
+             <PixelText color="#000000">Invalid game step</PixelText>
+            </vstack>}
+            
         </vstack>
         </zstack>
 

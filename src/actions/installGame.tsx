@@ -37,6 +37,7 @@ export const installGame: MenuItem = {
             service.createPinnedPost(post.id),
             service.storeGameSettings({
                 subredditName: community.name,
+                questions: Settings.questions,
             } as GameSettings),
             ui.navigateTo(post),
             ui.showToast("Game Installed")

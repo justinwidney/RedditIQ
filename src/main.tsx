@@ -12,7 +12,7 @@ Devvit.configure({
 });
 
 Devvit.addCustomPostType({
-  name: 'Chess Paint',
+  name: 'Reddit IQ',
   description: 'A game to solve a moving puzzle with chess movements',
   height: 'tall',
   render: Router,

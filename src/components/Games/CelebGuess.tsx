@@ -1,18 +1,12 @@
 import { Context, Devvit, JSONObject, useForm, useInterval, useState } from "@devvit/public-api";
-import { UserData } from "../../types.js";
+import { GameProps, GameScore, UserData } from "../../types.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import Settings from '../../Settings.json';
-import { splitArray } from "../../utils/utils.js";
+import { ScoreToLetter, splitArray } from "../../utils/utils.js";
 import { ProgressBar } from "../Addons/ProgressBar.js";
+import { PieceSymbol } from "../Addons/PieceSymbol.js";
 
 
-interface CelebPageProps {
-  onComplete: (score: number) => void;
-  onCancel: () => void;
-  userData: UserData | null;
-  setScore: ((value: number | ((prevState: number) => number)) => void);
-
-}
 
 interface CelebQuestion extends JSONObject {
   image: string;
@@ -28,12 +22,16 @@ interface drawData {
   }
   
 
+const ANIMATION_INTERVAL = 250;
+const INITIAL_MAX_HINTS = 3;
+const INNER_SIZE = 275;
+const GRID_SIZE = '275px';
 
 export const CelebPage = (
-  props: CelebPageProps,
+  props: GameProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess } = props;
   
   // Sample celebrity questions
   const [questions] = useState<CelebQuestion[]>([
@@ -71,58 +69,69 @@ export const CelebPage = (
 
 
   const [startTime] = useState(Date.now());
-  const drawingTime = Settings.drawTimeEasy || 60;
+  
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [drawingData, setDrawingData] = useState<drawData[]>(Array(Settings.canvasWidth * Settings.canvasHeight).fill({color: 0, drawn: false}));
+  const [hintIndex, setHintIndex] = useState(0);
 
 
-  const innerSize = 275;
+ 
   const size = '275px';
-
-  const pieceSize: Devvit.Blocks.SizeString = `${innerSize / 16}px`;
-
-
+  const pieceSize: Devvit.Blocks.SizeString = `${INNER_SIZE / 16}px`;
+  const drawingTime = Settings.drawTimeEasy || 60;
   const currentQuestion = questions[0];
 
 
   useInterval(() => {
+
     setElapsedTime(Date.now() - startTime);
     const remainingTime = drawingTime * 1000 - elapsedTime;
-    
-    const randomIndex = Math.floor(Math.random() * drawingData.length);
-    const randomIndex2 = Math.floor(Math.random() * drawingData.length);
 
     const newDrawingData = [...drawingData];
-    newDrawingData[randomIndex].drawn = true;
-    newDrawingData[randomIndex2].drawn = true;
+
+    for (let i = 0; i < 2; i++) {
+      const randomIndex = Math.floor(Math.random() * drawingData.length);
+      newDrawingData[randomIndex] = { ...newDrawingData[randomIndex], drawn: true };
+    }
     
     setDrawingData(newDrawingData);
      
+    if (remainingTime <= 0) {
+      setUserGuess(prevState => [...prevState, 'N'])
+      props.onComplete();
+    }
 
-    if (remainingTime <= 0) props.onComplete(0);
-  }, 250).start();
+  }, ANIMATION_INTERVAL).start();
 
 
 
-  const handleSubmit = (name:string) => {
-    // Clean up and normalize the input for comparison
+  const handleSubmit = (name:string):void => {
+
+    if (hintIndex > INITIAL_MAX_HINTS) {
+      return;
+    }
+
+    console.log("Checking answer...")
+
     const cleanedInput = name.trim().toLowerCase();
     const cleanedAnswer = currentQuestion.name.toLowerCase();
     
     // Check if the answer is correct
-    const correct = cleanedInput === cleanedAnswer || 
-                   cleanedAnswer.includes(cleanedInput) || 
-                   cleanedInput.includes(cleanedAnswer);
+    const correct = cleanedInput === cleanedAnswer 
     
     setIsCorrect(correct);
     
     if (correct) {
       const newScore = elapsedTime < 10000 ? 3 : elapsedTime < 20000 ? 2 : 1;
+      setUserGuess(prevState => [...prevState, 'Y'])
       setScore((prev) => prev + newScore);
-      onComplete(0);
+      onComplete();
+    }
+    else {
+      setHintIndex((prev) => prev + 1);
     }
     
     setShowResult(true);
@@ -132,28 +141,25 @@ export const CelebPage = (
 
  
 
-  const pixels = drawingData.map((pixel, index) => (
+  // Render the pixel grid
+  const renderPixelGrid = () => {
+    const pixels = drawingData.map((pixel, index) => (
+      <hstack
+        key={`pixel-${index}`}
+        height={pieceSize}
+        width={pieceSize}
+        backgroundColor={pixel.drawn ? "transparent" : "black"}
+      />
+    ));
 
-    <>
-    <hstack
-      height={pieceSize}
-      width={pieceSize}
-      backgroundColor={
-        pixel.drawn === true ? "transparent" : "black" 
-      }
-
-    > 
-    </hstack>
-    </>
-  ));
-
-  const grid = (
-    <vstack height={size} width={size} padding="none">
-      {splitArray(pixels, 16).map((row) => (
-        <hstack>{row}</hstack>
-      ))}
-    </vstack>
-  );
+    return (
+      <vstack height={GRID_SIZE} width={GRID_SIZE} padding="none">
+        {splitArray(pixels, 16).map((row, rowIndex) => (
+          <hstack key={`row-${rowIndex}`}>{row}</hstack>
+        ))}
+      </vstack>
+    );
+  };
 
 
   
@@ -173,13 +179,25 @@ const myForm = useForm(
   },
   async (values) => {
 
-    console.log(values.answer);
-
     handleSubmit(values.answer);
   }
 );     
 
-
+  const renderHintHearts = () => {
+    const hearts = [];
+    for (let i = INITIAL_MAX_HINTS - 1; i >= 0; i--) {
+      if (hintIndex <= i) {
+        hearts.push(
+          <PieceSymbol 
+            type="heart" 
+            color="red" 
+            scale={0.5} 
+          />
+        );
+      }
+    }
+    return hearts;
+  };
 
 
 
@@ -210,26 +228,28 @@ const myForm = useForm(
         <ProgressBar width={256} onComplete={onCancel} />
       </vstack>
       
-      <spacer size="medium" />
-      
+      <spacer size="small" />
+      <hstack alignment="center middle">
+          {renderHintHearts()}
+      </hstack>
+      <spacer size="small" />
+
       
       <vstack alignment="middle center" width="100%">
         <zstack width="250px" height="250px">
             <image
                 imageHeight={512}
                 imageWidth={512}
-                height={size}
-                width={size}
+                height={GRID_SIZE}
+                width={GRID_SIZE}
                 url="grid-template.png"
             />
-          {grid}
+          {renderPixelGrid()}
         </zstack>
         
         
         <spacer size="medium" />
-        
           <vstack gap="medium" width="80%" alignment="middle center">
-            
             
             <hstack gap="medium">
               <CustomButton
@@ -237,7 +257,7 @@ const myForm = useForm(
                 height="40px"
                 label="Solve"
                 color={Settings.theme.primary}
-                onClick={()=> context.ui.showForm(myForm)}
+                onClick={()=> { if (hintIndex < INITIAL_MAX_HINTS) return context.ui.showForm(myForm)}}
               />
             </hstack>
           </vstack>

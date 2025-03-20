@@ -50,7 +50,7 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
             instructions: [
                 "Look at the post title and content",
                 "Guess which subreddit it came from",
-                "Type your answer in the text field",
+                "Get Hints to help you out each guess",
                 "Points are awarded for correct guesses"
             ]
         },

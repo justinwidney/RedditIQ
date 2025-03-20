@@ -21,10 +21,6 @@ export const ProgressBar = (props: ProgressBarProps): JSX.Element => {
     const remainingPercentage = (elapsedTime / (drawingTime * 1000)) * 100;
     setPercentage( remainingPercentage);
 
-    console.log(remainingTime);
-    console.log(remainingPercentage);
-
-
     if (remainingTime <= 0) if(onComplete) onComplete();
   }, 500).start();
 

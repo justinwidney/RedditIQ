@@ -1,6 +1,6 @@
 {
     "pinnedPost":{
-        "title":"Chess Paint"
+        "title":"Reddit IQ"
     },
     "theme":{
       "primary": "#FF9D00",
@@ -25,5 +25,7 @@
       ],
       "drawTimeEasy": 20,
       "canvasWidth": 16,
-      "canvasHeight": 16
+      "canvasHeight": 16,
+      "questions" : "0,1,3,5,2,1,4",
+      "answers" : ["Y","B","B","A","B","C","Y","F","Y","A","A","C","A","C","N","Y","N"]
 }

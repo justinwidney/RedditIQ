@@ -103,9 +103,8 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
                 postData={data.postData}
                 userData={data.userData}
                 username={data.username} 
-                gameSettings={{
-                    subredditName: ""
-                }}            />
+                gameSettings={data.gameSettings }          
+                  />
         )
         }
 

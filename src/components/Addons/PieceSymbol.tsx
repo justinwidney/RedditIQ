@@ -7,7 +7,7 @@ import piecesData from '../../data/pieces.json';
 
 export type SupportedPieces = keyof typeof Pieces;
 
-export type ChessPieceType = "pawn" | "rook" | "knight" | "bishop" | "queen" | "king" | "available" | 'up-arrow';
+export type ChessPieceType = "pawn" | "rook" | "knight" | "bishop" | "queen" | "king" | "available" | 'up-arrow' | 'heart';
 
 const Pieces: Record<ChessPieceType, PieceData> = piecesData as Record<ChessPieceType, PieceData>;
 

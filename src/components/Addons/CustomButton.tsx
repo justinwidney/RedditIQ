@@ -47,7 +47,7 @@ export const CustomButton = (props: ButtonProps): JSX.Element => {
 
 
     return (
-        <hstack width={width}  height={height } alignment="center middle" gap="small" onPress={onClick} backgroundColor={style.borderColor}>
+        <hstack width={width}  height={height } alignment="center middle" gap="small" onPress={onClick} backgroundColor={Settings.theme.primary}>
             <hstack width="100%" height="100%" alignment="center middle" backgroundColor={Settings.theme.primary} padding="small" >
 
                 {icon ? <image url="background.png" imageHeight={30} imageWidth={30}  /> : null }

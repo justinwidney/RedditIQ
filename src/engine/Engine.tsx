@@ -1,5 +1,5 @@
 import {  RedditAPIClient, RedisClient, Scheduler, User } from "@devvit/public-api";
-import { GameSettings, PinnedPostData, PostId, PuzzlePostData, UserData, PostType, usernameID } from "../types.js";
+import { GameSettings, PinnedPostData, PostId, PuzzlePostData, UserData, PostType, usernameID, GameType, GameScoreData } from "../types.js";
 import Settings from "../Settings.json"
 import { PostData } from "../components/SolvePageRouter.js";
 import { Devvit } from '@devvit/public-api';
@@ -49,29 +49,43 @@ export class Engine {
     // Return Completed Play Counts
 
     async getPlayerCount(postId: PostId): Promise<number> {
-
-        console.log("Getting Player Count");
         const key = this.keys.postUserGuessCounter(postId);
         return await this.redis.zCard(key);
       }
       
+
       /***
        * 
-       *  Get the gueses for a post 
-       * 
+       *  Save gueses for a postID
+       *  user -> guess
        */
-
-
-      async saveGuessScore(postId: PostId, guess: string, username: string): Promise<void> {
+      async saveGuessScore<T extends GameType>(
+        postId: PostId, 
+        guess: GameScoreData[T], 
+        username: string
+      ): Promise<void> {
         await this.redis.hSet(this.keys.guessScores(postId), { [username]: guess });
+      }
+
+
+      /**
+     * Clears all guess scores for a specific post
+     * @param postId The ID of the post to clear guesses for
+     * @returns Promise resolving to true if successful
+     */
+    async clearGuessScores(postId: PostId): Promise<boolean> {
+      const key = this.keys.guessScores(postId);      
+      const result = await this.redis.del(key);      
+      return true;
     }
 
-      
+      /***
+       * Get guesses for postID
+       */
+
       async getGuessScores(postId: PostId): Promise<{ [guess: string]: string[] }> {
         const key = this.keys.guessScores(postId);
         const data = await this.redis.hGetAll(key);
-
-        console.log(data, "Data for guesses");
 
         const parsedData: { [guess: string]: usernameID[] } = {};
         Object.entries(data).forEach(([guess, commentId]) => {
@@ -84,7 +98,11 @@ export class Engine {
         return parsedData;
       }
   
-      
+
+      /**
+       * Get the guess for a userID on a postID
+       */
+
       async getGuessScore(postId: PostId, username: string): Promise<string | undefined> {
         const key = this.keys.guessScores(postId);
         return await this.redis.hGet(key, username);
@@ -92,15 +110,19 @@ export class Engine {
     
 
 
+      /**
+       * 
+       * increment the user's guess count
+       * save the postID to the user's solved list
+       * get the user's score
+       * save the guess
+       */
 
-
-      
-
-      async submitGuess(event: {
+      async submitGuess<T extends GameType>(event: {
         postData: PostData ;
         username: string;
-        guess: string;
-      }): Promise<number> {
+        guess: GameScoreData[T], 
+        }): Promise<number> {
 
         if (!this.reddit || !this.scheduler) {
           console.error('Reddit API client or Scheduler not available in Service');
@@ -114,7 +136,6 @@ export class Engine {
               1, // Score increment
             )
                 
-          
           const userPoints = 1;
 
            this.redis.zAdd(this.keys.postSolved(event.postData.postId), {
@@ -123,18 +144,17 @@ export class Engine {
            })
       
 
-            this.incrementUserScore(event.username, userPoints)
-       
-
+          this.incrementUserScore(event.username, userPoints)
           this.saveGuessScore(event.postData.postId, event.guess, event.username);
-
-
-        //await Promise.all(promises);
-
 
         return userPoints;
       }
 
+
+      /**
+       * get the user's score
+       * increment the user's score
+       */
 
       async incrementUserScore(username: string, amount: number): Promise<number> {
 
@@ -191,11 +211,6 @@ export class Engine {
     }
 
 
-    
-
-
-
-
     async getPuzzlesDifficulties(): Promise<string[]> {
 
         const data = (
@@ -240,7 +255,6 @@ export class Engine {
     */
 
     async getPinnedPost(postId: PostId): Promise<PinnedPostData> {
-        
         const key = this.keys.postData(postId);
         const postType = await this.redis.hGet(key, "postType");
 
@@ -248,14 +262,7 @@ export class Engine {
             postId: postId,
             postType: postType ?? "pinned",
         }
-
-
-
     }
-
-
-
-
 
 
 
@@ -317,13 +324,17 @@ export class Engine {
     }
 
 
-
     async getGameSettings(): Promise<GameSettings> {
         const key = this.keys.gameSettings;
         const settings = await this.redis.hGetAll(key);
+        
         return settings as GameSettings; 
     }
   
+
+    /*
+    * Get Post Type
+    */
 
     async getPostType(postId: PostId): Promise<PostType> {
         
@@ -334,9 +345,8 @@ export class Engine {
 
         return (postType ?? defaultPostType) as PostType
 
-
-
     }
+
 
     async getPuzzlePost(postId: PostId): Promise<PuzzlePostData> {
 
