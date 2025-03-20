@@ -6,7 +6,7 @@ import { GAME_SVG } from "../data/svgs.js";
 
 interface PageCarouselProps {
   onComplete: (pageName: string) => void;
-  onCancel: () => void;
+  onCancel: (skip:boolean) => void;
   targetPageIndex: number; // The index of the page we want to land on (0-5)
 }
 

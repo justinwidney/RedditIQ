@@ -6,7 +6,7 @@ import Settings from '../../Settings.json';
 import { GAME_SVG } from '../../data/svgs.js';
 
 interface TutorialPageProps {
-    onClose: () => void;
+    onClose: (skip:boolean) => void;
 }
 
 type GameTutorial = {

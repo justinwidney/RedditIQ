@@ -60,7 +60,7 @@ export type UserData ={
 
 export interface GameProps {
     onComplete: () => void;
-    onCancel: () => void;
+    onCancel: (skip:boolean) => void;
     userData: UserData | null;
     setScore: (value: number | ((prevState: number) => number)) => void;
     setUserGuess: (value: GameScore[] | ((prevState: GameScore[]) => GameScore[])) => void;

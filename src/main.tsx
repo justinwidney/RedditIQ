@@ -4,11 +4,15 @@ import { Router } from './posts/Router.js';
 import { installGame } from './actions/installGame.js';
 import { addPuzzles } from './actions/addPuzzles.js';
 import { addPuzzlesForm } from './forms/addPuzzleForm.js';
+import { dailyPost } from './jobs/dailyPost.js';
+import { newPinnedPost } from './actions/addDailyPost.js';
 
 Devvit.configure({
   redditAPI: true,
   redis: true,
   media: true,
+  http: true,
+  
 });
 
 Devvit.addCustomPostType({
@@ -21,6 +25,7 @@ Devvit.addCustomPostType({
 
 Devvit.addMenuItem(installGame)
 Devvit.addMenuItem(addPuzzles(addPuzzlesForm))
+Devvit.addMenuItem(newPinnedPost)
 
 
 export default Devvit;

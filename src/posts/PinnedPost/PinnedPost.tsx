@@ -8,6 +8,24 @@ import { Engine } from "../../engine/Engine.js";
 import { StatsPage } from "../../components/Pages/ScorePage.js";
 
 
+const QUESTION_SETS = {
+  SET_1: 'questions/set1.json',
+  SET_2: 'questions/set2.json',
+  SET_3: 'questions/set3.json',
+  // Add more sets as needed
+};
+
+async function loadQuestionsFromPath(filePath) {
+ 
+  switch(filePath) {
+    case QUESTION_SETS.SET_1:
+      return (await import('../../data/Questions/March/19-03-2025.json')).default;
+    default:
+      return (await import('../../data/Questions/March/19-03-2025.json')).default;
+  }
+  
+}
+
 type PostData = {
     postId: PostId;
     postType: string;
@@ -21,12 +39,31 @@ interface PinnedPostProps {
 }
 
 
-export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Element => {
+export const  PinnedPost = (props: PinnedPostProps, context: Context): Promise<JSX.Element> => {
 
     const engine = new Engine(context);
     const isSolved = !!props.userData?.solved;
     const questions = props.gameSettings.questions;
 
+    //const response = await fetch('https://example.com', {
+    //  method: 'post',
+    //   headers: {
+    //    'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ content: context.commentId }),
+    // });
+
+    const reference = {
+        filePath: 'questions/set1.json'
+    }
+    
+    const [data] = useState(async () =>{
+        const questions = await loadQuestionsFromPath(reference.filePath);
+        console.log(questions)
+     } 
+    );
+
+   
 
     const [page, setPage] = useState(
        !isSolved ? 'score' : 'menu'
@@ -74,18 +111,15 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
             </vstack>
     )
 
-    const onClose = ():void => {
-        console.log('closing')
-        setPage('menu')
+    const onClose = (skip:boolean = false) :void => {
+        setPage(  skip? 'score' : 'menu')
     }
 
     const pages: Record<string, JSX.Element> = {
         menu: Menu,
         tutorial : <TutorialPage onClose={onClose} />,
         solve: <SolvePageRouter {...props} onCancel={onClose} questions={questions} />,
-        score: <StatsPage puzzleName={""} onBack={function (): void {
-          throw new Error("Function not implemented.");
-        } } {...props} />
+        score: <StatsPage puzzleName={""} {...props} />
     }
 
 

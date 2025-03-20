@@ -47,9 +47,8 @@ interface ScoreGroup {
 
 interface StatsPageProps {
   postData: PostData;
-  username: string;
+  username: string | null;
   puzzleName: string;
-  onBack: () => void;
 }
 
 export const StatsPage = (

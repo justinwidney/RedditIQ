@@ -1,0 +1,117 @@
+{
+    "questions": [
+      {
+        "type": "celebrity",
+        "image": "rick-astley.jpg",
+        "name": "Rick Astley",
+        "hint": "Never gonna give you up...",
+        "redditRelevance": "Rickrolled the internet and has a famous Reddit AMA"
+      },
+      {
+        "type": "historian",
+        "image": "historic_post3.png",
+        "title": "Bitcoin just hit $1000 for the first time!",
+        "content": "Can't believe this digital currency has grown so much. Anyone else mining?",
+        "subreddit": "cryptocurrency",
+        "date": {
+          "month": 11,
+          "year": 2013
+        },
+        "hints": [
+          "Early cryptocurrency milestone",
+          "Before the major boom",
+          "Mt. Gox was still operating"
+        ]
+      },
+      {
+        "type": "pasta",
+        "text": "To be fair, you have to have a very _____ IQ to understand _____. The humor is extremely _____, and without a solid grasp of _____ most of the jokes will go over a typical viewer's head.",
+        "blanks": ["high", "Rick and Morty", "subtle", "theoretical physics"],
+        "reference": "Famous TV show intellectual fan copypasta",
+        "options": [
+          [["small", "big", "tiny", "high"], 3],
+          [["sat", "Rick and Morty", "slept", "played"], 1],
+          [["blue", "green", "subtle", "yellow"], 2],
+          [["theoretical physics", "quantum mechanics", "calculus", "algebra"], 0]
+        ]
+      },
+      {
+        "type": "subreddit",
+        "image": "r-dataisbeautiful.jpg",
+        "answer": "dataisbeautiful",
+        "hints": [
+          "Visualizations",
+          "Graphs and charts",
+          "Information presentation"
+        ]
+      },
+      {
+        "type": "trivia",
+        "questions": [
+          {
+            "question": "What was Reddit's original name?",
+            "options": ["Snoo", "ReadIt", "FrontPage", "Reddigg"],
+            "correctAnswer": 1
+          },
+          {
+            "question": "In what year was Reddit founded?",
+            "options": ["2003", "2005", "2007", "2009"],
+            "correctAnswer": 1
+          },
+          {
+            "question": "What is the Reddit mascot's name?",
+            "options": ["Snoo", "Redd", "Karma", "Alien"],
+            "correctAnswer": 0
+          }
+        ]
+      },
+      {
+        "type": "upvotes",
+        "comparisons": [
+          {
+            "postA": {
+              "image": "post1A.jpg",
+              "title": "I built a PC case out of LEGO",
+              "upvotes": 45327
+            },
+            "postB": {
+              "image": "post1B.jpg",
+              "title": "My cat looks like Danny DeVito",
+              "upvotes": 67812
+            }
+          },
+          {
+            "postA": {
+              "image": "post2A.jpg",
+              "title": "I found a safe in my new house",
+              "upvotes": 89432
+            },
+            "postB": {
+              "image": "post2B.jpg",
+              "title": "I restored this painting I found at a garage sale",
+              "upvotes": 32156
+            }
+          },
+          {
+            "postA": {
+              "image": "post3A.jpg",
+              "title": "I took a picture of Saturn with my phone",
+              "upvotes": 23567
+            },
+            "postB": {
+              "image": "post3B.jpg",
+              "title": "I made bread for the first time",
+              "upvotes": 19847
+            }
+          }
+        ]
+      },
+      {
+        "type": "celebrity",
+        "image": "arnold.jpg",
+        "name": "Arnold Schwarzenegger",
+        "hint": "I'll be back",
+        "redditRelevance": "Active Reddit user who often comments in fitness subreddits"
+      }
+    ]
+  }
