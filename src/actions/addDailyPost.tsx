@@ -20,7 +20,18 @@ export const dailyPost = (form: FormKey): MenuItem => ({
 
 
 
-
+  function formatDateDMY(timestamp: number) {
+    const date = new Date(timestamp);
+    
+    // Get day, month, and year
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
+    const year = date.getFullYear();
+    
+    // Return in DD-MM-YYYY format
+    return `${day}-${month}-${year}`;
+  }
+  
 
 
 
@@ -46,6 +57,7 @@ export const newPinnedPost: MenuItem = {
     engine.storeGameSettings({
       subredditName: community.name,
       questions: Settings.questions,
+      fileName: `../../data/Questions/March/${formatDateDMY(Date.now())}.json`
   } as GameSettings),
 
   await Promise.all([

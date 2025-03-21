@@ -228,10 +228,9 @@ export class Engine {
     */
 
     async storeGameSettings(gameSettings: GameSettings): Promise<void> {
-        
+  
         const key = this.keys.gameSettings;
         await this.redis.hSet(key, gameSettings)
-
     }
 
 

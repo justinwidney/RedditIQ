@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useState, useForm } from "@devvit/public-api";
-import { GameProps, GameScore, UserData } from "../../types.js";
+import { GameProps, GameScore, HistorianQuestion, UserData } from "../../types.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import { PixelText } from "../Addons/PixelText.js";
 import { PixelSymbol } from "../Addons/PixelSymbol.js";
@@ -9,74 +9,22 @@ import { PieceSymbol } from "../Addons/PieceSymbol.js";
 
 
 
-interface HistorianQuestion extends JSONObject {
-  image: string;
-  title: string;
-  content: string;
-  subreddit: string;
-  date: {
-    month: number;
-    year: number;
-  };
-  hints: string[];
+
+
+interface HistorianPageProps extends GameProps {
+  question: HistorianQuestion;
 }
 
 const INITIAL_MAX_HINTS = 3;
 
 export const HistorianPage = (
-  props: GameProps,
+  props: HistorianPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore, setUserGuess } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess, question } = props;
   const { ui } = context;
   
-  // Sample historical post questions
-  const [questions] = useState<HistorianQuestion[]>([
-    {
-      image: "historic_post1.png",
-      title: "The iPhone has been announced!",
-      content: "Steve Jobs just unveiled this revolutionary device that's a phone, iPod, and internet device all in one!",
-      subreddit: "technology",
-      date: {
-        month: 1,
-        year: 2007
-      },
-      hints: ["First smartphone with multi-touch", "Before Android existed", "Revolutionary Apple product"]
-    },
-    {
-      image: "historic_post2.png",
-      title: "Gangnam Style just hit 1 billion views!",
-      content: "This Korean music video is the first to reach this milestone on YouTube. PSY is taking over the world!",
-      subreddit: "music",
-      date: {
-        month: 12,
-        year: 2012
-      },
-      hints: ["K-pop becomes global", "Early viral YouTube sensation", "Horse dance meme"]
-    },
-    {
-      image: "historic_post3.png",
-      title: "Bitcoin just hit $1000 for the first time!",
-      content: "Can't believe this digital currency has grown so much. Anyone else mining?",
-      subreddit: "cryptocurrency",
-      date: {
-        month: 11,
-        year: 2013
-      },
-      hints: ["Early cryptocurrency milestone", "Before the major boom", "Mt. Gox was still operating"]
-    },
-    {
-      image: "historic_post4.png",
-      title: "The Dress - What colors do you see?",
-      content: "Is it blue and black or white and gold? My family is having a huge argument over this!",
-      subreddit: "pics",
-      date: {
-        month: 2,
-        year: 2015
-      },
-      hints: ["Viral optical illusion", "Internet-wide debate", "Color perception phenomenon"]
-    }
-  ]);
+  
 
   const [currentIndex, setCurrentIndex] = useState(0);
   //const [score, setScore] = useState(0);
@@ -86,11 +34,10 @@ export const HistorianPage = (
   const [hintIndex, setHintIndex] = useState(0);
   const [userAnswer, setAnswer] = useState({ month: "", year: "" });
 
-  const currentQuestion = questions[currentIndex];
 
 
   const handleShowHint = () => {
-    if (hintIndex < currentQuestion.hints.length - 1) {
+    if (hintIndex < question.hints.length - 1) {
       setHintIndex(hintIndex + 1);
     } else {
       setHintIndex(0);
@@ -120,8 +67,8 @@ export const HistorianPage = (
       const monthGuess = parseInt(values.month);
       const yearGuess = parseInt(values.year);
       
-      const correctMonth = currentQuestion.date.month;
-      const correctYear = currentQuestion.date.year;
+      const correctMonth = question.answer.month;
+      const correctYear = question.answer.year;
       
       // Allow for partial matches (e.g., "jan" for "january")
       const monthCorrect = correctMonth === (monthGuess) 
@@ -186,7 +133,7 @@ export const HistorianPage = (
         <vstack width="100%" height="100%" border="thick" borderColor="black" cornerRadius="medium" padding="medium" backgroundColor="#ffffff">
           <hstack gap="small" alignment="start">
             <PixelText scale={1} color="black">r/ </PixelText>
-            <PixelText scale={1} color="black">{ currentQuestion.subreddit}</PixelText>
+            <PixelText scale={1} color="black">{ question.content.content}</PixelText>
             <spacer size="small" />
             <PixelText scale={1} color="black">??? ago</PixelText>
           </hstack>
@@ -194,7 +141,7 @@ export const HistorianPage = (
           <spacer size="small" />
 
           <hstack gap="small" alignment="start">
-            <PixelText scale={1.5} color="black">{currentQuestion.title}</PixelText>
+            <PixelText scale={1.5} color="black">{question.content.title}</PixelText>
           </hstack>
 
           <spacer size="small" />
@@ -205,7 +152,7 @@ export const HistorianPage = (
             height="180px"
             width="400px"
             resizeMode="fill"
-            url={currentQuestion.image}
+            url={question.image}
           />
            
           <spacer grow />

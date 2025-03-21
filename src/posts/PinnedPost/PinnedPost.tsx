@@ -9,17 +9,17 @@ import { StatsPage } from "../../components/Pages/ScorePage.js";
 
 
 const QUESTION_SETS = {
-  SET_1: 'questions/set1.json',
+  SET_1: '../../data/Questions/March/21-03-2025.json',
   SET_2: 'questions/set2.json',
   SET_3: 'questions/set3.json',
   // Add more sets as needed
 };
 
-async function loadQuestionsFromPath(filePath) {
+async function loadQuestionsFromPath(filePath : string) {
  
   switch(filePath) {
     case QUESTION_SETS.SET_1:
-      return (await import('../../data/Questions/March/19-03-2025.json')).default;
+      return (await import('../../data/Questions/March/21-03-2025.json')).default;
     default:
       return (await import('../../data/Questions/March/19-03-2025.json')).default;
   }
@@ -39,34 +39,57 @@ interface PinnedPostProps {
 }
 
 
+function createComponentIndexArray(questionsData) {
+  // Define your component order/mapping
+  const componentTypes = [
+    'celebGuess',    // index 0
+    'trivia',        // index 1
+    'subredditGuess', // index 2
+    'copyPasta',     // index 3
+    'upvotes',       // index 4
+    'historian'      // index 5
+  ];
+  
+  // Map of question types to component indices
+  const typeToIndexMap = {
+    'celebrity': 0,     // celebGuess
+    'trivia': 1,        // trivia
+    'subreddit': 2,     // subredditGuess
+    'pasta': 3,         // copyPasta
+    'upvotes': 4,       // upvotes
+    'historian': 5      // historian
+  };
+  
+  // Extract the question types from the JSON
+  const questionTypes = questionsData.questions.map(question => question.type);
+  
+  // Convert each question type to its corresponding component index
+  const indexArray = questionTypes.map(type => typeToIndexMap[type]);
+  
+  return indexArray;
+}
+
+
 export const  PinnedPost = (props: PinnedPostProps, context: Context): Promise<JSX.Element> => {
 
     const engine = new Engine(context);
     const isSolved = !!props.userData?.solved;
-    const questions = props.gameSettings.questions;
+    //const questions = props.gameSettings.questions;
 
-    //const response = await fetch('https://example.com', {
-    //  method: 'post',
-    //   headers: {
-    //    'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ content: context.commentId }),
-    // });
-
-    const reference = {
-        filePath: 'questions/set1.json'
-    }
-    
     const [data] = useState(async () =>{
-        const questions = await loadQuestionsFromPath(reference.filePath);
+        const questions = await loadQuestionsFromPath(props.gameSettings.fileName);
         console.log(questions)
+        return questions;
      } 
     );
+
+
+    const questions = createComponentIndexArray(data);
 
    
 
     const [page, setPage] = useState(
-       !isSolved ? 'score' : 'menu'
+       isSolved ? 'score' : 'menu'
     );
 
     const { data: user, loading } = useAsync<{
@@ -118,7 +141,7 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): Promise<J
     const pages: Record<string, JSX.Element> = {
         menu: Menu,
         tutorial : <TutorialPage onClose={onClose} />,
-        solve: <SolvePageRouter {...props} onCancel={onClose} questions={questions} />,
+        solve: <SolvePageRouter {...props} onCancel={onClose} questions={questions} questionData={data} />,
         score: <StatsPage puzzleName={""} {...props} />
     }
 

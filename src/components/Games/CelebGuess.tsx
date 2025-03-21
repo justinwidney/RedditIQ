@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useForm, useInterval, useState } from "@devvit/public-api";
-import { GameProps, GameScore, UserData } from "../../types.js";
+import { CelebrityQuestion, GameProps, GameScore, UserData } from "../../types.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import Settings from '../../Settings.json';
 import { ScoreToLetter, splitArray } from "../../utils/utils.js";
@@ -8,11 +8,8 @@ import { PieceSymbol } from "../Addons/PieceSymbol.js";
 
 
 
-interface CelebQuestion extends JSONObject {
-  image: string;
-  name: string;
-  hint: string;
-  redditRelevance: string;
+interface CelebPageProps extends GameProps {
+  question: CelebrityQuestion
 }
 
 interface drawData {
@@ -28,44 +25,16 @@ const INNER_SIZE = 275;
 const GRID_SIZE = '275px';
 
 export const CelebPage = (
-  props: GameProps,
+  props: CelebPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore, setUserGuess } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess, question } = props;
   
-  // Sample celebrity questions
-  const [questions] = useState<CelebQuestion[]>([
-    {
-      image: "keanu.jpg",
-      name: "Keanu Reeves",
-      hint: "Known for 'The Matrix' and 'John Wick'",
-      redditRelevance: "Reddit's favorite wholesome celebrity"
-    },
-    {
-      image: "rick-astley.jpg",
-      name: "Rick Astley",
-      hint: "Never gonna give you up...",
-      redditRelevance: "Rickrolled the internet and has a famous Reddit AMA"
-    },
-    {
-      image: "elon-musk.jpg",
-      name: "Elon Musk",
-      hint: "CEO of Tesla and SpaceX",
-      redditRelevance: "Frequently discussed across Reddit, particularly in tech subreddits"
-    },
-    {
-      image: "arnold.jpg",
-      name: "Arnold Schwarzenegger",
-      hint: "I'll be back",
-      redditRelevance: "Active Reddit user who often comments in fitness subreddits"
-    },
-    {
-      image: "bill-gates.jpg",
-      name: "Bill Gates",
-      hint: "Microsoft founder and philanthropist",
-      redditRelevance: "Regular AMAs and his Reddit Secret Santa participation"
-    }
-  ]);
+ 
+  //const { image, name, answer } = question;
+
+  console.log(question)
+
 
 
   const [startTime] = useState(Date.now());
@@ -82,7 +51,6 @@ export const CelebPage = (
   const size = '275px';
   const pieceSize: Devvit.Blocks.SizeString = `${INNER_SIZE / 16}px`;
   const drawingTime = Settings.drawTimeEasy || 60;
-  const currentQuestion = questions[0];
 
 
   useInterval(() => {
@@ -117,7 +85,7 @@ export const CelebPage = (
     console.log("Checking answer...")
 
     const cleanedInput = name.trim().toLowerCase();
-    const cleanedAnswer = currentQuestion.name.toLowerCase();
+    const cleanedAnswer = question.answer.toLowerCase();
     
     // Check if the answer is correct
     const correct = cleanedInput === cleanedAnswer 
@@ -242,7 +210,7 @@ const myForm = useForm(
                 imageWidth={512}
                 height={GRID_SIZE}
                 width={GRID_SIZE}
-                url="grid-template.png"
+                url={question.image ? question.image : "pxArt(9)"}
             />
           {renderPixelGrid()}
         </zstack>

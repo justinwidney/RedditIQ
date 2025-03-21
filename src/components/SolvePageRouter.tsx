@@ -12,6 +12,8 @@ import { PixelText } from "./Addons/PixelText.js";
 import { formatCompositeScore } from "../utils/utils.js";
 
 
+
+
 export interface PostData {
   postId: PostId
   postType: string;
@@ -23,7 +25,8 @@ interface SolvePageRouterProps {
     userData: UserData | null;
     onCancel: (skip:boolean) => void;
     postData: PostData;
-    questions: string;
+    questions: number[];
+    questionData: any;
   }
 
 
@@ -32,13 +35,18 @@ interface SolvePageRouterProps {
  */
 export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): JSX.Element => {
 
-    const questionList = props.questions.split(',').map(Number)
 
-    const [stepList] = useState<number[]>(questionList.length > 0 ? questionList : [0,1,2,3,4,5])
+    const [stepList] = useState<number[]>(props.questions)
     const [score, setScore] = useState<number>(0)
     const [userGuess, setUserGuess] = useState<GameScore[]>([]);
     const [targetIndex, setTargetIndex] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<string>('randomize');
+
+
+
+    const currentQuestion = props.questionData.questions[targetIndex];
+
+    console.log(props.questionData, "QUESTION DATA")
 
     const engine = new Engine(context);
 
@@ -95,12 +103,12 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
 
     const steps: Record<string, JSX.Element> = {
       // GAMES
-      celebGuess: <CelebPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
-      trivia: <TriviaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
-      subredditGuess: <SubredditGuessPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
-      copyPasta: <PastaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
-      upvotes: <UpvotesPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
-      historian: <HistorianPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} />,
+      celebGuess: <CelebPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
+      trivia: <TriviaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
+      subredditGuess: <SubredditGuessPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion}  />,
+      copyPasta: <PastaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
+      upvotes: <UpvotesPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
+      historian: <HistorianPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
  
       // RANDOMIZER
       randomize: <PageCarousel {...props} onComplete={onCompleteRandomize} targetPageIndex={stepList[targetIndex]}/>,

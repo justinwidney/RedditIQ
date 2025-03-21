@@ -43,6 +43,7 @@ export enum PostType {
 export type GameSettings = {
     subredditName: string;
     questions: string
+    fileName: string;
 }
 
 interface PostData {
@@ -64,6 +65,7 @@ export interface GameProps {
     userData: UserData | null;
     setScore: (value: number | ((prevState: number) => number)) => void;
     setUserGuess: (value: GameScore[] | ((prevState: GameScore[]) => GameScore[])) => void;
+    question: Question;
 }
 
 export type PinnedPostData = {
@@ -80,4 +82,92 @@ export type PuzzlePostData = {
     puzzle: string;
     solution: string;
 }
+
+interface BaseQuestion {
+    type: 'celebrity' | 'historian' | 'pasta' | 'subreddit' | 'trivia' | 'upvotes';
+  }
+  
+  // Celebrity question type
+  export interface CelebrityQuestion extends BaseQuestion {
+    type: 'celebrity';
+    image: string;
+    answer: string;
+    name?: string;
+    hint?: string;
+    redditRelevance?: string;
+  }
+  
+  // Historian question type
+  export interface HistorianQuestion extends BaseQuestion {
+    type: 'historian';
+    image: string;
+    content: {
+      title: string;
+      content: string;
+      subreddit: string;
+    };
+    answer: {
+      month: number;
+      year: number;
+    };
+  }
+  
+  // Pasta question type
+  interface PastaQuestion extends BaseQuestion {
+    type: 'pasta';
+    text: string;
+    blanks: string[];
+    reference: string;
+    options: [string[], number][]; // Array of [array of options, correct index]
+  }
+  
+  // Subreddit question type
+  interface SubredditQuestion extends BaseQuestion {
+    type: 'subreddit';
+    image: string;
+    answer: string;
+  }
+  
+  // Trivia question type
+  interface TriviaQuestionItem {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+  }
+  
+  interface TriviaQuestion extends BaseQuestion {
+    type: 'trivia';
+    questions: TriviaQuestionItem[];
+  }
+  
+  // Upvotes question type
+  interface Post {
+    image: string;
+    title: string;
+    upvotes: number;
+  }
+  
+  interface PostComparison {
+    postA: Post;
+    postB: Post;
+  }
+  
+  interface UpvotesQuestion extends BaseQuestion {
+    type: 'upvotes';
+    comparisons: PostComparison[];
+  }
+
+  type Question = 
+  | CelebrityQuestion 
+  | HistorianQuestion 
+  | PastaQuestion 
+  | SubredditQuestion 
+  | TriviaQuestion 
+  | UpvotesQuestion;
+
+// Main quiz data structure
+interface QuizData {
+  questions: Question[];
+}
+
 

@@ -2,26 +2,23 @@
     "questions": [
       {
         "type": "celebrity",
-        "image": "rick-astley.jpg",
-        "name": "Rick Astley Junior",
-        "hint": "Never gonna give you up...",
-        "redditRelevance": "Rickrolled the internet and has a famous Reddit AMA"
+        "image": "pxArt(11).png", 
+        "answer": "Rick Astley"
       },
       {
         "type": "historian",
         "image": "historic_post3.png",
-        "title": "Bitcoin just hit $1000 for the first time!",
-        "content": "Can't believe this digital currency has grown so much. Anyone else mining?",
-        "subreddit": "cryptocurrency",
-        "date": {
+        "content":
+          {
+          "title": "Bitcoin just hit $1000 for the first time!",
+          "content": "Can't believe this digital currency has grown so much. Anyone else mining?",
+          "subreddit": "cryptocurrency"
+          }
+        ,
+        "answer": {
           "month": 11,
           "year": 2013
-        },
-        "hints": [
-          "Early cryptocurrency milestone",
-          "Before the major boom",
-          "Mt. Gox was still operating"
-        ]
+        }
       },
       {
         "type": "pasta",
@@ -38,12 +35,7 @@
       {
         "type": "subreddit",
         "image": "r-dataisbeautiful.jpg",
-        "answer": "dataisbeautiful",
-        "hints": [
-          "Visualizations",
-          "Graphs and charts",
-          "Information presentation"
-        ]
+        "answer": "dataisbeautiful"
       },
       {
         "type": "trivia",
