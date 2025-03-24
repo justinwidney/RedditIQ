@@ -106,9 +106,9 @@ export const PageCarousel = (
 
 
   return (
-    <vstack width="100%" height="100%" backgroundColor={Settings.theme.background} padding="large" alignment="center middle">
+    <vstack width="100%" height="100%" backgroundColor={Settings.theme.background} padding="medium" alignment="middle">
       <hstack width="100%" alignment="middle center">
-        <PixelText scale={3}> Next Game</PixelText>
+        <PixelText scale={4}> Next Game</PixelText>
       </hstack>
       
       <spacer size="large" />
@@ -119,7 +119,7 @@ export const PageCarousel = (
         <hstack width="100%" alignment="middle center" gap="medium">
             {firstRowPages.map((page, index) => (
             <vstack
-                width={`${PAGE_SIZE}px`}
+                width={`33%`}
                 height={`${PAGE_SIZE}px`}
                 backgroundColor={currentIndex === index ? page.color : "#CCCCCC"}
                 cornerRadius="medium"
@@ -144,7 +144,7 @@ export const PageCarousel = (
         <hstack width="100%" alignment="middle center" gap="medium">
             {secondRowPages.map((page, index) => (
             <vstack
-                width={`${PAGE_SIZE}px`}
+                width={`33%`}
                 height={`${PAGE_SIZE}px`}
                 backgroundColor={currentIndex === (index + 3) ? page.color : "#CCCCCC"}
                 cornerRadius="medium"

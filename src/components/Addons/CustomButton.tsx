@@ -6,12 +6,12 @@ import { PixelText } from "./PixelText.js";
 
 const styles = {
     primary: {  
-        backgroundColor: '#FF0000',
-        borderColor: '#FF0000',
+        backgroundColor: '#FF9D00',
+        borderColor: '#000000',
         color: '#FFFFFF',
     },
     secondary: {
-        backgroundColor: '#00FF00',
+        backgroundColor: '#898989',
         borderColor: '#00FF00',
         color: '#FFFFFF',
     },
@@ -47,8 +47,8 @@ export const CustomButton = (props: ButtonProps): JSX.Element => {
 
 
     return (
-        <hstack width={width}  height={height } alignment="center middle" gap="small" onPress={onClick} backgroundColor={Settings.theme.primary}>
-            <hstack width="100%" height="100%" alignment="center middle" backgroundColor={Settings.theme.primary} padding="small" >
+        <hstack width={width}  height={height } alignment="center middle" gap="small" onPress={onClick} backgroundColor={style.borderColor}>
+            <hstack width="100%" height="100%" alignment="center middle" backgroundColor={style.backgroundColor} padding="small" >
 
                 {icon ? <image url="background.png" imageHeight={30} imageWidth={30}  /> : null }
                 {label ? <PixelText scale={textSize} color="#000000">{label}</PixelText> : null}

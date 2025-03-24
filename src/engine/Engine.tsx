@@ -61,10 +61,10 @@ export class Engine {
        */
       async saveGuessScore<T extends GameType>(
         postId: PostId, 
-        guess: GameScoreData[T], 
+        guess: GameScoreData[T][], 
         username: string
       ): Promise<void> {
-        await this.redis.hSet(this.keys.guessScores(postId), { [username]: guess });
+        await this.redis.hSet(this.keys.guessScores(postId), { [username]: guess.join(',') });
       }
 
 
@@ -121,7 +121,7 @@ export class Engine {
       async submitGuess<T extends GameType>(event: {
         postData: PostData ;
         username: string;
-        guess: GameScoreData[T], 
+        guess: GameScoreData[T][], 
         }): Promise<number> {
 
         if (!this.reddit || !this.scheduler) {
@@ -186,23 +186,17 @@ export class Engine {
       }> {
         const defaultValue = { rank: -1, score: 0 };
         if (!username) return defaultValue;
-        try {
-          const [rank, score] = await Promise.all([
-  
+      
+          const [rank, score] = await Promise.all([  
             this.redis.zRank(this.keys.scores, username),
-            // TODO: Remove .zScore when .zRank supports the WITHSCORE option
             this.redis.zScore(this.keys.scores, username),
           ]);
+
           return {
             rank: rank === undefined ? -1 : rank,
             score: score === undefined ? 0 : score,
           };
-        } catch (error) {
-          if (error) {
-            console.error('Error fetching user score board entry', error);
-          }
-          return defaultValue;
-        }
+       
       }
 
 

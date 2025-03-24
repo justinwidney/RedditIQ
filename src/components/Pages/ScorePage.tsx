@@ -2,38 +2,15 @@ import { Context, Devvit, useAsync, useState } from "@devvit/public-api";
 import { PixelText } from "../Addons/PixelText.js";
 import { Engine } from "../../engine/Engine.js";
 import { PostData } from "../SolvePageRouter.js";
-import { abbreviateNumber, calculateScore } from "../../utils/utils.js";
+import { abbreviateNumber } from "../../utils/utils.js";
 import Settings from "../../Settings.json";
+import { Question } from "../../types.js";
 
 
 
 
-function processGuessData(guesses: { [guess: string]: string[] }) {
-  const total = Object.keys(guesses).length;
-  const groups: Record<number, ScoreGroup> = {};
 
-  // Process guesses and group by score
-  Object.entries(guesses).forEach(([username, guessArray]) => {
-    if (!guessArray || !guessArray.length) return;
 
-    const sep = guessArray[0].split(',');
-    const score = calculateScore(sep);
-    
-    if (!groups[score]) {
-      groups[score] = { count: 0, answers: [] };
-    }
-    
-    groups[score].count++;
-    groups[score].answers.push({ username, guessString: guessArray[0] });
-  });
-  
-  // Sort scores in descending order
-  const sorted = Object.keys(groups)
-    .map(Number)
-    .sort((a, b) => b - a);
-  
-  return { scoreGroups: groups, sortedScores: sorted, totalGuesses: total };
-}
 
 
 
@@ -49,6 +26,7 @@ interface StatsPageProps {
   postData: PostData;
   username: string | null;
   puzzleName: string;
+  answer: any;
 }
 
 export const StatsPage = (
@@ -56,11 +34,47 @@ export const StatsPage = (
   context: Context
 ): JSX.Element => {
 
-  const { puzzleName,  onBack } = props;
+
+  const { puzzleName, answer } = props;
+
+
   const engine = new Engine(context);
   const rowCount = 6;
-
   const rowHeight: Devvit.Blocks.SizeString = `${100 / rowCount}%`;
+
+
+  function calculateScore(sep: string[]) {
+    const sum = sep.reduce((total, current) => total + parseInt(current, 10), 0);         
+    return sum;
+  }
+
+  function processGuessData(guesses: { [guess: string]: string[] }) {
+    const total = Object.keys(guesses).length;
+    const groups: Record<number, ScoreGroup> = {};
+  
+    // Process guesses and group by score
+    Object.entries(guesses).forEach(([username, guessArray]) => {
+      if (!guessArray || !guessArray.length) return;
+  
+      const sep = guessArray[0].split(',');
+      const score = calculateScore(sep);
+      
+      if (!groups[score]) {
+        groups[score] = { count: 0, answers: [] };
+      }
+      
+      groups[score].count++;
+      groups[score].answers.push({ username, guessString: guessArray[0] });
+    });
+    
+    // Sort scores in descending order
+    const sorted = Object.keys(groups)
+      .map(Number)
+      .sort((a, b) => b - a);
+    
+    return { scoreGroups: groups, sortedScores: sorted, totalGuesses: total };
+  }
+
 
   const { data, loading } = useAsync<{
     playerCount: number;
@@ -81,7 +95,7 @@ export const StatsPage = (
       return {
         playerCount: players,
         guesses : guessScores,
-        userGuess: userGuess
+        userGuess: userGuess || ""
       };
     } catch (error) {
       if (error) {
@@ -96,9 +110,6 @@ export const StatsPage = (
         Test
     </>
   }
-
-  
-  console.log(data.guesses)
 
   
   const { scoreGroups, sortedScores, totalGuesses } = processGuessData(data.guesses);

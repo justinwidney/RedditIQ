@@ -59,10 +59,4 @@ export function splitArray<T>(array: T[], segmentLength: number): T[][] {
   }
   
 
-  export function calculateScore(sep: string[]) {
-    const correctString = Settings.answers
-    const correct = sep.filter((v, i) => v === correctString[i]).length
-    return correct
-
-
-  }
+  

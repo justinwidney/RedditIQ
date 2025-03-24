@@ -7,7 +7,7 @@
       },
       {
         "type": "historian",
-        "image": "historic_post3.png",
+        "image": "pxArt(9).png",
         "content":
           {
           "title": "Bitcoin just hit $1000 for the first time!",
@@ -62,12 +62,14 @@
         "comparisons": [
           {
             "postA": {
-              "image": "post1A.jpg",
+              "image": "pxArt(11).png",
+              "subreddit": "pics",
               "title": "I built a PC case out of LEGO",
               "upvotes": 45327
             },
             "postB": {
-              "image": "post1B.jpg",
+              "image": "pxArt(11).png",
+              "subreddit": "funny",
               "title": "My cat looks like Danny DeVito",
               "upvotes": 67812
             }
@@ -75,11 +77,13 @@
           {
             "postA": {
               "image": "post2A.jpg",
+              "subreddit": " r/mildlyinteresting",
               "title": "I found a safe in my new house",
               "upvotes": 89432
             },
             "postB": {
               "image": "post2B.jpg",
+              "subreddit": "DIY",
               "title": "I restored this painting I found at a garage sale",
               "upvotes": 32156
             }
@@ -87,11 +91,13 @@
           {
             "postA": {
               "image": "post3A.jpg",
+              "subreddit": "space",
               "title": "I took a picture of Saturn with my phone",
               "upvotes": 23567
             },
             "postB": {
               "image": "post3B.jpg",
+              "subreddit": "food",
               "title": "I made bread for the first time",
               "upvotes": 19847
             }
@@ -105,5 +111,6 @@
         "hint": "I'll be back",
         "redditRelevance": "Active Reddit user who often comments in fitness subreddits"
       }
-    ]
+    ],
+    "answer" :["3","3","3","3","1","1","1","1","1","1","3"]
   }

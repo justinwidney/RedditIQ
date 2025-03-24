@@ -12,20 +12,18 @@ export type usernameID = `t1_${string}`;
 * Score Types for the Game to save in redis
 */
 
-export type BinaryScore = 'Y' | 'N';  // Yes/No for simple correct/incorrect
-export type GradedScore = 'F' | 'H' | 'N';  // Full/Half/None for partially correct answers
-export type MultipleChoiceScore = 'A' | 'B' | 'C' | 'D';  // Multiple choice answers
+export type MultipleChoiceScore = '3' | '2' | '1' | '0';  // Multiple choice answers
 
-export type GameScore = BinaryScore | GradedScore | MultipleChoiceScore;
+export type GameScore =  MultipleChoiceScore;
 export type CompositeScore<T extends GameScore> = string; // Will be formatted as "Y,N,Y" or "F-H-N"
 
 export interface GameScoreData {
-    celebGuess: BinaryScore;
+    celebGuess: MultipleChoiceScore;
     trivia: MultipleChoiceScore;
-    subredditGuess: GradedScore;
-    copyPasta: CompositeScore<GradedScore>; // For multiple words, like "F,H,N,F"
-    upvotes: GradedScore;
-    historian: CompositeScore<BinaryScore>; // For ordering multiple posts, like "Y-N-Y-Y"
+    subredditGuess: MultipleChoiceScore;
+    copyPasta: MultipleChoiceScore; // For multiple words, like "F,H,N,F"
+    upvotes: MultipleChoiceScore;
+    historian: MultipleChoiceScore; // For ordering multiple posts, like "Y-N-Y-Y"
   }
   
   // Type for each game's score
@@ -60,10 +58,11 @@ export type UserData ={
 
 
 export interface GameProps {
-    onComplete: () => void;
+    onComplete: (userGuess: MultipleChoiceScore[]) => void;
     onCancel: (skip:boolean) => void;
     userData: UserData | null;
     setScore: (value: number | ((prevState: number) => number)) => void;
+    userGuess: GameScore[];
     setUserGuess: (value: GameScore[] | ((prevState: GameScore[]) => GameScore[])) => void;
     question: Question;
 }
@@ -113,7 +112,7 @@ interface BaseQuestion {
   }
   
   // Pasta question type
-  interface PastaQuestion extends BaseQuestion {
+  export interface PastaQuestion extends BaseQuestion {
     type: 'pasta';
     text: string;
     blanks: string[];
@@ -122,42 +121,46 @@ interface BaseQuestion {
   }
   
   // Subreddit question type
-  interface SubredditQuestion extends BaseQuestion {
+  export interface SubredditQuestion extends BaseQuestion {
     type: 'subreddit';
+    subreddit: string;
     image: string;
+    image2: string;
     answer: string;
+    upvotes: number;
   }
   
   // Trivia question type
-  interface TriviaQuestionItem {
+  export interface TriviaQuestionItem {
     question: string;
     options: string[];
     correctAnswer: number;
   }
   
-  interface TriviaQuestion extends BaseQuestion {
+  export interface TriviaQuestion extends BaseQuestion {
     type: 'trivia';
     questions: TriviaQuestionItem[];
   }
   
   // Upvotes question type
-  interface Post {
+  interface RedditPost {
     image: string;
     title: string;
     upvotes: number;
+    subreddit: string;
   }
   
-  interface PostComparison {
-    postA: Post;
-    postB: Post;
+  export interface PostComparison {
+    postA: RedditPost;
+    postB: RedditPost;
   }
   
-  interface UpvotesQuestion extends BaseQuestion {
+  export interface UpvotesQuestion extends BaseQuestion {
     type: 'upvotes';
     comparisons: PostComparison[];
   }
 
-  type Question = 
+  export type Question = 
   | CelebrityQuestion 
   | HistorianQuestion 
   | PastaQuestion 

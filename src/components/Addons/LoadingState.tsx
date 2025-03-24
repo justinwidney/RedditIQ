@@ -1,8 +1,7 @@
-import { Devvit, MenuItem } from "@devvit/public-api";
+import { Devvit } from '@devvit/public-api';
 
-
-export const LoadingPreview= ():JSX.Element => (
-    <zstack width="100%" height="100%" alignment="center middle">
+export const LoadingState = (): JSX.Element => (
+  <zstack width="100%" height="100%" alignment="center middle">
     <image
       imageHeight={1024}
       imageWidth={1500}

@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useInterval, useState } from "@devvit/public-api";
-import { GameProps, GameScore, UserData } from "../../types.js";
+import { GameProps, GameScore, TriviaQuestion, UserData } from "../../types.js";
 import { OptionItem } from "./TriviaOption.js";
 
 import Settings from '../../Settings.json';
@@ -7,54 +7,19 @@ import { ProgressBar } from "../Addons/ProgressBar.js";
 import { PixelText } from "../Addons/PixelText.js";
 import { indexToLetter } from "../../utils/utils.js";
 
-interface TriviaPageProps {
-  onComplete: () => void;
-  onCancel: () => void;
-  userData: UserData | null;
-  setScore: ((value: number | ((prevState: number) => number)) => void);
+interface TriviaPageProps extends GameProps {
+  question: TriviaQuestion;
 }
 
-interface TriviaQuestion extends JSONObject {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-}
 
 export const TriviaPage = (
-  props: GameProps,
+  props: TriviaPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore, setUserGuess } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess, question } = props;
   
-  // Sample trivia questions
-  const [questions] = useState<TriviaQuestion[]>([
-    {
-      question: "What was Reddit's original name?",
-      options: ["Snoo", "ReadIt", "FrontPage", "Reddigg"],
-      correctAnswer: 1
-    },
-    {
-      question: "In what year was Reddit founded?",
-      options: ["2003", "2005", "2007", "2009"],
-      correctAnswer: 1
-    },
-    {
-      question: "What is the Reddit mascot's name?",
-      options: ["Snoo", "Redd", "Karma", "Alien"],
-      correctAnswer: 0
-    },
-    {
-      question: "What does 'TIL' commonly stand for on Reddit?",
-      options: ["Time I Lost", "Today I Learned", "Truth In Life", "Tell It Live"],
-      correctAnswer: 1
-    },
-    {
-      question: "Which of these is NOT one of Reddit's default sort options?",
-      options: ["Hot", "New", "Popular", "Rising"],
-      correctAnswer: 2
-    }
-  ]);
 
+  const textSize = context.dimensions.width > 600 ? 1.5 : 1;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -63,7 +28,7 @@ export const TriviaPage = (
   const [timerActive, setTimerActive] = useState(true);
   const [submitted, setSubmitted] = useState(false);
 
-  const currentQuestion = questions[currentIndex];
+  const currentQuestion = question.questions[currentIndex];
   const [nextQuestionTime, setNextQuestionTime] = useState(10000);
 
 
@@ -85,7 +50,6 @@ export const TriviaPage = (
       setSelectedOption(index);
       handleSubmit(index);
       setNextQuestionTime(1500)
-      setUserGuess(prevState => [...prevState, indexToLetter(index) as GameScore])
     }
 
     setSubmitted(true);
@@ -97,6 +61,10 @@ export const TriviaPage = (
     // Check if the answer is correct
     if (index === currentQuestion.correctAnswer) {
       setScore( prev => prev + 1);
+      setUserGuess(prevState => [...prevState, '1'])
+    }
+    else {
+      setUserGuess(prevState => [...prevState, '0'])
     }
     
     setShowResult(true);
@@ -105,8 +73,8 @@ export const TriviaPage = (
 
   const onFinish = () => {
 
-      for(let i = 0; i < currentIndex-questions.length; i++){
-        setUserGuess(prevState => [...prevState, "N" as GameScore])
+      for(let i = 0; i < currentIndex-question.questions.length; i++){
+        setUserGuess(prevState => [...prevState, "0" as GameScore])
       }
       
       onComplete();
@@ -114,7 +82,7 @@ export const TriviaPage = (
 
 
   const handleNextQuestion = () => {
-    if (currentIndex < questions.length - 1) {
+    if (currentIndex < question.questions.length - 1) {
       setCurrentIndex( (currentIndex) => currentIndex + 1);
       setSelectedOption(null);
       setShowResult(false);
@@ -171,7 +139,7 @@ export const TriviaPage = (
         border="thick"
         width="100%"
       >
-        <PixelText scale={2} color="#FFFFFF">{currentQuestion.question}</PixelText>
+        <PixelText scale={textSize} color="#FFFFFF">{currentQuestion.question}</PixelText>
       </vstack>
       
       <spacer size="large" />

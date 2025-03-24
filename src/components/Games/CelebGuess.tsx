@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useForm, useInterval, useState } from "@devvit/public-api";
-import { CelebrityQuestion, GameProps, GameScore, UserData } from "../../types.js";
+import { CelebrityQuestion, GameProps, GameScore, MultipleChoiceScore, UserData } from "../../types.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import Settings from '../../Settings.json';
 import { ScoreToLetter, splitArray } from "../../utils/utils.js";
@@ -21,34 +21,24 @@ interface drawData {
 
 const ANIMATION_INTERVAL = 250;
 const INITIAL_MAX_HINTS = 3;
-const INNER_SIZE = 275;
-const GRID_SIZE = '275px';
+const INNER_SIZE = 325;
+const GRID_SIZE_HEIGHT = '275px';
+const GRID_SIZE_WIDTH = '325px';
 
 export const CelebPage = (
   props: CelebPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore, setUserGuess, question } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess, question, userGuess } = props;
   
  
-  //const { image, name, answer } = question;
-
-  console.log(question)
-
-
-
   const [startTime] = useState(Date.now());
-  
-  const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [drawingData, setDrawingData] = useState<drawData[]>(Array(Settings.canvasWidth * Settings.canvasHeight).fill({color: 0, drawn: false}));
   const [hintIndex, setHintIndex] = useState(0);
-
-
  
-  const size = '275px';
   const pieceSize: Devvit.Blocks.SizeString = `${INNER_SIZE / 16}px`;
   const drawingTime = Settings.drawTimeEasy || 60;
 
@@ -57,7 +47,6 @@ export const CelebPage = (
 
     setElapsedTime(Date.now() - startTime);
     const remainingTime = drawingTime * 1000 - elapsedTime;
-
     const newDrawingData = [...drawingData];
 
     for (let i = 0; i < 2; i++) {
@@ -68,8 +57,8 @@ export const CelebPage = (
     setDrawingData(newDrawingData);
      
     if (remainingTime <= 0) {
-      setUserGuess(prevState => [...prevState, 'N'])
-      props.onComplete();
+      setUserGuess(prevState => [...prevState, '0'])
+      props.onComplete(userGuess);
     }
 
   }, ANIMATION_INTERVAL).start();
@@ -78,31 +67,40 @@ export const CelebPage = (
 
   const handleSubmit = (name:string):void => {
 
-    if (hintIndex > INITIAL_MAX_HINTS) {
-      return;
-    }
-
-    console.log("Checking answer...")
-
     const cleanedInput = name.trim().toLowerCase();
-    const cleanedAnswer = question.answer.toLowerCase();
-    
-    // Check if the answer is correct
+    const cleanedAnswer = question.answer.trim().toLowerCase();
+
+    console.log(cleanedInput, cleanedAnswer, "TEST")
+
     const correct = cleanedInput === cleanedAnswer 
     
     setIsCorrect(correct);
     
     if (correct) {
-      const newScore = elapsedTime < 10000 ? 3 : elapsedTime < 20000 ? 2 : 1;
-      setUserGuess(prevState => [...prevState, 'Y'])
-      setScore((prev) => prev + newScore);
-      onComplete();
+
+        const newScore = elapsedTime < 10000 ? 3 : elapsedTime < 20000 ? 2 : 1;
+        const newScoreLetter = newScore === 3 ? '3' : newScore === 2 ? '2' : '1';
+
+        const updateGuess = [...userGuess, newScoreLetter] as MultipleChoiceScore[];
+        setUserGuess(prevState => [...prevState, newScoreLetter])
+        setScore((prev) => prev + newScore);
+
+        onComplete(updateGuess);
     }
     else {
-      setHintIndex((prev) => prev + 1);
+
+        const nextHintIndex = hintIndex + 1;
+        setHintIndex(nextHintIndex);
+
+      if (nextHintIndex >= INITIAL_MAX_HINTS) {
+        setUserGuess(prevState => [...prevState, '0'])
+        onComplete(userGuess);
+      }
+
     }
+
     
-    setShowResult(true);
+    
   };
 
   
@@ -121,7 +119,7 @@ export const CelebPage = (
     ));
 
     return (
-      <vstack height={GRID_SIZE} width={GRID_SIZE} padding="none">
+      <vstack height={GRID_SIZE_HEIGHT} width={GRID_SIZE_WIDTH} padding="none">
         {splitArray(pixels, 16).map((row, rowIndex) => (
           <hstack key={`row-${rowIndex}`}>{row}</hstack>
         ))}
@@ -171,12 +169,12 @@ const myForm = useForm(
 
   return (
     <vstack width="100%" height="100%" backgroundColor={Settings.theme.background}>
-      <hstack width="100%" alignment="middle center">
+      <hstack width="100%" alignment="center">
        <image
                 imageHeight={56}
                 imageWidth={256}
                 width="256px"
-                height="128px"
+                height="100px"
                         url={`data:image/svg+xml,
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 128 64" shape-rendering="crispEdges">
                         <metadata>Made with Pixels to Svg https://codepen.io/shshaw/pen/XbxvNj</metadata>
@@ -204,12 +202,12 @@ const myForm = useForm(
 
       
       <vstack alignment="middle center" width="100%">
-        <zstack width="250px" height="250px">
+        <zstack width={GRID_SIZE_WIDTH} height={GRID_SIZE_HEIGHT}>
             <image
                 imageHeight={512}
                 imageWidth={512}
-                height={GRID_SIZE}
-                width={GRID_SIZE}
+                height={GRID_SIZE_HEIGHT}
+                width={GRID_SIZE_WIDTH}
                 url={question.image ? question.image : "pxArt(9)"}
             />
           {renderPixelGrid()}

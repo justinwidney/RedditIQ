@@ -1,6 +1,6 @@
 import { Context, Devvit, useState } from "@devvit/public-api";
 import { Engine } from "../engine/Engine.js"
-import { CompositeScore, GameScore, GameSettings, GradedScore, PostId, PuzzlePostData, UserData } from "../types.js";
+import { CelebrityQuestion, CompositeScore, GameScore, GameSettings, GradedScore, HistorianQuestion, MultipleChoiceScore, PastaQuestion, PostId, PuzzlePostData, Question, SubredditQuestion, TriviaQuestion, UpvotesQuestion, UserData } from "../types.js";
 import { UpvotesPage } from "./Games/Upvotes.js";
 import { SubredditGuessPage } from "./Games/SubredditGuess.js";
 import { TriviaPage } from "./Games/Trivia.js";
@@ -12,7 +12,15 @@ import { PixelText } from "./Addons/PixelText.js";
 import { formatCompositeScore } from "../utils/utils.js";
 
 
-
+const IMG_URLS ={
+  "historian": "Windows_Screen.png",
+  "default": "classroom.png",
+  "celebrity": "classroom.png",
+  "pasta": "lunch.png",
+  "subreddit": "classroom.png",
+  "trivia": "classroom.png",
+  "upvotes": "Windows_Screen.png",
+}
 
 export interface PostData {
   postId: PostId
@@ -40,13 +48,12 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
     const [score, setScore] = useState<number>(0)
     const [userGuess, setUserGuess] = useState<GameScore[]>([]);
     const [targetIndex, setTargetIndex] = useState<number>(0);
+    const [questionIndex, setQuestionIndex] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<string>('randomize');
 
 
-
-    const currentQuestion = props.questionData.questions[targetIndex];
-
-    console.log(props.questionData, "QUESTION DATA")
+    const currentQuestion = props.questionData[questionIndex] as Question;
+    const currentQuestionType = currentQuestion.type ? currentQuestion.type : 'default';
 
     const engine = new Engine(context);
 
@@ -61,20 +68,17 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
     }
 
 
-    async function onGuessHandler(guess: GameScore | GameScore[]): Promise<void> {
+    async function onGuessHandler(guess: GameScore[]): Promise<void> {
       if (!props.postData || !props.username) {
           return;
       }
       
       try {
         // Ensure guess is an array before formatting
-        const guessArray = Array.isArray(guess) ? guess : [guess];
-        const userGuess = formatCompositeScore(guessArray);
-        
         const points = await engine.submitGuess({
             postData: props.postData,
             username: props.username,
-            guess: userGuess,
+            guess: guess,
         });
      
         props.onCancel(true);
@@ -84,13 +88,15 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
   }
 
 
-    const onCompletePage = async (): Promise<void> => {
+    const onCompletePage = async (latestGuesses: MultipleChoiceScore[]): Promise<void> => {
+
+      setQuestionIndex( prev => prev + 1)
 
       // Game OVER
       if(isLastQuestion) {
           if (props.username) {
-              const guessToSubmit = Array.isArray(userGuess) ? userGuess : [userGuess];
-              await onGuessHandler(guessToSubmit);
+            
+              await onGuessHandler(latestGuesses);
           }
       } else {
           setCurrentStep('randomize');
@@ -102,14 +108,32 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
 
 
     const steps: Record<string, JSX.Element> = {
+      
       // GAMES
-      celebGuess: <CelebPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
-      trivia: <TriviaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
-      subredditGuess: <SubredditGuessPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion}  />,
-      copyPasta: <PastaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
-      upvotes: <UpvotesPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
-      historian: <HistorianPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} question={currentQuestion} />,
- 
+      celebGuess: currentQuestion.type === 'celebrity' ? (
+        <CelebPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} userGuess={userGuess} question={currentQuestion as CelebrityQuestion} />
+      ) : null,
+      
+      trivia: currentQuestion.type === 'trivia' ? (
+        <TriviaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} userGuess={userGuess} question={currentQuestion as TriviaQuestion} />
+      ) : null,
+      
+      subredditGuess: currentQuestion.type === 'subreddit' ? (
+        <SubredditGuessPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} userGuess={userGuess} question={currentQuestion as SubredditQuestion} />
+      ) : null,
+      
+      copyPasta: currentQuestion.type === 'pasta' ? (
+        <PastaPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} userGuess={userGuess} question={currentQuestion as PastaQuestion} />
+      ) : null,
+      
+      upvotes: currentQuestion.type === 'upvotes' ? (
+        <UpvotesPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} userGuess={userGuess} question={currentQuestion as UpvotesQuestion} />
+      ) : null,
+      
+      historian: currentQuestion.type === 'historian' ? (
+        <HistorianPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} userGuess={userGuess} question={currentQuestion as HistorianQuestion} />
+      ) : null,
+    
       // RANDOMIZER
       randomize: <PageCarousel {...props} onComplete={onCompleteRandomize} targetPageIndex={stepList[targetIndex]}/>,
     }
@@ -121,15 +145,13 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
           imageWidth={2048}
           height="100%"
           width="100%"
-          url="classroom.png"
+          url={IMG_URLS[currentQuestionType]}
           description="custom background"
           resizeMode="cover"  
           />
         <vstack width="100%" height="100%" >
 
             <hstack width="100%" height="5%" backgroundColor="#D9D9D9" padding="small">
-                <PixelText color="#000000"> RedditIQ </PixelText>
-                <spacer size="medium" />
                 <PixelText color="#000000">Question</PixelText>
                 <spacer size="small" />
 

@@ -6,23 +6,39 @@ import { SolvePageRouter } from "../../components/SolvePageRouter.js";
 import { GameSettings, PostId, PuzzlePostData, UserData } from "../../types.js";
 import { Engine } from "../../engine/Engine.js";
 import { StatsPage } from "../../components/Pages/ScorePage.js";
+import { PixelText } from "../../components/Addons/PixelText.js";
+import { LoadingState } from "../../components/Addons/LoadingState.js";
 
 
-const QUESTION_SETS = {
-  SET_1: '../../data/Questions/March/21-03-2025.json',
-  SET_2: 'questions/set2.json',
-  SET_3: 'questions/set3.json',
-  // Add more sets as needed
-};
+
+function extractDateFromPath(filePath) {
+
+  const datePattern = /(\d{2})-(\d{2})-(\d{4})\.json$/;
+  const match = filePath.match(datePattern);
+
+  const monthPattern = /Questions\/([A-Za-z]+)\//;
+  const monthMatch = filePath.match(monthPattern);
+  
+  
+  if (match) {
+    const monthName = monthMatch[1];
+    const [_, day, month, year] = match;
+    return {
+      monthName,
+      day,
+      month,
+      year,
+      formatted: `${day}-${month}-${year}`
+    };
+  }
+  
+  return null;
+}
 
 async function loadQuestionsFromPath(filePath : string) {
  
-  switch(filePath) {
-    case QUESTION_SETS.SET_1:
-      return (await import('../../data/Questions/March/21-03-2025.json')).default;
-    default:
-      return (await import('../../data/Questions/March/19-03-2025.json')).default;
-  }
+  const todayDate = extractDateFromPath(filePath)
+  return (await import(`../../data/Questions/${todayDate?.monthName}/${todayDate?.formatted}.json`)).default;
   
 }
 
@@ -61,7 +77,7 @@ function createComponentIndexArray(questionsData) {
   };
   
   // Extract the question types from the JSON
-  const questionTypes = questionsData.questions.map(question => question.type);
+  const questionTypes = questionsData.map(question => question.type);
   
   // Convert each question type to its corresponding component index
   const indexArray = questionTypes.map(type => typeToIndexMap[type]);
@@ -70,39 +86,47 @@ function createComponentIndexArray(questionsData) {
 }
 
 
-export const  PinnedPost = (props: PinnedPostProps, context: Context): Promise<JSX.Element> => {
+export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Element => {
 
     const engine = new Engine(context);
     const isSolved = !!props.userData?.solved;
     //const questions = props.gameSettings.questions;
 
-    const [data] = useState(async () =>{
-        const questions = await loadQuestionsFromPath(props.gameSettings.fileName);
-        console.log(questions)
-        return questions;
-     } 
-    );
+
+    const { data:player, loading} = useAsync<{
+      playerCount: number;
+      rank: number;
+      score: number;
+      questions: any[];
+      answer: string[]
+    }>(async () => {
+      const players = await engine.getPlayerCount(props.postData.postId);
+      const user = await engine.getUserScore(props.username);
+      const questions = await loadQuestionsFromPath(props.gameSettings.fileName);
 
 
-    const questions = createComponentIndexArray(data);
+      return {
+        playerCount: players ? players : 0,
+        rank: user.rank,
+        score: user.score,
+        questions: questions.questions,
+        answer: questions.answer
+      }
+    });
 
-   
+    
+    if (player === null || loading) {
+      return <LoadingState />;
+    }
+  
+    const questions = createComponentIndexArray(player.questions);
+
 
     const [page, setPage] = useState(
        isSolved ? 'score' : 'menu'
     );
 
-    const { data: user, loading } = useAsync<{
-        rank: number;
-        score: number;
-      }>(async () => {
-        return await engine.getUserScore(props.username);
-      });
-    
-      if (user === null || loading) {
-        return <> loading ...</>
-      }
-    
+     
 
     const Menu = (
         <vstack width="100%" height="100%" alignment="center middle">
@@ -125,14 +149,28 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): Promise<J
             <spacer grow />
             
             <vstack alignment="center middle" gap="small">
-              <CustomButton onClick={() => setPage('solve')} label="Play Game"  width="256px" height="48px" color="#FFFFFF"/>
-              <CustomButton onClick={() => setPage('tutorial')} label="Tutorial" width="256px" height="48px" color="#FFFFFF"/>
+              <CustomButton onClick={() => setPage('solve')} label="Prove my IQ"  width="256px" height="48px" color="#FFFFFF"/>
+              <CustomButton onClick={() => setPage('tutorial')} label="Tutorial" width="256px" height="48px" color="#FFFFFF" />
             </vstack>
 
-            <spacer grow />
+     
+
+          <spacer grow />
+
+            <hstack alignment="center middle" gap="small" width={"100%"} backgroundColor="black" padding="small">
+              <PixelText scale={2}>Perfect Scores</PixelText>
+              <spacer size="small" />
+              <PixelText scale={2}>{player?.playerCount?.toLocaleString() || '0'}</PixelText>
+              <PixelText scale={2}>%</PixelText>
+            </hstack>
+
+            <spacer size="medium" />
 
             </vstack>
     )
+
+
+   
 
     const onClose = (skip:boolean = false) :void => {
         setPage(  skip? 'score' : 'menu')
@@ -141,12 +179,12 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): Promise<J
     const pages: Record<string, JSX.Element> = {
         menu: Menu,
         tutorial : <TutorialPage onClose={onClose} />,
-        solve: <SolvePageRouter {...props} onCancel={onClose} questions={questions} questionData={data} />,
-        score: <StatsPage puzzleName={""} {...props} />
+        solve: <SolvePageRouter {...props} onCancel={onClose} questions={questions} questionData={player.questions} />,
+        score: <StatsPage puzzleName={""} {...props} answer={player.answer} />
     }
 
 
 
-    return pages[page] || Menu
+    return pages[page] || Menu;
 
 }

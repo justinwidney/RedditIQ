@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useState, TextAreaWidget, useForm } from "@devvit/public-api";
-import { GameProps, UserData } from "../../types.js";
+import { GameProps, SubredditQuestion, UserData } from "../../types.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import { PixelText } from "../Addons/PixelText.js";
 import { PixelSymbol } from "../Addons/PixelSymbol.js";
@@ -9,12 +9,10 @@ import { GAME_SVG } from "../../data/svgs.js";
 
 
 
-
-interface SubredditQuestion extends JSONObject {
-  image: string;
-  answer: string;
-  hints: string[];
+interface SubredditGuessPageProps extends GameProps {
+  question: SubredditQuestion;
 }
+
 
 const INITIAL_MAX_HINTS = 3;
 
@@ -36,54 +34,33 @@ const myForm = Devvit.createForm(
 
 
 export const SubredditGuessPage = (
-  props: GameProps,
+  props: SubredditGuessPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore, setUserGuess } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess, question, userGuess } = props;
 
   const {ui, reddit} = context;
-  
-  // Sample subreddit questions
-  const [questions] = useState<SubredditQuestion[]>([
-    {
-      image: "pxArt(9).png",
-      answer: "aww",
-      hints: ["Cute animals", "Wholesome content", "Makes you say the subreddit name"]
-    },
-    {
-      image: "r-dataisbeautiful.jpg",
-      answer: "dataisbeautiful",
-      hints: ["Visualizations", "Graphs and charts", "Information presentation"]
-    },
-    {
-      image: "r-oddlysatisfying.jpg",
-      answer: "oddlysatisfying",
-      hints: ["Things that feel good to watch", "Perfect fits", "Pleasing patterns"]
-    },
-    {
-      image: "r-askreddit.jpg",
-      answer: "askreddit",
-      hints: ["Questions for the community", "Discussion-based", "Very popular"]
-    }
-  ]);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const containerWidth = context.dimensions.width > 600 ? '450px' : '300px';
+  const pictureWidth = context.dimensions.width > 600 ? '400px' : '250px';
+  const textSize = context.dimensions.width > 600 ? 1.5 : 1;
+  
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [hintIndex, setHintIndex] = useState(0);
 
-  const currentQuestion = questions[currentIndex];
+  const currentQuestion = question
 
 
-  const onFinish = () => {
+  const onFinish = (sovled:boolean) => {
 
     const score = 3 - hintIndex;
-    const guess = isCorrect ? 'Y' : 'N';
+    const guess = sovled ? '3' : '0';
 
     setUserGuess(prevState => [...prevState, guess])
     setScore(prevScore => prevScore + score);
-    onComplete();
+    onComplete(userGuess);
 
   }
 
@@ -91,9 +68,8 @@ export const SubredditGuessPage = (
 // Handle selecting an option for a blank
 const handleOptionSelect = (option : string ) => {
 
-    if (hintIndex >= INITIAL_MAX_HINTS) {
-      onFinish();
-    }
+    setHintIndex( prev => prev + 1);
+
 
     // Clean up and normalize the input for comparison
     const cleanedInput = option.trim().toLowerCase();
@@ -107,11 +83,18 @@ const handleOptionSelect = (option : string ) => {
     setIsCorrect(correct);
     
     if (correct) {
-      onFinish();
+      onFinish(true);
+      return
     }
+
+    if (hintIndex >= INITIAL_MAX_HINTS -1) {
+      onFinish(false);
+      return
+    }
+
     
     setShowResult(true);
-    setHintIndex( prev => prev + 1);
+   
 };
 
   const myForm = useForm(
@@ -167,9 +150,9 @@ const handleOptionSelect = (option : string ) => {
       
     
       
-      <vstack alignment="middle center" width="450px">
+      <vstack alignment="middle center" width={containerWidth}>
         
-        <vstack width="100%" height="100%" border="thick" borderColor="black" cornerRadius="medium" padding="medium" backgroundColor="#ffffff">
+        <vstack width="100%" height="100%" border="thick" borderColor="gray"  padding="medium" backgroundColor="#ffffff">
 
           <hstack gap="small" alignment="start middle" >
 
@@ -187,10 +170,10 @@ const handleOptionSelect = (option : string ) => {
           <spacer size="small" />
 
           <hstack gap="small" alignment="start" >
-            {hintIndex <= 0 ? <PixelText scale={1.5} color="black"> .... </PixelText>: <PixelText scale={1.5} color="black"> The speakers keep getting bigger </PixelText> }
+            {hintIndex <= 0 ? <PixelText scale={textSize} color="black"> .... </PixelText>: <PixelText scale={textSize} color="black"> The speakers keep getting bigger </PixelText> }
           </hstack>
           <hstack gap="small" alignment="start" >
-          {hintIndex <= 0 ? <PixelText scale={1.5} color="black"> ....  </PixelText> : <PixelText scale={1.5} color="black"> and my living room stays the same size </PixelText>} 
+          {hintIndex <= 0 ? <PixelText scale={textSize} color="black"> ....  </PixelText> : <PixelText scale={textSize} color="black"> and my living room stays the same size </PixelText>} 
           </hstack>
 
           <spacer size="small" />
@@ -199,9 +182,9 @@ const handleOptionSelect = (option : string ) => {
             imageHeight={180}
             imageWidth={400}
             height="180px"
-            width= "400px"
+            width= {pictureWidth}
             resizeMode="fill"
-            url="pxArt(11).png"
+            url={ hintIndex > 1 ? currentQuestion.image2 : currentQuestion.image}
           />
            
 
@@ -214,7 +197,7 @@ const handleOptionSelect = (option : string ) => {
 
                <PixelSymbol type="arrow-up" color="##000000" scale={2}/>
                 <spacer size="small" />
-                {hintIndex <= 1 ? <PixelText scale={1} color="#000000">???</PixelText> : <PixelText scale={1} color="#000000">25</PixelText> }
+                {hintIndex <= 1 ? <PixelText scale={1} color="#000000">???</PixelText> : <PixelText scale={1} color="#000000">{currentQuestion.upvotes}</PixelText> }
 
           </hstack>
           </hstack>   

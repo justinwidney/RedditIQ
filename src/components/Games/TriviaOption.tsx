@@ -38,7 +38,7 @@ export const OptionItem = (props: OptionItemProps) => {
         border="thick"
         onPress={() => onSelect(index)}
       >
-        <PixelText scale={2} color="#FFFFFF">{option}</PixelText>
+        <PixelText scale={1.5} color="#FFFFFF">{option}</PixelText>
       </vstack>
     );
   };

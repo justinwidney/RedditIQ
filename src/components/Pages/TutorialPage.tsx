@@ -83,33 +83,36 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
             instructions: [
                 "Read the post titles carefully",
                 "Choose the correct month and year",
-                "Submit your answers before time runs out",
-                "Points for correct ordering!"
+                "Three tries to get the correct date",
+                "Points for getting within 6months or 1 year!"
             ]
         },
     ];
 
-    // Navigate to next game
     const handleNext = () => {
         setCurrentGameIndex((prev) => (prev + 1) % gameTutorials.length);
     };
 
-    // Navigate to previous game
     const handlePrev = () => {
         setCurrentGameIndex((prev) => (prev - 1 + gameTutorials.length) % gameTutorials.length);
     };
 
     const currentGame = gameTutorials[currentGameIndex];
 
+    const handleSkip = () => {
+        props.onClose(false);
+    };
+
+
     return (
-        <vstack width="100%" height="100%" padding="large">
+        <vstack width="100%" height="100%" padding="small">
            
             {/* Title Bar */}
             <hstack width="100%" alignment="middle">
                 <spacer width="24px" />
                 <PixelText > Tutorial </PixelText>
                 <spacer grow />
-                <CustomButton label="Close" textSize={1} height="32px" width="64px" onClick={props.onClose} />
+                <CustomButton label="Close" textSize={1} height="32px" width="64px" onClick={handleSkip} />
                 <spacer width="24px" />
             </hstack>
             
@@ -160,7 +163,7 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
                                 {/* Navigation Buttons */}
                                 <hstack width="100%" alignment="center middle" gap="large">
                                     <CustomButton 
-                                        label="← Prev" 
+                                        label="Prev" 
                                         textSize={1} 
                                         height="32px" 
                                         width="80px" 
@@ -170,7 +173,7 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
                                         {`${currentGameIndex + 1} of ${gameTutorials.length}`}
                                     </text>
                                     <CustomButton 
-                                        label="Next →" 
+                                        label="Next" 
                                         textSize={1} 
                                         height="32px" 
                                         width="80px" 

@@ -2,13 +2,10 @@ import { Devvit, MenuItem } from "@devvit/public-api";
 import { Engine } from "../engine/Engine.js";
 import Settings  from "../Settings.json";
 import { GameSettings } from "../types.js";
+import { LoadingPreview } from "../utils/loadingPreview.js";
 
 
-const LoadingPreview= ():JSX.Element => (
-    <vstack width="100%" height="100%">
-        <text> Loading... ss </text>
-    </vstack>
-)
+
 
 /*
 * Install Game and store Setting 

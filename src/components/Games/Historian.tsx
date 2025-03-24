@@ -21,29 +21,33 @@ export const HistorianPage = (
   props: HistorianPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore, setUserGuess, question } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess, question, userGuess } = props;
   const { ui } = context;
   
   
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  //const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [hintIndex, setHintIndex] = useState(0);
   const [userAnswer, setAnswer] = useState({ month: "", year: "" });
+  const [month, setMonth] = useState(0);
+  const [year, setYear] = useState(0);
 
 
+  const containerWidth = context.dimensions.width > 600 ? '425px' : '325px';
+  const pictureWidth = context.dimensions.width > 600 ? '390px' : '300px';
+  const padding = context.dimensions.width > 600 ? 'medium' : 'small';
 
-  const handleShowHint = () => {
-    if (hintIndex < question.hints.length - 1) {
-      setHintIndex(hintIndex + 1);
-    } else {
-      setHintIndex(0);
-    }
-    setShowHint(true);
-  };
+
+  const toastMessage = (yearDifference:number, monthDifference:number) =>{
+
+    const monthDifferenceText = monthDifference > 4 ? "Far" : `Close` ;
+    const yearDifferenceText = yearDifference > 3 ? "Far" : `Close` ;
+
+    ui.showToast({ text: `The Month is ${monthDifferenceText} and the Year is ${yearDifferenceText}` });
+    
+}
+
 
   const guessForm = useForm(
     () => {
@@ -52,12 +56,14 @@ export const HistorianPage = (
           {
             type: 'number',
             name: 'month',
-            label: 'Month',
+            label: 'Release Month',
+            defaultValue: month,
           },
           {
             type: 'number',
             name: 'year',
-            label: 'Year',
+            label: 'Release Year',
+            defaultValue: year,
           },
         ],
       };
@@ -66,6 +72,9 @@ export const HistorianPage = (
       // Handle the guess submission
       const monthGuess = parseInt(values.month);
       const yearGuess = parseInt(values.year);
+
+      setMonth(monthGuess);
+      setYear(yearGuess);
       
       const correctMonth = question.answer.month;
       const correctYear = question.answer.year;
@@ -73,21 +82,44 @@ export const HistorianPage = (
       // Allow for partial matches (e.g., "jan" for "january")
       const monthCorrect = correctMonth === (monthGuess) 
       const yearCorrect = yearGuess === correctYear;
-      
+
+      const guessMonthsTotal = (yearGuess * 12) + monthGuess;
+      const correctMonthsTotal = (correctYear * 12) + correctMonth;
+      const timeDelta = Math.abs(guessMonthsTotal - correctMonthsTotal);
+
+      const isWithinSixMonths = timeDelta <= 6;  
+      const isWithinOneYear = timeDelta <= 12;
+
       setAnswer({ month: values.month, year: values.year });
       setIsCorrect(monthCorrect && yearCorrect);
       
-      if (monthCorrect && yearCorrect) {
-        setScore(prevScore => prevScore + 1);
-        setUserGuess(prevState => [...prevState, ScoreToLetter(1) as GameScore])
-        onComplete();
+      if (isWithinSixMonths) {
+        setScore(prevScore => prevScore + 3);
+        setUserGuess(prevState => [...prevState, '3'])
+        onComplete(userGuess);
+        return
       }
-      else if(monthCorrect || yearCorrect){
+
+      else if( (isWithinOneYear) && hintIndex === 2){
         setScore(prevScore => prevScore + 0.5);
-        setUserGuess(prevState => [...prevState, ScoreToLetter(0.5) as GameScore])
-        onComplete();
+        setUserGuess(prevState => [...prevState, '1'])
+        onComplete(userGuess);
+        return
+      }
+
+      else if( hintIndex > 2){
+        setScore(prevScore => prevScore + 0);
+        setUserGuess(prevState => [...prevState, '0'])
+        onComplete(userGuess);
+        return
       }
       
+
+      const timeDifference = Math.abs(correctYear - yearGuess);
+      const monthDifference = Math.abs(correctMonth - monthGuess);
+      toastMessage(timeDifference, monthDifference)
+
+
       setShowResult(true);
       setHintIndex(prev => prev + 1);
     }
@@ -111,72 +143,71 @@ export const HistorianPage = (
 
 
   return (
-    <vstack width="100%" height="100%" padding="small" backgroundColor="#9b59b6" alignment="center middle">
+    <vstack width="100%" height="100%" padding="medium"  alignment="center">
+
+      <spacer size="small" />
+
       <hstack width="100%" alignment="middle center">
         <image
-          imageHeight={64}
-          imageWidth={128}
-          width="256px"
-          height="128px"
+          imageHeight={96}
+          imageWidth={144}
+          width="192px"
+          height="96px"
           url={GAME_SVG.historian}
           description="Reddit Historian logo"
         />
       </hstack>
 
       <spacer size="small" />
-      <hstack alignment="center middle">
-          {renderHintHearts()}
-      </hstack>
-      <spacer size="small" />
       
-      <vstack alignment="middle center" width="450px">
-        <vstack width="100%" height="100%" border="thick" borderColor="black" cornerRadius="medium" padding="medium" backgroundColor="#ffffff">
-          <hstack gap="small" alignment="start">
-            <PixelText scale={1} color="black">r/ </PixelText>
-            <PixelText scale={1} color="black">{ question.content.content}</PixelText>
+      <vstack alignment="middle center" width={containerWidth}>
+        <vstack width="100%" height="100%" border="thick" borderColor="gray" padding={padding} backgroundColor="#ffffff" >
+          <hstack gap="small" alignment="start middle" backgroundColor="#2A3439" width="100%" padding="small">
+            <PixelText scale={1} color="#FFFFFF">r/ </PixelText>
+            <PixelText scale={1} color="white">{ question.content.subreddit}</PixelText>
             <spacer size="small" />
-            <PixelText scale={1} color="black">??? ago</PixelText>
+            <PixelText scale={1} color="white">??? ago</PixelText>
+
+            <spacer grow />
+            {renderHintHearts()}
+
           </hstack>
 
           <spacer size="small" />
 
           <hstack gap="small" alignment="start">
-            <PixelText scale={1.5} color="black">{question.content.title}</PixelText>
+            <PixelText scale={1} color="black">{question.content.title}</PixelText>
           </hstack>
 
           <spacer size="small" />
 
           <image
-            imageHeight={180}
+            imageHeight={150}
             imageWidth={400}
-            height="180px"
-            width="400px"
+            height="150px"
+            width={pictureWidth}
             resizeMode="fill"
             url={question.image}
           />
            
-          <spacer grow />
 
-          <hstack gap="small" alignment="middle start">
-            <hstack width="100px" height="25px" alignment="center middle" gap="small" backgroundColor="gray">
-              <hstack width="100%" height="100%" alignment="center middle" backgroundColor="gray" padding="small">
-                <PixelSymbol type="arrow-up" color="#000000" scale={2}/>
-                <PixelText scale={1.5} color="#000000"> 2242</PixelText> 
-              </hstack>
-            </hstack>   
-
-            <CustomButton
-              width="150px"
-              height="25px"
-              textSize={1}
-              label={"Make a Guess"}
-              onClick={() => context.ui.showForm(guessForm)}
-            />
-          </hstack>
         </vstack>
                 
       
       </vstack>
+
+      <spacer size="small" />
+
+      <hstack alignment="middle center">
+            <CustomButton
+              width="120px"
+              height="40px"
+              textSize={2}
+              label={"Solve"}
+              onClick={() => context.ui.showForm(guessForm)}
+            />
+          </hstack>
+
     </vstack>
   );
 };
