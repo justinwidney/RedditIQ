@@ -5,6 +5,8 @@ import Settings from '../../Settings.json';
 import { PixelText } from "../Addons/PixelText.js";
 import { ProgressBar } from "../Addons/ProgressBar.js";
 import { GAME_SVG } from "../../data/svgs.js";
+import { CustomButton } from "../Addons/CustomButton.js";
+import { renderHintHearts } from "../Addons/Hearts.js";
 
 interface UpvotesPageProps extends GameProps {
 question: UpvotesQuestion;
@@ -94,19 +96,23 @@ export const UpvotesPage = (
 }
 
 
-
   const renderPostCard = (post: PostComparison['postA'], label: string, isSelected: boolean) => {
     return (
+
+
+      
+
       <vstack 
         backgroundColor={
-          isSelected && correct ? "rgba(255, 140, 0, 0.2)" : isSelected && !correct? "rgba(255, 50, 50, 0.5)" : "white"
+          isSelected && correct ? "rgba(255, 140, 0, 0.2)" : isSelected && !correct? "rgba(255, 50, 50, 0.5)" : "#013839"
         }
-        borderColor={isSelected ? "orange" : "gray"}
-        border={isSelected ? "thick" : "thin"}
-        padding="medium"
+        padding="small"
         width="40%"
+        height="100%"
         onPress={() => handleSelection(label as 'A' | 'B')}
       >
+        <vstack alignment="middle center" width="100%" backgroundColor="white" height="100%" >
+
          <hstack gap="small" alignment="start middle" backgroundColor="#2A3439" width="100%" padding="small">
           <PixelText scale={1} color="#FFFFFF">{post.subreddit}</PixelText>
         </hstack>
@@ -121,50 +127,53 @@ export const UpvotesPage = (
         <zstack border="thin" borderColor="#000000">
         <image
           url={post.image}
-          imageHeight={250}
+          imageHeight={225}
           imageWidth={250}
-          height="150px"
+          height="100%"
           width="100%"
-          resizeMode="cover"
+          resizeMode="fill"
         />
         </zstack>
-        
+
+        </vstack>
       </vstack>
     );
   };
 
   return (
-    <vstack width="100%" height="100%" padding="medium"  >
-      <spacer size="medium" />
-      <hstack width="100%" alignment="middle center">
-      <image
-                imageHeight={64}
-                imageWidth={128}
-                width="128px"
-                height="64px"
-                resizeMode="fill"
-                url={GAME_SVG.upvotes}
-               />
+    <vstack width="100%" height="100%" padding="small" alignment="center">
+      <spacer height="58px" />
+      
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
+        <hstack width="100%" alignment="center middle" backgroundColor="white">
+          <spacer size="small" />
+          <PixelText scale={1} color={"black"}>www.</PixelText>
+          <image
+            imageHeight={64}
+            imageWidth={64}
+            width="96px"
+            height="32px"
+            url={GAME_SVG.upvotes}
+          />
+          <PixelText scale={1} color={"black"}>.com</PixelText>
+          <spacer grow />
+          <PixelText scale={1} color={"black"}>Tries</PixelText>
+          {renderHintHearts ? renderHintHearts(0) : null}
+        </hstack>
       </hstack>
       
       <spacer size="small" />
       
-      <vstack alignment="center middle" >
+   
+          <hstack width="100%" gap="medium" alignment="middle center" height={"325px"}>
+            {renderPostCard(currentComparison.postA, 'A', selectedPost === 'A')}
+            {renderPostCard(currentComparison.postB, 'B', selectedPost === 'B')}
+          </hstack>
 
-        <ProgressBar width={256} onComplete={onFinish} />
-      </vstack>
       
-      <spacer size="large" />
+      <spacer size="small" />
       
-          
-      <hstack width="100%" gap="medium" alignment="middle center" >
-        {renderPostCard(currentComparison.postA, 'A', selectedPost === 'A')}
-        {renderPostCard(currentComparison.postB, 'B', selectedPost === 'B')}
-      </hstack>
-      
-      <spacer size="large" />
-      
-
+ 
     </vstack>
   );
 };

@@ -14,11 +14,11 @@ import { formatCompositeScore } from "../utils/utils.js";
 
 const IMG_URLS ={
   "historian": "Windows_Screen.png",
-  "default": "classroom.png",
-  "celebrity": "classroom.png",
-  "pasta": "lunch.png",
-  "subreddit": "classroom.png",
-  "trivia": "classroom.png",
+  "default": "background.png",
+  "celebrity": "Windows_Screen.png",
+  "pasta": "Windows_Screen.png",
+  "subreddit": "Windows_Screen.png",
+  "trivia": "Windows_Screen.png",
   "upvotes": "Windows_Screen.png",
 }
 
@@ -54,6 +54,8 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
 
     const currentQuestion = props.questionData[questionIndex] as Question;
     const currentQuestionType = currentQuestion.type ? currentQuestion.type : 'default';
+
+    console.log('currentQuestionType', currentQuestionType)
 
     const engine = new Engine(context);
 
@@ -145,12 +147,13 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
           imageWidth={2048}
           height="100%"
           width="100%"
-          url={IMG_URLS[currentQuestionType]}
+          url={ currentStep==='randomize' ? 'background.png' : IMG_URLS[currentQuestionType]}
           description="custom background"
           resizeMode="cover"  
           />
         <vstack width="100%" height="100%" >
 
+          {currentStep==='randomize' &&
             <hstack width="100%" height="5%" backgroundColor="#D9D9D9" padding="small">
                 <PixelText color="#000000">Question</PixelText>
                 <spacer size="small" />
@@ -168,6 +171,7 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
                 <PixelText color="#000000">{score.toString()}</PixelText>
 
               </hstack>
+          }
             
             {steps[currentStep] 
             ||   

@@ -5,6 +5,7 @@ import Settings from '../../Settings.json';
 import { ScoreToLetter, splitArray } from "../../utils/utils.js";
 import { ProgressBar } from "../Addons/ProgressBar.js";
 import { PieceSymbol } from "../Addons/PieceSymbol.js";
+import { PixelText } from "../Addons/PixelText.js";
 
 
 
@@ -19,11 +20,9 @@ interface drawData {
   }
   
 
-const ANIMATION_INTERVAL = 250;
+const ANIMATION_INTERVAL = 200;
 const INITIAL_MAX_HINTS = 3;
-const INNER_SIZE = 325;
-const GRID_SIZE_HEIGHT = '275px';
-const GRID_SIZE_WIDTH = '325px';
+const GRID_SIZE_HEIGHT = '250px';
 
 export const CelebPage = (
   props: CelebPageProps,
@@ -39,8 +38,13 @@ export const CelebPage = (
   const [drawingData, setDrawingData] = useState<drawData[]>(Array(Settings.canvasWidth * Settings.canvasHeight).fill({color: 0, drawn: false}));
   const [hintIndex, setHintIndex] = useState(0);
  
-  const pieceSize: Devvit.Blocks.SizeString = `${INNER_SIZE / 16}px`;
+  const pieceSize: Devvit.Blocks.SizeString = `${context.dimensions.width / 16}px`;
+  const pieceSizeHeight: Devvit.Blocks.SizeString = `${context.dimensions?.height / 16}px`;
+
+
   const drawingTime = Settings.drawTimeEasy || 60;
+
+  const pictureWidth:Devvit.Blocks.SizeString = `${context.dimensions.width}px`
 
 
   useInterval(() => {
@@ -70,7 +74,6 @@ export const CelebPage = (
     const cleanedInput = name.trim().toLowerCase();
     const cleanedAnswer = question.answer.trim().toLowerCase();
 
-    console.log(cleanedInput, cleanedAnswer, "TEST")
 
     const correct = cleanedInput === cleanedAnswer 
     
@@ -112,14 +115,14 @@ export const CelebPage = (
     const pixels = drawingData.map((pixel, index) => (
       <hstack
         key={`pixel-${index}`}
-        height={pieceSize}
+        height={pieceSizeHeight}
         width={pieceSize}
         backgroundColor={pixel.drawn ? "transparent" : "black"}
       />
     ));
 
     return (
-      <vstack height={GRID_SIZE_HEIGHT} width={GRID_SIZE_WIDTH} padding="none">
+      <vstack height={GRID_SIZE_HEIGHT} width="100%" padding="none">
         {splitArray(pixels, 16).map((row, rowIndex) => (
           <hstack key={`row-${rowIndex}`}>{row}</hstack>
         ))}
@@ -157,7 +160,7 @@ const myForm = useForm(
           <PieceSymbol 
             type="heart" 
             color="red" 
-            scale={0.5} 
+            scale={1} 
           />
         );
       }
@@ -168,68 +171,90 @@ const myForm = useForm(
 
 
   return (
-    <vstack width="100%" height="100%" backgroundColor={Settings.theme.background}>
-      <hstack width="100%" alignment="center">
-       <image
-                imageHeight={56}
-                imageWidth={256}
-                width="256px"
-                height="100px"
-                        url={`data:image/svg+xml,
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 128 64" shape-rendering="crispEdges">
-                        <metadata>Made with Pixels to Svg https://codepen.io/shshaw/pen/XbxvNj</metadata>
-                        <path stroke="#42252f" d="M31 16h3M31 17h3M30 18h1M34 18h1M30 19h1M34 19h1M28 20h2M35 20h1M28 21h2M35 21h1M28 22h2M35 22h1M27 23h1M36 23h1M19 24h9M36 24h9M19 25h2M44 25h1M19 26h2M44 26h1M19 27h2M44 27h1M19 28h2M44 28h1M19 29h2M44 29h1M19 30h2M44 30h1M21 31h1M43 31h1M22 32h1M41 32h2M23 33h1M40 33h1M24 34h2M39 34h1M24 35h2M39 35h1M23 36h1M40 36h1M23 37h1M40 37h1M22 38h1M41 38h2M22 39h1M41 39h2M22 40h1M31 40h3M41 40h2M22 41h1M28 41h3M34 41h2M41 41h2M22 42h1M26 42h2M36 42h3M41 42h2M22 43h1M26 43h2M36 43h3M41 43h2M22 44h4M39 44h4" />
-                        <path stroke="#f0dd11" d="M31 18h3M31 19h3M30 20h5M30 21h5M30 22h5M28 23h8M28 24h8M21 25h23M21 26h23M22 27h21M23 28h18M24 29h16M24 30h16M26 31h13M26 32h13M26 33h13M26 34h13M26 35h13M24 36h7M34 36h6M24 37h4M36 37h4M23 38h3M39 38h2M23 39h3M39 39h2" />
-                        <path stroke="#000000" d="M48 21h1M51 21h1M54 21h2M58 21h1M62 21h1M64 21h4M71 21h5M77 21h1M80 21h1M83 21h2M87 21h5M48 22h2M51 22h1M53 22h1M56 22h1M58 22h2M61 22h2M64 22h1M73 22h1M77 22h1M80 22h1M82 22h1M85 22h1M89 22h1M48 23h1M50 23h2M53 23h4M58 23h1M60 23h1M62 23h1M64 23h3M73 23h1M77 23h4M82 23h4M89 23h1M48 24h1M51 24h1M53 24h1M56 24h1M58 24h1M62 24h1M64 24h1M73 24h1M77 24h1M80 24h1M82 24h1M85 24h1M89 24h1M48 25h1M51 25h1M53 25h1M56 25h1M58 25h1M62 25h1M64 25h4M73 25h1M77 25h1M80 25h1M82 25h1M85 25h1M89 25h1M49 27h9M61 27h15M82 27h6M94 27h9M49 28h9M61 28h15M82 28h6M94 28h9M49 29h9M61 29h15M82 29h6M94 29h9M46 30h3M67 30h3M79 30h3M88 30h3M94 30h3M103 30h3M46 31h3M67 31h3M79 31h3M88 31h3M94 31h3M103 31h3M46 32h3M67 32h3M79 32h3M88 32h3M94 32h3M103 32h3M49 33h6M67 33h3M79 33h12M94 33h9M49 34h6M67 34h3M79 34h12M94 34h9M49 35h6M67 35h3M79 35h12M94 35h9M55 36h3M67 36h3M79 36h3M88 36h3M94 36h3M100 36h3M55 37h3M67 37h3M79 37h3M88 37h3M94 37h3M100 37h3M55 38h3M67 38h3M79 38h3M88 38h3M94 38h3M100 38h3M46 39h9M67 39h3M79 39h3M88 39h3M94 39h3M103 39h3M46 40h9M67 40h3M79 40h3M88 40h3M94 40h3M103 40h3M46 41h9M67 41h3M79 41h3M88 41h3M94 41h3M103 41h3" />
-                        <path stroke="#ffffff" d="M21 27h1M43 27h1M22 28h1M41 28h2M23 29h1M40 29h1M23 30h1M40 30h1M24 31h2M39 31h1M31 36h3M28 37h3M34 37h2M26 38h2M36 38h3M26 39h2M36 39h3M23 40h3M39 40h2" />
-                        <path stroke="#c76904" d="M21 28h1M43 28h1M21 29h2M41 29h3M21 30h2M41 30h3M22 31h2M40 31h3M23 32h3M39 32h2M24 33h2M39 33h1M31 37h3M28 38h8M28 39h8M26 40h5M34 40h5M23 41h5M36 41h5M23 42h3M39 42h2M23 43h3M39 43h2" />
-                        </svg>                    
-                        `}
-            />
-        </hstack>
-      
-      
-      <vstack alignment="center middle" >
+    <vstack width="100%" height="100%" padding="small" alignment="center">
 
-        <ProgressBar width={256} onComplete={onCancel} />
-      </vstack>
+     <spacer height="58px" />
+
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
+        <hstack width="100%" alignment="center middle" backgroundColor="white" >
+        <spacer size="small" />
+        <PixelText scale={1} color={"black"}>www.</PixelText>
+        <image
+                   imageHeight={64}
+                   imageWidth={64}
+                   width="96px"  // Calculated to maintain aspect ratio: 40 ÷ 48 × 64 = 53.33
+                   height="32px" // Your target height
+                          url={`data:image/svg+xml,
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 96 32" shape-rendering="crispEdges">                          <path stroke="#42252f" d="M16 1h3M16 2h3M15 3h1M19 3h1M15 4h1M19 4h1M13 5h2M20 5h1M13 6h2M20 6h1M13 7h2M20 7h1M12 8h1M21 8h1M4 9h9M21 9h9M4 10h2M29 10h1M4 11h2M29 11h1M4 12h2M29 12h1M4 13h2M29 13h1M4 14h2M29 14h1M4 15h2M29 15h1M6 16h1M28 16h1M7 17h1M26 17h2M8 18h1M25 18h1M9 19h2M24 19h1M9 20h2M24 20h1M8 21h1M25 21h1M8 22h1M25 22h1M7 23h1M26 23h2M7 24h1M26 24h2M7 25h1M16 25h3M26 25h2M7 26h1M13 26h3M19 26h2M26 26h2M7 27h1M11 27h2M21 27h3M26 27h2M7 28h1M11 28h2M21 28h3M26 28h2M7 29h4M24 29h4" />
+                          <path stroke="#f0dd11" d="M16 3h3M16 4h3M15 5h5M15 6h5M15 7h5M13 8h8M13 9h8M6 10h23M6 11h23M7 12h21M8 13h18M9 14h16M9 15h16M11 16h13M11 17h13M11 18h13M11 19h13M11 20h13M9 21h7M19 21h6M9 22h4M21 22h4M8 23h3M24 23h2M8 24h3M24 24h2" />
+                          <path stroke="#000000" d="M33 6h1M36 6h1M39 6h2M43 6h1M47 6h1M49 6h4M56 6h5M62 6h1M65 6h1M68 6h2M72 6h5M33 7h2M36 7h1M38 7h1M41 7h1M43 7h2M46 7h2M49 7h1M58 7h1M62 7h1M65 7h1M67 7h1M70 7h1M74 7h1M33 8h1M35 8h2M38 8h4M43 8h1M45 8h1M47 8h1M49 8h3M58 8h1M62 8h4M67 8h4M74 8h1M33 9h1M36 9h1M38 9h1M41 9h1M43 9h1M47 9h1M49 9h1M58 9h1M62 9h1M65 9h1M67 9h1M70 9h1M74 9h1M33 10h1M36 10h1M38 10h1M41 10h1M43 10h1M47 10h1M49 10h4M58 10h1M62 10h1M65 10h1M67 10h1M70 10h1M74 10h1M34 12h9M46 12h15M67 12h6M79 12h9M34 13h9M46 13h15M67 13h6M79 13h9M34 14h9M46 14h15M67 14h6M79 14h9M31 15h3M52 15h3M64 15h3M73 15h3M79 15h3M88 15h3M31 16h3M52 16h3M64 16h3M73 16h3M79 16h3M88 16h3M31 17h3M52 17h3M64 17h3M73 17h3M79 17h3M88 17h3M34 18h6M52 18h3M64 18h12M79 18h9M34 19h6M52 19h3M64 19h12M79 19h9M34 20h6M52 20h3M64 20h12M79 20h9M40 21h3M52 21h3M64 21h3M73 21h3M79 21h3M85 21h3M40 22h3M52 22h3M64 22h3M73 22h3M79 22h3M85 22h3M40 23h3M52 23h3M64 23h3M73 23h3M79 23h3M85 23h3M31 24h9M52 24h3M64 24h3M73 24h3M79 24h3M88 24h3M31 25h9M52 25h3M64 25h3M73 25h3M79 25h3M88 25h3M31 26h9M52 26h3M64 26h3M73 26h3M79 26h3M88 26h3" />
+                          <path stroke="#ffffff" d="M6 12h1M28 12h1M7 13h1M26 13h2M8 14h1M25 14h1M8 15h1M25 15h1M9 16h2M24 16h1M16 21h3M13 22h3M19 22h2M11 23h2M21 23h3M11 24h2M21 24h3M8 25h3M24 25h2" />
+                          <path stroke="#c76904" d="M6 13h1M28 13h1M6 14h2M26 14h3M6 15h2M26 15h3M7 16h2M25 16h3M8 17h3M24 17h2M9 18h2M24 18h1M16 22h3M13 23h8M13 24h8M11 25h5M19 25h5M8 26h5M21 26h5M8 27h3M24 27h2M8 28h3M24 28h2" />
+                          </svg>                    
+                          `}
+              />
+        <PixelText  scale={1}  color={"black"}>.com</PixelText>
+
+        <spacer grow />
+        <PixelText scale={1} color={"black"}>Tries</PixelText>
+        {renderHintHearts()}
+        </hstack>
+       </hstack>
       
-      <spacer size="small" />
-      <hstack alignment="center middle">
-          {renderHintHearts()}
-      </hstack>
+      
+    
+      
+     
       <spacer size="small" />
 
       
       <vstack alignment="middle center" width="100%">
-        <zstack width={GRID_SIZE_WIDTH} height={GRID_SIZE_HEIGHT}>
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
+        <zstack width="100%" backgroundColor="white" alignment="center middle">
             <image
-                imageHeight={512}
-                imageWidth={512}
-                height={GRID_SIZE_HEIGHT}
-                width={GRID_SIZE_WIDTH}
+                imageHeight={GRID_SIZE_HEIGHT}
+                imageWidth={pictureWidth}
+                height={"100%"}                
+                width={"100%"}
                 url={question.image ? question.image : "pxArt(9)"}
+                resizeMode="cover"
             />
           {renderPixelGrid()}
         </zstack>
-        
-        
-        <spacer size="medium" />
-          <vstack gap="medium" width="80%" alignment="middle center">
+        </hstack>
+      </vstack>
+
+      <spacer size="small" />
+
+      <hstack width="80%" alignment="center middle" >
             
-            <hstack gap="medium">
-              <CustomButton
-                width="120px"
+      <hstack width="60%" alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
+              <ProgressBar width={300} onComplete={onComplete} />
+            </hstack>
+
+      <spacer grow />
+        <hstack width="35%" alignment="center middle"  height="40px" >
+
+          <CustomButton
+                width="70px"
                 height="40px"
-                label="Solve"
-                color={Settings.theme.primary}
+                label="skip"
+                color={"white"}
+                onClick={onComplete}
+              />
+              <spacer grow />
+
+              <CustomButton
+                width="100px"
+                height="40px"
+                label="ENTER"
+                color={"white"}
                 onClick={()=> { if (hintIndex < INITIAL_MAX_HINTS) return context.ui.showForm(myForm)}}
               />
-            </hstack>
-          </vstack>
+        </hstack>
+
+          </hstack>
   
-   
-      </vstack>
     </vstack>
   );
 };

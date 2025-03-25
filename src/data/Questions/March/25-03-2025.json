@@ -1,0 +1,116 @@
+{
+    "questions": [
+      {
+        "type": "celebrity",
+        "image": "Rickroll.png", 
+        "answer": "Rick Astley"
+      },
+      {
+        "type": "historian",
+        "image": "bitcoin.png",
+        "content":
+          {
+          "title": "Bitcoin reaches $1000 on mtgox",
+          "content": "Can't believe this digital currency has grown so much. Anyone else mining?",
+          "subreddit": "Bitcoin"
+          }
+        ,
+        "answer": {
+          "month": 11,
+          "year": 2013
+        }
+      },
+      {
+        "type": "pasta",
+        "text": "To be fair, you have to have a very _____ IQ to understand _____. The humor is extremely _____, and without a solid grasp of _____ most of the jokes will go over a typical viewer's head.",
+        "blanks": ["high", "Rick and Morty", "subtle", "theoretical physics"],
+        "reference": "Famous TV show intellectual fan copypasta",
+        "options": [
+          [["small", "big", "tiny", "high"], 3],
+          [["Breaking Bad", "Rick and Morty", "Game of Thrones", "The Office"], 1],
+          [["obvious",  "complex", "subtle", "nuanced"], 2],
+          [["theoretical physics", "quantum mechanics", "calculus", "algebra"], 0]
+        ]
+      },
+      {
+        "type": "subreddit",
+        "image": "audio.png",
+        "image2": "audio2.png",
+        "answer": "audiophile",
+        "upvotes" : 989
+      },
+      {
+        "type": "trivia",
+        "questions": [
+          {
+            "question": "A reddit story followed ___ cheating on her Husband?",
+            "options": ["Carly","Jenny", "Zack's girlfriend", "The PI's wife"],
+            "correctAnswer": 1
+          },
+          {
+            "question": "What did the hitch hiker teach us?",
+            "options": ["Today is for us", "Today you, tommorow me", "Today me, tommorow you", "Pay it forward"],
+            "correctAnswer": 1
+          },
+          {
+            "question": "At dinner a redditor pretended to have never saw a",
+            "options": ["Potato", "Soup Spoon", "Lobster", "Asparagus"],
+            "correctAnswer": 0
+          }
+        ]
+      },
+      {
+        "type": "upvotes",
+        "comparisons": [
+          {
+            "postA": {
+              "image": "pc.png",
+              "subreddit": "r/pcmasterrace",
+              "title": "I built a PC case out of LEGO",
+              "upvotes": 12000
+            },
+            "postB": {
+              "image": "danny.png",
+              "subreddit": "r/funny",
+              "title": "Danni Devito's weight loss progress! ",
+              "upvotes": 14000
+            }
+          },
+          {
+            "postA": {
+              "image": "rock.png",
+              "subreddit": "r/intrestingasfuck",
+              "title": "Found this Giant amethyst at a garage sale for 50 bucks",
+              "upvotes": 91000
+            },
+            "postB": {
+              "image": "cat.png",
+              "subreddit": "r/thisismylifenow",
+              "title": "The best way to advertise your garage sale nearby",
+              "upvotes": 37000
+            }
+          },
+          {
+            "postA": {
+              "image": "space.png",
+              "subreddit": "r/space",
+              "title": "I took this space photo with my phone , no editing at all",
+              "upvotes": 22000
+            },
+            "postB": {
+              "image": "bread.png",
+              "subreddit": "r/breadit",
+              "title": "I tried making bread for the first time not to long ago.",
+              "upvotes": 19847
+            }
+          }
+        ]
+      },
+      {
+        "type": "celebrity",
+        "image": "Arnold.png",
+        "answer": "Arnold Schwarzenegger"
+      }
+    ],
+    "answer" :["3","3","3","3","1","1","1","1","1","1","3"]
+  }

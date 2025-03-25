@@ -6,6 +6,7 @@ import { PixelSymbol } from "../Addons/PixelSymbol.js";
 import Settings from "../../Settings.json"
 import { PieceSymbol } from "../Addons/PieceSymbol.js";
 import { GAME_SVG } from "../../data/svgs.js";
+import { ProgressBar } from "../Addons/ProgressBar.js";
 
 
 
@@ -123,7 +124,7 @@ const handleOptionSelect = (option : string ) => {
           <PieceSymbol 
             type="heart" 
             color="red" 
-            scale={0.5} 
+            scale={1} 
           />
         );
       }
@@ -134,87 +135,108 @@ const handleOptionSelect = (option : string ) => {
 
 
   return (
-    <vstack width="100%" height="100%" padding="small" backgroundColor="#e74c3c" alignment="center">
-      <hstack width="100%" alignment="middle center">
-        
-      <image
-                imageHeight={64}
-                imageWidth={128}
-                width="256px"
-                height="144px"
-                        url={GAME_SVG.subredditGuess}
-                description="subreddit Guess logo"
-                />
-
+    <vstack width="100%" height="100%" padding="small" alignment="center">
+      <spacer height="58px" />
+      
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
+        <hstack width="100%" alignment="center middle" backgroundColor="white">
+          <spacer size="small" />
+          <PixelText scale={1} color={"black"}>www.</PixelText>
+          <image
+            imageHeight={64}
+            imageWidth={64}
+            width="96px"
+            height="32px"
+            url={GAME_SVG.subredditGuess}
+          />
+          <PixelText scale={1} color={"black"}>.com</PixelText>
+          <spacer grow />
+          <PixelText scale={1} color={"black"}>Tries</PixelText>
+          {renderHintHearts()}
+        </hstack>
       </hstack>
       
-    
+      <spacer size="small" />
       
-      <vstack alignment="middle center" width={containerWidth}>
-        
-        <vstack width="100%" height="100%" border="thick" borderColor="gray"  padding="medium" backgroundColor="#ffffff">
-
-          <hstack gap="small" alignment="start middle" >
-
-          <PixelText scale={1} color="black"> r/.....</PixelText>
-          <PixelText scale={1} color="black"> 1hr ago</PixelText>
-
-          <spacer grow />
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
+        <vstack alignment="middle center" width="100%" backgroundColor="white" padding="small">
+          <hstack gap="small" alignment="start middle" width="100%">
+            <PixelText scale={1} color="black">r/.....</PixelText>
+            <PixelText scale={1} color="black">1hr ago</PixelText>
+            <spacer grow />
+          </hstack>
           
-            <hstack alignment="center middle">
-            {renderHintHearts()}
-            </hstack>
-
-          </hstack>
-
           <spacer size="small" />
-
-          <hstack gap="small" alignment="start" >
-            {hintIndex <= 0 ? <PixelText scale={textSize} color="black"> .... </PixelText>: <PixelText scale={textSize} color="black"> The speakers keep getting bigger </PixelText> }
+          
+          <hstack gap="small" alignment="start" width="100%">
+            {hintIndex <= 0 ? 
+              <PixelText scale={textSize} color="black">.... </PixelText> : 
+              <PixelText scale={textSize} color="black">The speakers keep getting bigger</PixelText>
+            }
           </hstack>
-          <hstack gap="small" alignment="start" >
-          {hintIndex <= 0 ? <PixelText scale={textSize} color="black"> ....  </PixelText> : <PixelText scale={textSize} color="black"> and my living room stays the same size </PixelText>} 
+          
+          <hstack gap="small" alignment="start" width="100%">
+            {hintIndex <= 0 ? 
+              <PixelText scale={textSize} color="black">.... </PixelText> : 
+              <PixelText scale={textSize} color="black">and my living room stays the same size</PixelText>
+            }
           </hstack>
-
+          
           <spacer size="small" />
-
+          
           <image
             imageHeight={180}
             imageWidth={400}
             height="180px"
-            width= {pictureWidth}
+            width="100%"
             resizeMode="fill"
-            url={ hintIndex > 1 ? currentQuestion.image2 : currentQuestion.image}
+            url={hintIndex > 1 ? currentQuestion.image2 : currentQuestion.image}
           />
-           
-
-          <spacer  grow />
-
-          <hstack gap="small" alignment="middle start">
-
-          <hstack width="100px"  height="25px" alignment="center middle" gap="small" backgroundColor="gray">
-            <hstack width="100%" height="100%" alignment="center middle" backgroundColor={Settings.theme.primary} padding="small" >
-
-               <PixelSymbol type="arrow-up" color="##000000" scale={2}/>
+          
+          <spacer size="small" />
+          
+          <hstack gap="small" alignment="middle start" width="100%">
+            <hstack width="100px" height="25px" alignment="center middle" gap="small" backgroundColor="gray">
+              <hstack width="100%" height="100%" alignment="center middle" backgroundColor={Settings.theme.primary} padding="small">
+                <PixelSymbol type="arrow-up" color="#000000" scale={2}/>
                 <spacer size="small" />
-                {hintIndex <= 1 ? <PixelText scale={1} color="#000000">???</PixelText> : <PixelText scale={1} color="#000000">{currentQuestion.upvotes}</PixelText> }
-
+                {hintIndex <= 1 ? 
+                  <PixelText scale={1} color="#000000">???</PixelText> : 
+                  <PixelText scale={1} color="#000000">{currentQuestion.upvotes.toLocaleString()}</PixelText>
+                }
+              </hstack>
+            </hstack>
           </hstack>
-          </hstack>   
-
+        </vstack>
+      </hstack>
+      
+      <spacer size="small" />
+      
+      <hstack width="80%" alignment="center middle">
+        <hstack width="60%" alignment="center middle" height="40px" padding="small" backgroundColor="#013839">
+          <ProgressBar width={300} />
+        </hstack>
+        
+        <spacer grow />
+        
+        <hstack width="35%" alignment="center middle" height="40px">
           <CustomButton
-              width="150px"
-              height="25px"
-              textSize={1}
-              label={"Submit Guess"}
-              onClick={()=> context.ui.showForm(myForm)}
-                          />
-
-          </hstack>
-
-
-        </vstack>        
-      </vstack>
+            width="70px"
+            height="40px"
+            label="skip"
+            color={"white"}
+            onClick={onComplete}
+          />
+          <spacer grow />
+          <CustomButton
+            width="100px"
+            height="40px"
+            label="ENTER"
+            color={"white"}
+            onClick={() => context.ui.showForm(myForm)}
+          />
+        </hstack>
+      </hstack>
     </vstack>
   );
 };

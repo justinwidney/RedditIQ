@@ -38,6 +38,8 @@ export const HistorianPage = (
   const pictureWidth = context.dimensions.width > 600 ? '390px' : '300px';
   const padding = context.dimensions.width > 600 ? 'medium' : 'small';
 
+  const imageWidth:Devvit.Blocks.SizeString = `${context.dimensions.width}px`
+
 
   const toastMessage = (yearDifference:number, monthDifference:number) =>{
 
@@ -107,7 +109,7 @@ export const HistorianPage = (
         return
       }
 
-      else if( hintIndex > 2){
+      else if( hintIndex >= 2){
         setScore(prevScore => prevScore + 0);
         setUserGuess(prevState => [...prevState, '0'])
         onComplete(userGuess);
@@ -133,7 +135,7 @@ export const HistorianPage = (
           <PieceSymbol 
             type="heart" 
             color="red" 
-            scale={0.5} 
+            scale={1} 
           />
         );
       }
@@ -145,69 +147,94 @@ export const HistorianPage = (
   return (
     <vstack width="100%" height="100%" padding="medium"  alignment="center">
 
-      <spacer size="small" />
+  <spacer height="58px" />
 
-      <hstack width="100%" alignment="middle center">
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
+        <hstack width="100%" alignment="center middle" backgroundColor="white" >
+        <spacer size="small" />
+        <PixelText scale={1} color={"black"}>www.</PixelText>
         <image
-          imageHeight={96}
-          imageWidth={144}
-          width="192px"
-          height="96px"
-          url={GAME_SVG.historian}
-          description="Reddit Historian logo"
-        />
-      </hstack>
+                   imageHeight={64}
+                   imageWidth={64}
+                   width="96px"  // Calculated to maintain aspect ratio: 40 ÷ 48 × 64 = 53.33
+                   height="32px" // Your target height
+                   url={GAME_SVG.historian}              
+              />
+        <PixelText  scale={1}  color={"black"}>.com</PixelText>
+
+        <spacer grow />
+        <PixelText scale={1} color={"black"}>Tries</PixelText>
+        {renderHintHearts()}
+        </hstack>
+       </hstack>
+
 
       <spacer size="small" />
       
-      <vstack alignment="middle center" width={containerWidth}>
-        <vstack width="100%" height="100%" border="thick" borderColor="gray" padding={padding} backgroundColor="#ffffff" >
-          <hstack gap="small" alignment="start middle" backgroundColor="#2A3439" width="100%" padding="small">
-            <PixelText scale={1} color="#FFFFFF">r/ </PixelText>
-            <PixelText scale={1} color="white">{ question.content.subreddit}</PixelText>
-            <spacer size="small" />
-            <PixelText scale={1} color="white">??? ago</PixelText>
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
 
-            <spacer grow />
-            {renderHintHearts()}
+      <vstack alignment="middle center" width="100%" backgroundColor="white">
+    
+          <hstack gap="small" alignment="start middle" backgroundColor="white" width="100%" padding="small">
+            <PixelText scale={1} color="black">r/ </PixelText>
+            <PixelText scale={1} color="black">{ question.content.subreddit}</PixelText>
+            <spacer size="small" />
+            <PixelText scale={1} color="black">??? ago</PixelText>
 
           </hstack>
 
           <spacer size="small" />
 
           <hstack gap="small" alignment="start">
-            <PixelText scale={1} color="black">{question.content.title}</PixelText>
+            <PixelText scale={2} color="black">{question.content.title}</PixelText>
           </hstack>
 
           <spacer size="small" />
 
           <image
-            imageHeight={150}
-            imageWidth={400}
-            height="150px"
-            width={pictureWidth}
+            imageHeight={200}
+            imageWidth={pictureWidth}
+            height="100%"
+            width="100%"
             resizeMode="fill"
             url={question.image}
           />
            
+           </vstack>
 
-        </vstack>
+        </hstack>
                 
       
-      </vstack>
 
       <spacer size="small" />
+      <hstack width="80%" alignment="center middle" >
 
-      <hstack alignment="middle center">
-            <CustomButton
-              width="120px"
-              height="40px"
-              textSize={2}
-              label={"Solve"}
-              onClick={() => context.ui.showForm(guessForm)}
-            />
+      <hstack width="60%" alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
+      <PixelText scale={1} color="white">Guess the release date of this game</PixelText>
+      </hstack>
+
+      <spacer grow />
+
+      <hstack width="35%" alignment="center middle"  height="40px" >
+
+          <CustomButton
+                width="70px"
+                height="40px"
+                label="skip"
+                color={"white"}
+                onClick={onComplete}
+              />
+              <spacer grow />
+
+              <CustomButton
+                width="100px"
+                height="40px"
+                label="ENTER"
+                color={"white"}
+                onClick={()=> { if (hintIndex < INITIAL_MAX_HINTS) return context.ui.showForm(guessForm)}}
+              />
           </hstack>
-
+      </hstack>
     </vstack>
   );
 };

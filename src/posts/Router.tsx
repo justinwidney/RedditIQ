@@ -6,7 +6,7 @@
 */
 
 import { Context, Devvit,  useState } from "@devvit/public-api";
-import { PinnedPostData, PostId, PostType, PuzzlePostData, UserData } from "../types.js";
+import { GameSettings, PinnedPostData, PostId, PostType, PuzzlePostData, UserData } from "../types.js";
 import { PinnedPost } from "./PinnedPost/PinnedPost.js";
 import { Engine } from "../engine/Engine.js";
 import { PuzzlePost } from "./PuzzlePost/PuzzlePost.js";
@@ -15,6 +15,7 @@ import { PuzzlePost } from "./PuzzlePost/PuzzlePost.js";
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
 
     const postId = context.postId as PostId;
+    const gameEngine = new Engine(context)
 
     const getUsername = async () => {
         if (!context.userId) return null;
@@ -36,7 +37,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         return null;
     }
 
-    const gameEngine = new Engine(context)
 
     function getPostData(
         postType: PostType,
@@ -49,18 +49,18 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             case PostType.PUZZLE:
                 return gameEngine.getPuzzlePost(postId);
             default:
-                return gameEngine.getPuzzlePost(postId);
+                return gameEngine.getPinnedPost(postId);
        }
     }
     }
+
 
     const [data] = useState<{
         postData: PuzzlePostData | PinnedPostData;
         postType: PostType;
         userData: UserData | null;
         username: string | null;
-        gameSettings: Record<string, any> | null;
-        puzzle: Record<string, any> | null;
+        gameSettings: GameSettings;
     }>( async () => {
         
         const [postType, username] = await Promise.all([
@@ -68,11 +68,10 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             getUsername()]
         );
 
-        const [postData, userData, gameSettings, puzzle] = await Promise.all([
+        const [postData, userData, gameSettings] = await Promise.all([
             getPostData(postType, postId),
             gameEngine.getUserData(username, postId),
             gameEngine.getGameSettings(),
-            gameEngine.getPuzzle(postId)
         ]);
 
         return {
@@ -81,22 +80,12 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             userData,
             username,
             gameSettings,
-            puzzle,
         }
     });
         
+    
 
     const postTypes: Record<string, JSX.Element> = {
-
-        puzzlePost:(
-            <PuzzlePost
-            postData ={data.postData}
-            userData ={data.userData}
-            username ={data.username}
-            gameSettings ={data.gameSettings}
-            puzzle = {data.puzzle}
-            />
-        ),
 
         pinned:(
             <PinnedPost
@@ -115,7 +104,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             imageWidth={2048}
             height="100%"
             width="100%"
-            url="background.png"
+            url="Windows_Screen.png"
             description="custom background"
             resizeMode="cover"  
             />

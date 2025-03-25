@@ -1,13 +1,14 @@
-import { Devvit } from "@devvit/public-api";
+import { Devvit, useInterval } from "@devvit/public-api";
 import { PixelSymbol, SupportedSymbols } from "./PixelSymbol.js";
 import Settings  from "../../Settings.json"
 import { PixelText } from "./PixelText.js";
+import { Shadow } from "./Shadow.js";
 
 
 const styles = {
     primary: {  
-        backgroundColor: '#FF9D00',
-        borderColor: '#000000',
+        backgroundColor: '#24610A',
+        borderColor: '#013839',
         color: '#FFFFFF',
     },
     secondary: {
@@ -36,7 +37,7 @@ interface ButtonProps {
 
 }
 
-
+const ANIMATION_INTERVAL = 250
 
 
 export const CustomButton = (props: ButtonProps): JSX.Element => {
@@ -44,17 +45,19 @@ export const CustomButton = (props: ButtonProps): JSX.Element => {
     const {textSize, label, onClick, width = 20, height = 20, color, icon, appearance} = props;
     const style = styles[appearance || 'primary']
 
-
+ 
 
     return (
-        <hstack width={width}  height={height } alignment="center middle" gap="small" onPress={onClick} backgroundColor={style.borderColor}>
+        <Shadow height={height} width={width}>
+        <hstack width={width}  height={height } alignment="center middle" padding="xsmall" onPress={onClick} backgroundColor={style.backgroundColor}>
             <hstack width="100%" height="100%" alignment="center middle" backgroundColor={style.backgroundColor} padding="small" >
 
                 {icon ? <image url="background.png" imageHeight={30} imageWidth={30}  /> : null }
-                {label ? <PixelText scale={textSize} color="#000000">{label}</PixelText> : null}
+                {label ? <PixelText scale={textSize} color={color}>{label}</PixelText> : null}
 
-        </hstack>
-        </hstack>   
+                </hstack>
+            </hstack>   
+        </Shadow>
 
     )
     

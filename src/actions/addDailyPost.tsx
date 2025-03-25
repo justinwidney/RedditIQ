@@ -46,7 +46,7 @@ export const newPinnedPost: MenuItem = {
     const todayDate = new Date().toLocaleDateString();
 
     const post = await context.reddit.submitPost({
-      title: `Reddit IQ Game ${todayDate}`,
+      title: `Reddit IQ - 2010s`,
       subredditName: community.name,
       preview: <LoadingPreview />,
     });

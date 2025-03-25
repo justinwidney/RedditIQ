@@ -16,7 +16,6 @@ type PageData = {
   image: string;
 }
 
-const MAX_CYCLES = 3;
 const PAGE_SIZE = 150;
 const ANIMATION_INTERVAL = 125;
 const COMPLETION_DELAY = 2500;
@@ -27,6 +26,9 @@ export const PageCarousel = (
   context: Context
 ): JSX.Element => {
   const { onComplete, onCancel, targetPageIndex } = props;
+
+  const MAX_CYCLES = Math.floor(Math.random() * 3 );
+
   
   // Define the 6 pages with their properties
   const [pages] = useState<PageData[]>([
@@ -106,7 +108,7 @@ export const PageCarousel = (
 
 
   return (
-    <vstack width="100%" height="100%" backgroundColor={Settings.theme.background} padding="medium" alignment="middle">
+    <vstack width="100%" height="100%"  padding="medium" alignment="middle">
       <hstack width="100%" alignment="middle center">
         <PixelText scale={4}> Next Game</PixelText>
       </hstack>

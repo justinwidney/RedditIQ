@@ -5,6 +5,8 @@ import { ProgressBar } from "../Addons/ProgressBar.js";
 import { indexToLetter } from "../../utils/utils.js";
 import { GAME_SVG } from "../../data/svgs.js";
 import Settings from "../../Settings.json";
+import { PixelText } from "../Addons/PixelText.js";
+import { renderHintHearts } from "../Addons/Hearts.js";
 
 
 interface PastaPageProps extends GameProps {
@@ -29,7 +31,7 @@ export const PastaPage = (
 
   const dimensions = context.dimensions;
 
-  const chunkSize = dimensions.width > 500 ? 65 : 45
+  const chunkSize = dimensions.width > 500 ? 50 : 25
   const spacerSize = dimensions.width > 500 ? "large" : "small"
 
 
@@ -162,14 +164,14 @@ const handleOptionSelect = (option :string[] ) => {
     return (
       <vstack  width="100%" alignment="middle start" >
         {parts.map((part, index) => (
-          <hstack width="100%">
+          <hstack width="100%" alignment="start middle" height="25px">
             {part.split("_____").map((sub, subIndex) => ( 
                 <>
-              <text weight="bold" size="medium" color="black">{sub}</text>
+              <PixelText scale={1.1} color="black">{sub}</PixelText>
 
               {subIndex < part.split("_____").length - 1 && (
                 <vstack  
-                  width="120px" 
+                  width="100px" 
                   border={showResult ? "thick" : "none"}
                   backgroundColor={
                     showResult 
@@ -180,10 +182,11 @@ const handleOptionSelect = (option :string[] ) => {
                   }
                   padding="xsmall"
                   alignment="middle center"
+                  height={"20px"}
                 >   
                     <hstack onPress={() => handleTextClick(flatIndex(index, subIndex))}>
-                      <text weight="bold" size="medium" color="black" >
-                        {userInputs[flatIndex(index, subIndex)] || "_______"}
+                      <text weight="bold" size="small" color="black" >
+                        {userInputs[flatIndex(index, subIndex)] || "___________"}
                       </text>
                     </hstack>
                   
@@ -200,47 +203,68 @@ const handleOptionSelect = (option :string[] ) => {
   };
 
   return (
-    <vstack width="100%" height="100%" padding="large" backgroundColor={Settings.theme.background}>
-      <vstack width="100%" alignment="middle center">
-                <image
-                imageHeight={64}
-                imageWidth={128}
-                width="256px"
-                height="128px"
-                        url={GAME_SVG.copyPasta}
-                description="chess paint logo"
-                
-                />
-
-        <ProgressBar width={256} onComplete={handleSubmit} />
+    <vstack width="100%" height="100%" padding="small" alignment="center">
+      <spacer height="58px" />
+      
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
+        <hstack width="100%" alignment="center middle" backgroundColor="white">
+          <spacer size="small" />
+          <PixelText scale={1} color={"black"}>www.</PixelText>
+          <image
+            imageHeight={64}
+            imageWidth={64}
+            width="96px"
+            height="32px"
+            url={GAME_SVG.copyPasta}
+          />
+          <PixelText scale={1} color={"black"}>.com</PixelText>
+          <spacer grow />
+          <PixelText scale={1} color={"black"}>Tries</PixelText>
+          {renderHintHearts(0)}
+        </hstack>
+      </hstack>
+      
+      <spacer size="small" />
+      
+      <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
+        <vstack alignment="middle center" width="100%" backgroundColor="white" padding="small">
+          <hstack gap="small" alignment="start" width="100%">
+            <PixelText scale={2} color="black">Fill in the blanks:</PixelText>
+          </hstack>
+          <spacer size="small" />
+          <vstack width="100%" alignment="center middle" height={"230px"}>
+            {renderTextWithBlanks()}
+          </vstack>
+        </vstack>
+      </hstack>
+      
+      <spacer size="small" />
+      
+      <hstack width="80%" alignment="center middle">
+        <hstack width="60%" alignment="center middle" height="40px" padding="small" backgroundColor="#013839">
+          <ProgressBar width={300} onComplete={handleSubmit} />
+        </hstack>
         
-      </vstack>
-      
-      <spacer size={spacerSize} />
-      
-      <vstack 
-        padding="large"
-        backgroundColor="white" 
-        cornerRadius="medium" 
-        border="thick"
-        width="100%"
-        gap="medium"
-      >
-          <text weight="bold" size="medium" color="black">Fill in the blanks:</text>
-          {renderTextWithBlanks()}
-      </vstack>
-
-      <spacer size={spacerSize} />
-
-      <vstack gap="medium" alignment="middle center">
+        <spacer grow />
+        
+        <hstack width="35%" alignment="center middle" height="40px">
           <CustomButton
-            width="150px"
+            width="70px"
             height="40px"
-            label="Submit"
-            onClick={handleSubmit}
-        />
-      </vstack>
-      
+            label="skip"
+            color={"white"}
+            onClick={onComplete || handleSubmit}
+          />
+          <spacer grow />
+          <CustomButton
+            width="100px"
+            height="40px"
+            label="ENTER"
+            color={"white"}
+            onClick={() => handleSubmit}
+          />
+        </hstack>
+      </hstack>
     </vstack>
   );
 };
