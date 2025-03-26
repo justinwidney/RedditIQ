@@ -59,4 +59,69 @@ export function splitArray<T>(array: T[], segmentLength: number): T[][] {
   }
   
 
+  export function levenshteinDistance(str1:string, str2:string) {
+    const m = str1.length;
+    const n = str2.length;
+    
+    // Create a matrix of size (m+1) x (n+1)
+    const dp = Array(m + 1).fill(0).map(() => Array(n + 1).fill(0));
+    
+    // Initialize first row and column
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    
+    // Fill the matrix
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        if (str1[i - 1] === str2[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1];
+        } else {
+          dp[i][j] = Math.min(
+            dp[i - 1][j - 1] + 1, // substitution
+            dp[i][j - 1] + 1,     // insertion
+            dp[i - 1][j] + 1      // deletion
+          );
+        }
+      }
+    }
+    
+    return dp[m][n];
+  }
+
+  export const splitTextByWordBoundaries = (text: string, chunkSize: number) => {
+    const chunks: string[] = [];
+    let currentChunk = "";
+    
+    // Split the text into words
+    const words = text.split(/\s+/);
+    
+    for (const word of words) {
+      const potentialChunk = currentChunk ? `${currentChunk} ${word}` : word;
+      
+      if (potentialChunk.length <= chunkSize) {
+        currentChunk = potentialChunk;
+      } else {
+        if (currentChunk) {
+          chunks.push(currentChunk);
+        }
+        
+        if (word.length > chunkSize) {
+          for (let i = 0; i < word.length; i += chunkSize) {
+            chunks.push(word.substring(i, i + chunkSize));
+          }
+          currentChunk = "";
   
+        } else {
+          currentChunk = word;
+        }
+      }
+    }
+    
+    if (currentChunk) {
+      chunks.push(currentChunk);
+    }
+    
+    return chunks;
+  };
+
+  export const INITIAL_MAX_HINTS = 3;

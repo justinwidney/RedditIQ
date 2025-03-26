@@ -3,7 +3,7 @@
       {
         "type": "celebrity",
         "image": "Rickroll.png", 
-        "answer": "Rick Astley"
+        "answers": ["Rick Astley", "Rick Ashley", "Rick Roll"]
       },
       {
         "type": "historian",
@@ -109,7 +109,7 @@
       {
         "type": "celebrity",
         "image": "Arnold.png",
-        "answer": "Arnold Schwarzenegger"
+        "answers": ["Arnold Schwarzenegger", "Arnold", "Arnold S"]
       }
     ],
     "answer" :["3","3","3","3","1","1","1","1","1","1","3"]

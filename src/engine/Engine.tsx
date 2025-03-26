@@ -122,32 +122,35 @@ export class Engine {
         postData: PostData ;
         username: string;
         guess: GameScoreData[T][], 
+        IQ: number;
         }): Promise<number> {
 
         if (!this.reddit || !this.scheduler) {
           console.error('Reddit API client or Scheduler not available in Service');
           return 0;
-        }
+        } 
+
+        const IQ = event.IQ;
 
             // Increment the user's guess count
-            this.redis.zIncrBy(
+          this.redis.zIncrBy(
               this.keys.postUserGuessCounter(event.postData.postId),
               event.username, // Member
               1, // Score increment
             )
-                
-          const userPoints = 1;
-
+                            
+          // Save the postID to the user's solved list
            this.redis.zAdd(this.keys.postSolved(event.postData.postId), {
               member: event.username,
               score: Date.now(),
            })
       
 
-          this.incrementUserScore(event.username, userPoints)
+          const nextScore = this.incrementUserScore(event.username, IQ)
+          
           this.saveGuessScore(event.postData.postId, event.guess, event.username);
 
-        return userPoints;
+        return nextScore;
       }
 
 
@@ -156,15 +159,18 @@ export class Engine {
        * increment the user's score
        */
 
-      async incrementUserScore(username: string, amount: number): Promise<number> {
+      async incrementUserScore(username: string, IQ: number): Promise<number> {
 
       if (this.scheduler === undefined) {
         console.error('Scheduler not available in Service');
         return 0;
       }
+
       const key = this.keys.scores;
-      //const prevScore = (await this.redis.zScore(key, username)) ?? 0;
-      const nextScore = await this.redis.zIncrBy(key, username, amount)
+
+      const prevScore = (await this.redis.zScore(key, username)) ?? 0;
+      const diffAmount = IQ - prevScore;
+      const nextScore = await this.redis.zIncrBy(key, username, diffAmount)
      
   
       return nextScore;

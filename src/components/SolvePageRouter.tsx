@@ -1,4 +1,4 @@
-import { Context, Devvit, useState } from "@devvit/public-api";
+import { Context, Devvit, useInterval, useState } from "@devvit/public-api";
 import { Engine } from "../engine/Engine.js"
 import { CelebrityQuestion, CompositeScore, GameScore, GameSettings, GradedScore, HistorianQuestion, MultipleChoiceScore, PastaQuestion, PostId, PuzzlePostData, Question, SubredditQuestion, TriviaQuestion, UpvotesQuestion, UserData } from "../types.js";
 import { UpvotesPage } from "./Games/Upvotes.js";
@@ -10,7 +10,7 @@ import { HistorianPage } from "./Games/Historian.js";
 import { PageCarousel } from "./RandomizePage.js";
 import { PixelText } from "./Addons/PixelText.js";
 import { formatCompositeScore } from "../utils/utils.js";
-
+import { IQScoreOverlay } from "./Overlay.js";
 
 const IMG_URLS ={
   "historian": "Windows_Screen.png",
@@ -42,20 +42,20 @@ interface SolvePageRouterProps {
  * Router component that manages game flow between different mini-games
  */
 export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): JSX.Element => {
-
-
     const [stepList] = useState<number[]>(props.questions)
     const [score, setScore] = useState<number>(0)
     const [userGuess, setUserGuess] = useState<GameScore[]>([]);
     const [targetIndex, setTargetIndex] = useState<number>(0);
     const [questionIndex, setQuestionIndex] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<string>('randomize');
-
+    
+    // IQ overlay state
+    const [currentIQ, setCurrentIQ] = useState<number>(100); // Start with 100 IQ
+    const [showIQOverlay, setShowIQOverlay] = useState<boolean>(false);
+    const [newIQ, setNewIQ] = useState<number >(100);
 
     const currentQuestion = props.questionData[questionIndex] as Question;
     const currentQuestionType = currentQuestion.type ? currentQuestion.type : 'default';
-
-    console.log('currentQuestionType', currentQuestionType)
 
     const engine = new Engine(context);
 
@@ -69,6 +69,33 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
       setTargetIndex(targetIndex + 1)
     }
 
+    // Handle IQ animation completion
+    const handleIQAnimationComplete = () => {
+      // The animation is complete, but we'll wait for user tap to dismiss
+      if (newIQ !== 0) {
+        setCurrentIQ(newIQ);
+      }
+    };
+    
+    // Handle tap on overlay to dismiss
+    const handleOverlayTap = () => {
+      
+      if (newIQ !== undefined) {
+        setCurrentIQ(newIQ);
+      }
+
+      if (showIQOverlay) {
+        setShowIQOverlay(false);
+        setNewIQ(0);
+        
+        // Check if it's the last question
+        if(isLastQuestion) {
+          onGuessHandler(userGuess);
+        } else {
+          setCurrentStep('randomize');
+        }
+      }
+    };
 
     async function onGuessHandler(guess: GameScore[]): Promise<void> {
       if (!props.postData || !props.username) {
@@ -81,36 +108,41 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
             postData: props.postData,
             username: props.username,
             guess: guess,
+            IQ: currentIQ,
         });
      
         props.onCancel(true);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-
-    const onCompletePage = async (latestGuesses: MultipleChoiceScore[]): Promise<void> => {
-
-      setQuestionIndex( prev => prev + 1)
-
-      // Game OVER
-      if(isLastQuestion) {
-          if (props.username) {
-            
-              await onGuessHandler(latestGuesses);
-          }
-      } else {
-          setCurrentStep('randomize');
+      } catch (error) {
+        console.error(error);
       }
     }
 
+    const onCompletePage = async (latestGuesses: MultipleChoiceScore[]): Promise<void> => {
 
+      const lastGuess = latestGuesses[latestGuesses.length - 1];
+      const scoreValue = parseInt(lastGuess);
 
-
+      let iqChange = 0;
+  
+      if (scoreValue === 3) {
+        iqChange = Math.floor(Math.random() * 6) + 10; // 10-15 points
+      } else if (scoreValue === 2) {
+        iqChange = Math.floor(Math.random() * 6) + 5; // 5-10 points
+      } else if (scoreValue === 1) {
+        iqChange = Math.floor(Math.random() * 5) + 1; // 1-5 points
+      } else {
+        iqChange = -(Math.floor(Math.random() * 11) + 5); // -5 to -15 points
+      }
+      
+      const updatedIQ = Math.max(50, Math.min(200, currentIQ + iqChange)); // Cap IQ between 50 and 200
+      
+      setNewIQ(updatedIQ);
+      setShowIQOverlay(true);
+      
+      setQuestionIndex(prev => prev + 1);
+    }
 
     const steps: Record<string, JSX.Element> = {
-      
       // GAMES
       celebGuess: currentQuestion.type === 'celebrity' ? (
         <CelebPage {...props} onComplete={onCompletePage} setScore={setScore} setUserGuess={setUserGuess} userGuess={userGuess} question={currentQuestion as CelebrityQuestion} />
@@ -170,6 +202,11 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
                 <spacer size="small" />
                 <PixelText color="#000000">{score.toString()}</PixelText>
 
+                <spacer size="large" />
+
+                <PixelText color="#000000">IQ:</PixelText>
+                <spacer size="small" />
+                <PixelText color="#000000">{currentIQ.toString()}</PixelText>
               </hstack>
           }
             
@@ -180,11 +217,18 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
             </vstack>}
             
         </vstack>
-        </zstack>
-
+        
+        {/* IQ Score Overlay */}
+        {showIQOverlay && (
+          <hstack width="100%" height="100%" onPress={handleOverlayTap}>
+            <IQScoreOverlay
+              initialIQ={currentIQ}
+              newIQ={newIQ}
+              isVisible={showIQOverlay}
+              onAnimationComplete={handleIQAnimationComplete}
+            />
+          </hstack>
+        )}
+      </zstack>
     )
-
-   
-
-
 }

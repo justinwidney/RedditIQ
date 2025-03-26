@@ -17,21 +17,19 @@ interface SubredditGuessPageProps extends GameProps {
 
 const INITIAL_MAX_HINTS = 3;
 
-const myForm = Devvit.createForm(
-    {
-      fields: [
-        {
-          type: 'paragraph', // This creates a multi-line text input
-          name: 'userText',
-          label: 'Enter your text:',
-        },
-      ],
-    },
-    (event, context) => {
-      context.ui.showToast({ text: `Submitted: ${event.values.userText}` });
-    }
-  );
-  
+const subredditOptions = [
+  'r/aww',
+  'r/AskReddit',
+  'r/funny',
+  'r/gaming',
+  'r/memes',
+  'r/pics',
+  'r/todayilearned',
+  'r/worldnews',
+  'r/audiophile',
+  'r/technology',
+  'r/programming',
+]
 
 
 export const SubredditGuessPage = (
@@ -54,7 +52,9 @@ export const SubredditGuessPage = (
   const currentQuestion = question
 
 
-  const onFinish = (sovled:boolean) => {
+  const onFinish = (sovled:boolean = false) => {
+
+    console.log('onFinish', sovled)
 
     const score = 3 - hintIndex;
     const guess = sovled ? '3' : '0';
@@ -67,13 +67,15 @@ export const SubredditGuessPage = (
 
 
 // Handle selecting an option for a blank
-const handleOptionSelect = (option : string ) => {
+const handleOptionSelect = (option : string[] ) => {
+
+    const guess = option[0];
 
     setHintIndex( prev => prev + 1);
 
 
     // Clean up and normalize the input for comparison
-    const cleanedInput = option.trim().toLowerCase();
+    const cleanedInput = guess.trim().toLowerCase();
     const cleanedAnswer = currentQuestion.answer.toLowerCase();
     
     // Check if the answer is correct
@@ -98,14 +100,21 @@ const handleOptionSelect = (option : string ) => {
    
 };
 
+
+
+
   const myForm = useForm(
-    () => {
+    (data: {lableOptions? :string[]}) => {
       return {
         fields: [
           {
-            type: 'string',
+            type: 'select',
             name: 'answer',
             label: `Pick an option 'r/' `,
+            options : data.lableOptions ? data.lableOptions.map((option) => ({
+              value: option,
+              label: option,
+            })) : [],
           },
         ],
    
@@ -131,8 +140,6 @@ const handleOptionSelect = (option : string ) => {
     }
     return hearts;
   };
-
-
 
   return (
     <vstack width="100%" height="100%" padding="small" alignment="center">
@@ -169,44 +176,24 @@ const handleOptionSelect = (option : string ) => {
           <spacer size="small" />
           
           <hstack gap="small" alignment="start" width="100%">
-            {hintIndex <= 0 ? 
-              <PixelText scale={textSize} color="black">.... </PixelText> : 
-              <PixelText scale={textSize} color="black">The speakers keep getting bigger</PixelText>
-            }
+            <PixelText scale={textSize} color="black">The speakers keep getting bigger</PixelText>
           </hstack>
           
           <hstack gap="small" alignment="start" width="100%">
-            {hintIndex <= 0 ? 
-              <PixelText scale={textSize} color="black">.... </PixelText> : 
-              <PixelText scale={textSize} color="black">and my living room stays the same size</PixelText>
-            }
+            <PixelText scale={textSize} color="black">and my living room stays the same size</PixelText>
           </hstack>
           
           <spacer size="small" />
           
           <image
-            imageHeight={180}
+            imageHeight={200}
             imageWidth={400}
             height="180px"
             width="100%"
             resizeMode="fill"
             url={hintIndex > 1 ? currentQuestion.image2 : currentQuestion.image}
           />
-          
-          <spacer size="small" />
-          
-          <hstack gap="small" alignment="middle start" width="100%">
-            <hstack width="100px" height="25px" alignment="center middle" gap="small" backgroundColor="gray">
-              <hstack width="100%" height="100%" alignment="center middle" backgroundColor={Settings.theme.primary} padding="small">
-                <PixelSymbol type="arrow-up" color="#000000" scale={2}/>
-                <spacer size="small" />
-                {hintIndex <= 1 ? 
-                  <PixelText scale={1} color="#000000">???</PixelText> : 
-                  <PixelText scale={1} color="#000000">{currentQuestion.upvotes.toLocaleString()}</PixelText>
-                }
-              </hstack>
-            </hstack>
-          </hstack>
+                    
         </vstack>
       </hstack>
       
@@ -214,7 +201,7 @@ const handleOptionSelect = (option : string ) => {
       
       <hstack width="80%" alignment="center middle">
         <hstack width="60%" alignment="center middle" height="40px" padding="small" backgroundColor="#013839">
-          <ProgressBar width={300} />
+          <ProgressBar width={300} onComplete={onFinish} />
         </hstack>
         
         <spacer grow />
@@ -225,7 +212,7 @@ const handleOptionSelect = (option : string ) => {
             height="40px"
             label="skip"
             color={"white"}
-            onClick={onComplete}
+            onClick={onFinish}
           />
           <spacer grow />
           <CustomButton
@@ -233,7 +220,7 @@ const handleOptionSelect = (option : string ) => {
             height="40px"
             label="ENTER"
             color={"white"}
-            onClick={() => context.ui.showForm(myForm)}
+            onClick={() => context.ui.showForm(myForm, {lableOptions: subredditOptions} )}
           />
         </hstack>
       </hstack>

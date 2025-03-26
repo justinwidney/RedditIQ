@@ -37,10 +37,11 @@ function extractDateFromPath(filePath) {
   return null;
 }
 
-async function loadQuestionsFromPath(filePath : string) {
+async function loadQuestionsFromPath(title: string) {
+
+  console.log("Title: ", title);
  
-  const todayDate = extractDateFromPath(filePath)
-  return (await import(`../../data/Questions/${todayDate?.monthName}/${todayDate?.formatted}.json`)).default;
+  return (await import(`../../data/Questions/${title}.json`)).default;
   
 }
 
@@ -104,7 +105,7 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
     }>(async () => {
       const players = await engine.getPlayerCount(props.postData.postId);
       const user = await engine.getUserScore(props.username);
-      const questions = await loadQuestionsFromPath(props.gameSettings.fileName);
+      const questions = await loadQuestionsFromPath(props.gameSettings.title);
 
 
       return {
@@ -128,19 +129,26 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
        isSolved ? 'score' : 'menu'
     );
 
+    const Title = props.gameSettings.title;
      
 
     const Menu = (
         <vstack width="100%" height="100%" alignment="middle center" >
 
-            <hstack width="80%" padding="large" >
+            <spacer height={"32px"} />
+
+            <hstack width="80%" padding="medium" >
               <spacer grow />
               {renderHintHearts(0)}
             </hstack>
 
 
             <hstack width="100%" alignment="center middle">
+              <zstack alignment="center middle" width={"60%"}>
+
+            <vstack width="100%" alignment="middle center" height={"200px"} >
               <image
+
                   imageHeight={150}
                   imageWidth={300}
                   width="341px"
@@ -153,7 +161,29 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
                   </svg>`}
                   description="Reddit IQ Logo"
                   />
+                  
+              </vstack>
+
+              <vstack alignment="start" width="100%" height={"200px"}>
+              <image
+                  imageHeight={128}
+                  imageWidth={256}
+                  width="140px"    
+                  height="128px"
+                          url={`data:image/svg+xml,
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="11 -10 43 43" shape-rendering="crispEdges">
+                          <g transform="rotate(-45, 32, 11)">
+                          <rect x="12" y="1" width="40" height="20" fill="#FF0000" stroke-width="1" />
+                          <text x="32" y="15" font-size="7" text-anchor="middle" fill="white">${Title}</text>
+                          </g>
+                          </svg>`}
+                  description="Title Field"
+                  />
+              </vstack>
+        
+            </zstack>
             </hstack>
+
 
             <spacer size="small"/>
             
@@ -166,12 +196,20 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
 
      
 
-          <spacer size="large" />
+          <spacer size="medium" />
 
-            <hstack alignment="center middle" gap="small" width={"100%"} padding="small">
-              <PixelText scale={2} color="black">Average IQ</PixelText>
+            <hstack alignment="center middle" gap="small" width={"82%"} padding="small">
+
+              <spacer width={"30%"} />
+
+              <PixelText scale={2} color="white">Average IQ</PixelText>
               <spacer size="small" />
-              <PixelText scale={3} color="black">88</PixelText>
+              <PixelText scale={3} color="white">88</PixelText>
+
+              <spacer grow />
+
+              <CustomButton onClick={() => setPage('tutorial')} label="?"  width="30px" height="30px" color="#FFFFFF" textSize={1}/>
+
             </hstack>
 
             <spacer size="large" />

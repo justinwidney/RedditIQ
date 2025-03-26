@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useState, useForm } from "@devvit/public-api";
-import { GameProps, GameScore, HistorianQuestion, UserData } from "../../types.js";
+import { GameProps, GameScore, HistorianQuestion, MultipleChoiceScore, UserData } from "../../types.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import { PixelText } from "../Addons/PixelText.js";
 import { PixelSymbol } from "../Addons/PixelSymbol.js";
@@ -29,38 +29,91 @@ export const HistorianPage = (
   const [isCorrect, setIsCorrect] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [hintIndex, setHintIndex] = useState(0);
-  const [userAnswer, setAnswer] = useState({ month: "", year: "" });
+  const [userAnswer, setAnswer] = useState({  year: 0});
   const [month, setMonth] = useState(0);
   const [year, setYear] = useState(0);
 
+  const dimensions = context.dimensions || { width: 700, height: 500 }; // default dimensions
 
-  const containerWidth = context.dimensions.width > 600 ? '425px' : '325px';
-  const pictureWidth = context.dimensions.width > 600 ? '390px' : '300px';
-  const padding = context.dimensions.width > 600 ? 'medium' : 'small';
+  const containerWidth = dimensions.width > 600 ? '425px' : '325px';
+  const pictureWidth = dimensions.width > 600 ? '390px' : '300px';
+  const padding = dimensions.width > 600 ? 'medium' : 'small';
 
-  const imageWidth:Devvit.Blocks.SizeString = `${context.dimensions.width}px`
+  const imageWidth:Devvit.Blocks.SizeString = `${dimensions.width}px`
 
 
-  const toastMessage = (yearDifference:number, monthDifference:number) =>{
-
-    const monthDifferenceText = monthDifference > 4 ? "Far" : `Close` ;
+  const toastMessage = (yearDifference:number, ) =>{
     const yearDifferenceText = yearDifference > 3 ? "Far" : `Close` ;
-
-    ui.showToast({ text: `The Month is ${monthDifferenceText} and the Year is ${yearDifferenceText}` });
+    ui.showToast({ text: `The Year is ${yearDifferenceText}` });
     
 }
 
+
+  const updateScore = (points:number) : MultipleChoiceScore[]  =>  {
+
+      setScore(prevScore => prevScore + points);
+      let guessValue: MultipleChoiceScore;
+      if (points === 3) guessValue = "3";
+      else if (points === 1) guessValue = "1";
+      else guessValue = "0";
+
+      const newUserGuess = [...userGuess, guessValue]; 
+
+      setUserGuess(newUserGuess);
+
+      return newUserGuess;
+};
+
+  const onFinish = () => {
+   
+    onComplete( updateScore(0) );
+  };
+
+
+
+  const handleSubmit = (values: { [x: string]: any; month?: any; year?: any; }) => {
+
+
+    const yearGuess = parseInt(values.year);
+  
+    // Update state with user's guess
+    setYear(yearGuess);
+    setAnswer({ year: yearGuess });
+    
+    const correctYear = question.answer.year;
+  
+    const yearCorrect = yearGuess === correctYear;
+    setIsCorrect( yearCorrect);
+    
+    const timeDelta = Math.abs(yearGuess - correctYear);
+  
+    // Determine score based on accuracy
+    if (timeDelta <= 0) {
+     ;
+      onComplete( updateScore(3));
+      return;
+
+    } else if (timeDelta <= 2 && hintIndex === 2) {
+      updateScore(1);
+      onComplete( updateScore(1));
+      return;
+
+    } else if (hintIndex >= 2) {
+      onComplete( updateScore(0));
+      return;
+    }
+  
+    // If not returning early, show hint and result
+    const yearDifference = Math.abs(correctYear - yearGuess);
+    toastMessage(yearDifference);
+    setShowResult(true);
+    setHintIndex(prev => prev + 1);
+};
 
   const guessForm = useForm(
     () => {
       return {
         fields: [
-          {
-            type: 'number',
-            name: 'month',
-            label: 'Release Month',
-            defaultValue: month,
-          },
           {
             type: 'number',
             name: 'year',
@@ -71,59 +124,8 @@ export const HistorianPage = (
       };
     },
     (values) => {
-      // Handle the guess submission
-      const monthGuess = parseInt(values.month);
-      const yearGuess = parseInt(values.year);
-
-      setMonth(monthGuess);
-      setYear(yearGuess);
       
-      const correctMonth = question.answer.month;
-      const correctYear = question.answer.year;
-      
-      // Allow for partial matches (e.g., "jan" for "january")
-      const monthCorrect = correctMonth === (monthGuess) 
-      const yearCorrect = yearGuess === correctYear;
-
-      const guessMonthsTotal = (yearGuess * 12) + monthGuess;
-      const correctMonthsTotal = (correctYear * 12) + correctMonth;
-      const timeDelta = Math.abs(guessMonthsTotal - correctMonthsTotal);
-
-      const isWithinSixMonths = timeDelta <= 6;  
-      const isWithinOneYear = timeDelta <= 12;
-
-      setAnswer({ month: values.month, year: values.year });
-      setIsCorrect(monthCorrect && yearCorrect);
-      
-      if (isWithinSixMonths) {
-        setScore(prevScore => prevScore + 3);
-        setUserGuess(prevState => [...prevState, '3'])
-        onComplete(userGuess);
-        return
-      }
-
-      else if( (isWithinOneYear) && hintIndex === 2){
-        setScore(prevScore => prevScore + 0.5);
-        setUserGuess(prevState => [...prevState, '1'])
-        onComplete(userGuess);
-        return
-      }
-
-      else if( hintIndex >= 2){
-        setScore(prevScore => prevScore + 0);
-        setUserGuess(prevState => [...prevState, '0'])
-        onComplete(userGuess);
-        return
-      }
-      
-
-      const timeDifference = Math.abs(correctYear - yearGuess);
-      const monthDifference = Math.abs(correctMonth - monthGuess);
-      toastMessage(timeDifference, monthDifference)
-
-
-      setShowResult(true);
-      setHintIndex(prev => prev + 1);
+      handleSubmit(values);
     }
   );
 
@@ -186,7 +188,7 @@ export const HistorianPage = (
           <spacer size="small" />
 
           <hstack gap="small" alignment="start">
-            <PixelText scale={2} color="black">{question.content.title}</PixelText>
+            <PixelText scale={1.5} color="black">{question.content.title}</PixelText>
           </hstack>
 
           <spacer size="small" />
@@ -210,7 +212,7 @@ export const HistorianPage = (
       <hstack width="80%" alignment="center middle" >
 
       <hstack width="60%" alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
-      <PixelText scale={1} color="white">Guess the release date of this game</PixelText>
+      <PixelText scale={1} color="white">Guess the Date?</PixelText>
       </hstack>
 
       <spacer grow />
@@ -222,7 +224,7 @@ export const HistorianPage = (
                 height="40px"
                 label="skip"
                 color={"white"}
-                onClick={onComplete}
+                onClick={onFinish}
               />
               <spacer grow />
 

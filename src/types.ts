@@ -42,6 +42,7 @@ export type GameSettings = {
     subredditName: string;
     questions: string
     fileName: string;
+    title: string;
 }
 
 interface PostData {
@@ -90,7 +91,7 @@ interface BaseQuestion {
   export interface CelebrityQuestion extends BaseQuestion {
     type: 'celebrity';
     image: string;
-    answer: string;
+    answers: string[];
     name?: string;
     hint?: string;
     redditRelevance?: string;

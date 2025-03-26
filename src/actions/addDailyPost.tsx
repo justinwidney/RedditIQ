@@ -5,7 +5,6 @@ import { GameSettings } from "../types.js";
 import Settings from "../Settings.json";
 
 
-const DAILY_POST_JOB = 'dailyPost';
 
 
 export const dailyPost = (form: FormKey): MenuItem => ({
@@ -16,8 +15,6 @@ export const dailyPost = (form: FormKey): MenuItem => ({
       context.ui.showForm(form);
     },
   });
-
-
 
 
   function formatDateDMY(timestamp: number) {
@@ -45,8 +42,10 @@ export const newPinnedPost: MenuItem = {
     const community = await context.reddit.getCurrentSubreddit();
     const todayDate = new Date().toLocaleDateString();
 
+    const title = 'Seinfield'
+
     const post = await context.reddit.submitPost({
-      title: `Reddit IQ - 2010s`,
+      title: `Reddit IQ - ${title}`,
       subredditName: community.name,
       preview: <LoadingPreview />,
     });
@@ -57,7 +56,8 @@ export const newPinnedPost: MenuItem = {
     engine.storeGameSettings({
       subredditName: community.name,
       questions: Settings.questions,
-      fileName: `../../data/Questions/March/${formatDateDMY(Date.now())}.json`
+      title: title,
+      fileName: `../../data/Questions/March/${title}}.json`
   } as GameSettings),
 
   await Promise.all([

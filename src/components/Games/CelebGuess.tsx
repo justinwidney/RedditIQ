@@ -2,7 +2,7 @@ import { Context, Devvit, JSONObject, useForm, useInterval, useState } from "@de
 import { CelebrityQuestion, GameProps, GameScore, MultipleChoiceScore, UserData } from "../../types.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import Settings from '../../Settings.json';
-import { ScoreToLetter, splitArray } from "../../utils/utils.js";
+import { ScoreToLetter, levenshteinDistance, splitArray } from "../../utils/utils.js";
 import { ProgressBar } from "../Addons/ProgressBar.js";
 import { PieceSymbol } from "../Addons/PieceSymbol.js";
 import { PixelText } from "../Addons/PixelText.js";
@@ -34,17 +34,17 @@ export const CelebPage = (
   const [startTime] = useState(Date.now());
   const [isCorrect, setIsCorrect] = useState(false);
 
+  const drawingTime = Settings.drawTimeEasy || 60;
+
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [drawingData, setDrawingData] = useState<drawData[]>(Array(Settings.canvasWidth * Settings.canvasHeight).fill({color: 0, drawn: false}));
   const [hintIndex, setHintIndex] = useState(0);
  
-  const pieceSize: Devvit.Blocks.SizeString = `${context.dimensions.width / 16}px`;
-  const pieceSizeHeight: Devvit.Blocks.SizeString = `${context.dimensions?.height / 16}px`;
+  const dimensions = context.dimensions || { width: 700, height: 500 }; // default dimensions
 
-
-  const drawingTime = Settings.drawTimeEasy || 60;
-
-  const pictureWidth:Devvit.Blocks.SizeString = `${context.dimensions.width}px`
+  const pieceSize: Devvit.Blocks.SizeString = `${dimensions.width / 16}px`;
+  const pieceSizeHeight: Devvit.Blocks.SizeString = `${dimensions?.height / 16}px`;
+  const pictureWidth:Devvit.Blocks.SizeString = `${dimensions.width}px`
 
 
   useInterval(() => {
@@ -61,30 +61,50 @@ export const CelebPage = (
     setDrawingData(newDrawingData);
      
     if (remainingTime <= 0) {
-      setUserGuess(prevState => [...prevState, '0'])
-      props.onComplete(userGuess);
+      const updateGuess = [...userGuess, '0'] as MultipleChoiceScore[];
+      setUserGuess(updateGuess)
+      props.onComplete(updateGuess);
     }
 
   }, ANIMATION_INTERVAL).start();
 
 
 
+  const onFinish = () => {
+
+    const updateGuess = [...userGuess, '0'] as MultipleChoiceScore[];
+    setUserGuess(updateGuess)
+    props.onComplete(updateGuess);
+
+  }
+
+
   const handleSubmit = (name:string):void => {
 
     const cleanedInput = name.trim().toLowerCase();
-    const cleanedAnswer = question.answer.trim().toLowerCase();
 
+    const correct = question.answers.some(answer => 
+      answer.trim().toLowerCase() === cleanedInput
+    );
 
-    const correct = cleanedInput === cleanedAnswer 
+    const distance = question.answers.some(answer => {
+      const cleanedAnswer = answer.trim().toLowerCase();
+      const distance = levenshteinDistance(cleanedInput, cleanedAnswer);
+      const maxDistance = Math.min(2, Math.floor(cleanedAnswer.length / 3));
+      return distance <= maxDistance;
+    });
+
+    const isAnswerCorrect = correct || distance ;
     
-    setIsCorrect(correct);
+    setIsCorrect(isAnswerCorrect);
     
-    if (correct) {
+    if (isAnswerCorrect) {
 
         const newScore = elapsedTime < 10000 ? 3 : elapsedTime < 20000 ? 2 : 1;
         const newScoreLetter = newScore === 3 ? '3' : newScore === 2 ? '2' : '1';
 
         const updateGuess = [...userGuess, newScoreLetter] as MultipleChoiceScore[];
+
         setUserGuess(prevState => [...prevState, newScoreLetter])
         setScore((prev) => prev + newScore);
 
@@ -96,8 +116,10 @@ export const CelebPage = (
         setHintIndex(nextHintIndex);
 
       if (nextHintIndex >= INITIAL_MAX_HINTS) {
-        setUserGuess(prevState => [...prevState, '0'])
-        onComplete(userGuess);
+        const updateGuess = [...userGuess, '0'] as MultipleChoiceScore[];
+        setUserGuess(updateGuess)
+        onComplete(updateGuess);
+
       }
 
     }
@@ -229,7 +251,7 @@ const myForm = useForm(
       <hstack width="80%" alignment="center middle" >
             
       <hstack width="60%" alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
-              <ProgressBar width={300} onComplete={onComplete} />
+              <ProgressBar width={300} onComplete={onFinish} />
             </hstack>
 
       <spacer grow />
@@ -240,7 +262,7 @@ const myForm = useForm(
                 height="40px"
                 label="skip"
                 color={"white"}
-                onClick={onComplete}
+                onClick={onFinish}
               />
               <spacer grow />
 

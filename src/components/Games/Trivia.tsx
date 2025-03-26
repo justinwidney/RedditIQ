@@ -5,8 +5,9 @@ import { OptionItem } from "./TriviaOption.js";
 import Settings from '../../Settings.json';
 import { ProgressBar } from "../Addons/ProgressBar.js";
 import { PixelText } from "../Addons/PixelText.js";
-import { indexToLetter } from "../../utils/utils.js";
+import { INITIAL_MAX_HINTS, indexToLetter, splitTextByWordBoundaries } from "../../utils/utils.js";
 import { renderHintHearts } from "../Addons/Hearts.js";
+import { CustomButton } from "../Addons/CustomButton.js";
 
 interface TriviaPageProps extends GameProps {
   question: TriviaQuestion;
@@ -17,7 +18,7 @@ export const TriviaPage = (
   props: TriviaPageProps,
   context: Context
 ): JSX.Element => {
-  const { onComplete, onCancel, userData, setScore, setUserGuess, question } = props;
+  const { onComplete, onCancel, userData, setScore, setUserGuess, question, userGuess  } = props;
   
 
   const textSize = context.dimensions.width > 600 ? 1.5 : 1;
@@ -28,6 +29,7 @@ export const TriviaPage = (
   const [timeLeft, setTimeLeft] = useState(15); // 15 seconds per question
   const [timerActive, setTimerActive] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [livesIndex, setLivesIndex] = useState(0);
 
   const currentQuestion = question.questions[currentIndex];
   const [nextQuestionTime, setNextQuestionTime] = useState(10000);
@@ -66,6 +68,7 @@ export const TriviaPage = (
     }
     else {
       setUserGuess(prevState => [...prevState, '0'])
+      setLivesIndex(prev => prev +1 );
     }
     
     setShowResult(true);
@@ -78,12 +81,13 @@ export const TriviaPage = (
         setUserGuess(prevState => [...prevState, "0" as GameScore])
       }
       
-      onComplete();
+      onComplete(userGuess);
   }
 
 
   const handleNextQuestion = () => {
-    if (currentIndex < question.questions.length - 1) {
+
+    if (currentIndex < question.questions.length - 1 && livesIndex < INITIAL_MAX_HINTS) {
       setCurrentIndex( (currentIndex) => currentIndex + 1);
       setSelectedOption(null);
       setShowResult(false);
@@ -95,6 +99,12 @@ export const TriviaPage = (
       onFinish();
     }
   };
+
+
+
+
+  const parts = splitTextByWordBoundaries(currentQuestion.question, 50);
+
 
   return (
     <vstack width="100%" height="100%" padding="small" alignment="center">
@@ -126,15 +136,21 @@ export const TriviaPage = (
           <PixelText scale={1} color={"black"}>.com</PixelText>
           <spacer grow />
           <PixelText scale={1} color={"black"}>Tries</PixelText>
-          {renderHintHearts ? renderHintHearts(0) : null}
+          {renderHintHearts ? renderHintHearts(livesIndex) : null}
         </hstack>
       </hstack>
       
       <spacer size="small" />
       
       <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
-        <vstack alignment="middle center" width="100%" backgroundColor="white" padding="small" height={"50px"}>
-            <PixelText scale={textSize} color="#000000">{currentQuestion.question}</PixelText>
+        <vstack alignment="middle center" width="100%" backgroundColor="white" padding="small" height={"100%"}>
+            {parts.map((part, index) => {
+              return (
+                <hstack gap="small" padding="small">
+                  <PixelText scale={1.5} color={"black"}>{part}</PixelText>
+                </hstack>
+              );
+            })}
           </vstack>
         </hstack>
 
@@ -187,11 +203,27 @@ export const TriviaPage = (
     
       <spacer grow />
       
-      <hstack width="80%" alignment="center middle">
-        <hstack width="100%" alignment="center middle" height="40px" padding="small" backgroundColor="#013839">
-        <PixelText scale={1} color={"black"}>Score</PixelText>
-        </hstack>
-        </hstack>
+      <hstack width="80%" alignment="center middle" >
+            
+            <hstack width="80%" alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
+                    <ProgressBar width={375} onComplete={onFinish} />
+                  </hstack>
+      
+              <spacer grow />
+              <hstack width="15%" alignment="center middle"  height="40px" >
+      
+                  <CustomButton
+                      width="70px"
+                      height="40px"
+                      label="skip"
+                      color={"white"}
+                      onClick={ ()=> setNextQuestionTime(100)}
+                    />
+                    <spacer grow />
+ 
+              </hstack>
+      
+                </hstack>
 
       <spacer height="56px" />
 

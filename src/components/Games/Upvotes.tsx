@@ -7,6 +7,7 @@ import { ProgressBar } from "../Addons/ProgressBar.js";
 import { GAME_SVG } from "../../data/svgs.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import { renderHintHearts } from "../Addons/Hearts.js";
+import { splitTextByWordBoundaries } from "../../utils/utils.js";
 
 interface UpvotesPageProps extends GameProps {
 question: UpvotesQuestion;
@@ -97,10 +98,13 @@ export const UpvotesPage = (
 
 
   const renderPostCard = (post: PostComparison['postA'], label: string, isSelected: boolean) => {
+
+
+    const parts = splitTextByWordBoundaries(post.title, 35);
+
+
     return (
 
-
-      
 
       <vstack 
         backgroundColor={
@@ -115,13 +119,20 @@ export const UpvotesPage = (
 
          <hstack gap="small" alignment="start middle" backgroundColor="#2A3439" width="100%" padding="small">
           <PixelText scale={1} color="#FFFFFF">{post.subreddit}</PixelText>
+          <PixelText scale={1} color="#FFFFFF"> upvotes ?</PixelText>
         </hstack>
 
         <spacer size="small" />
 
-        <hstack gap="small" alignment="start">
-            <PixelText scale={1} color="black">{post.title}</PixelText>
-          </hstack>
+        <vstack gap="small" alignment="start">
+          {parts.map((part, index) => {
+              return (
+                <hstack padding="small">
+                  <PixelText scale={1} color={"black"}>{part}</PixelText>
+                </hstack>
+              );
+            })}
+          </vstack>
 
         <spacer size="small" />
         <zstack border="thin" borderColor="#000000">
@@ -164,7 +175,6 @@ export const UpvotesPage = (
       
       <spacer size="small" />
       
-   
           <hstack width="100%" gap="medium" alignment="middle center" height={"325px"}>
             {renderPostCard(currentComparison.postA, 'A', selectedPost === 'A')}
             {renderPostCard(currentComparison.postB, 'B', selectedPost === 'B')}
