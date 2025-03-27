@@ -50,9 +50,6 @@ export const newPinnedPost: MenuItem = {
       preview: <LoadingPreview />,
     });
 
-    //await post.sticky();
-    //await engine.createPinnedPost(post.id);
-
     const gameSettings = {
       subredditName: community.name,
       questions: Settings.questions,

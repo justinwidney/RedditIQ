@@ -152,9 +152,7 @@ export class Engine {
            }),
 
           this.incrementUserScore(event.username, IQ), // Total IQ,
-
           this.savePostIQ(event.postData.postId, event.username, IQ), // IQ for the post
-
           this.saveGuessScore(event.postData.postId, event.guess, event.username)
         ]);
 

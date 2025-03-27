@@ -57,7 +57,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         postType: PostType;
         userData: UserData | null;
         username: string | null;
-        gameSettings: GameSettings;
         postSettings: GameSettings;
     }>( async () => {
         
@@ -66,10 +65,9 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             getUsername()]
         );
 
-        const [postData, userData, gameSettings, postSettings] = await Promise.all([
+        const [postData, userData,  postSettings] = await Promise.all([
             getPostData(postType, postId),
             gameEngine.getUserData(username, postId),
-            gameEngine.getGameSettings(),
             gameEngine.getPostSettings(postId)
         ]);
 
@@ -80,7 +78,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             postType,
             userData,
             username,
-            gameSettings,
             postSettings
         }
     });
@@ -95,7 +92,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
                 postData={data.postData}
                 userData={data.userData}
                 username={data.username} 
-                gameSettings={data.gameSettings }   
                 postSettings={data.postSettings}       
                   />
         )

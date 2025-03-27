@@ -27,7 +27,6 @@ interface PinnedPostProps {
     postData: PostData
     userData: UserData | null;
     username: string | null;
-    gameSettings: GameSettings;
     postSettings?: GameSettings;
 }
 
@@ -68,44 +67,48 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
 
     const engine = new Engine(context);
     const isSolved = !!props.userData?.solved;
-    //const questions = props.gameSettings.questions;
+
     const dimensions = context.dimensions || { width: 700, height: 500 }; 
 
     const extraPadding = dimensions.width > 450 
 
-    const { data:player, loading} = useAsync<{
-      playerCount: number;
-      rank: number;
-      score: number;
-      questions: any[];
-      answer: string[]
-    }>(async () => {
-      const players = await engine.getPlayerCount(props.postData.postId);
-      const user = await engine.getUserScore(props.username);
-      const questions = await loadQuestionsFromPath(props.postSettings?.title || props.gameSettings.title);
+    const [data] = useState( 
+      async () => {
+        return context.cache(
+          async () => {
+            const json = await loadQuestionsFromPath(props.postSettings?.title || "");
+
+        return await json
+      },
+        {
+          key: context.userId!,
+          ttl: 2 * 60 * 60 * 1000
+        }
+        )
+      });
 
 
-      return {
-        playerCount: players ? players : 0,
-        rank: user.rank,
-        score: user.score,
-        questions: questions.questions,
-        answer: questions.answer
-      }
-    });
+      const { data:player, loading} = useAsync<{
+        playerCount: number;
+
+      }>(async () => {
+        const players = await engine.getPlayerCount(props.postData.postId);
+        return {
+          playerCount: players ? players : 0,
+        }
+      });
+
 
     
-    if (player === null || loading) {
-      return <LoadingState />;
-    }
-  
-    const questions = createComponentIndexArray(player.questions);
+
+    const questions = data?.question  ? createComponentIndexArray(data.questions) : [0, 1, 2, 3, 4, 5]
+   
 
     const [page, setPage] = useState(
        isSolved ? 'score' : 'menu'
     );
 
-    const Title = props.postSettings?.title || props.gameSettings.title;
+    const Title = props.postSettings?.title || "Puzzle";
      
 
     const Menu = (
@@ -207,8 +210,8 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
     const pages: Record<string, JSX.Element> = {
         menu: Menu,
         tutorial : <TutorialPage onClose={onClose} />,
-        solve: <SolvePageRouter {...props} onCancel={onClose} questions={questions} questionData={player.questions} />,
-        score: <StatsPage puzzleName={Title} {...props} answer={player.answer} />
+        solve: <SolvePageRouter {...props} onCancel={onClose} questions={questions} questionData={data.questions} />,
+        score: <StatsPage puzzleName={Title} {...props}  />
     }
 
 

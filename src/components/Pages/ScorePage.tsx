@@ -9,7 +9,7 @@ import { CustomButton } from "../Addons/CustomButton.js";
 
 interface ScoreGroup {
   count: number;
-  answers: Array<{
+  answers?: Array<{
     username: string;
     guessString: string;
   }>;
@@ -19,7 +19,7 @@ interface StatsPageProps {
   postData: PostData;
   username: string | null;
   puzzleName: string;
-  answer: any;
+  answer?: any;
 }
 
 export const StatsPage = (
@@ -28,16 +28,10 @@ export const StatsPage = (
 ): JSX.Element => {
 
 
-  const { puzzleName, answer } = props;
-
 
   const engine = new Engine(context);
   const rowCount = 6;
   const rowHeight: Devvit.Blocks.SizeString = `${100 / rowCount}%`;
-
-
-
-
 
 
 

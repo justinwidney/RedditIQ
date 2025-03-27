@@ -6,7 +6,6 @@ interface PuzzlePageProps {
     postData: Record<string, any>;
     userData: UserData | null;
     username: string | null;
-    gameSettings: Record<string, any> | null;
     puzzle: Record<string, any> | null;
 }
 

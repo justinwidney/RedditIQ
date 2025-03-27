@@ -29,7 +29,6 @@ export interface PostData {
 
 interface SolvePageRouterProps {
     username: string | null;
-    gameSettings: GameSettings;
     userData: UserData | null;
     onCancel: (skip:boolean) => void;
     postData: PostData;
