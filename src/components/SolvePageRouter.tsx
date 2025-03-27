@@ -69,14 +69,6 @@ export const SolvePageRouter = (props: SolvePageRouterProps, context: Context): 
     const postId = props.postData.postId;
     const isSolved = !!props.userData?.solved;
 
-    if(isLastQuestion || !currentQuestion) {
-      //props.onCancel(true);
-
-      console.log("New call")
-
-    }
-
-
     const onCompleteRandomize = (pageName:string) => {
       setCurrentStep(pageName)
       setTargetIndex(targetIndex + 1)

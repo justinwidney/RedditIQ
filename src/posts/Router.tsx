@@ -46,8 +46,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
        switch(postType){
             case PostType.PINNED:
                 return gameEngine.getPinnedPost(postId);
-            case PostType.PUZZLE:
-                return gameEngine.getPuzzlePost(postId);
             default:
                 return gameEngine.getPinnedPost(postId);
        }

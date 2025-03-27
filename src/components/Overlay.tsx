@@ -155,7 +155,7 @@ export const IQScoreOverlay = (
           )}
 
             {animationState === 'animating' && animationDirection === 'same' && (
-            <PixelText scale={2} color="yellow">BRAIN STATUS: STABLE.</PixelText>
+            <PixelText scale={2} color="yellow">BRAIN STATUS: CRUISE CONTROL.</PixelText>
           )}
           
           {animationState === 'complete' && (

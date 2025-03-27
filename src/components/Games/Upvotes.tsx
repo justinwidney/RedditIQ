@@ -146,10 +146,10 @@ export const UpvotesPage = (
         {extraPadding ? null : <spacer size="small" /> }
         
 
-        <vstack gap="small" alignment="start">
+        <vstack gap="small" alignment="start" padding="small">
           {parts.map((part, index) => {
               return (
-                <hstack padding="small">
+                <hstack >
                   <PixelText scale={1} color={"black"}>{part}</PixelText>
                 </hstack>
               );

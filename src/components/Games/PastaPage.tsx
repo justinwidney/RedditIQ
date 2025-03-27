@@ -243,9 +243,14 @@ export const PastaPage = (
       
       <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839" height={"55%"}>
         <vstack alignment="middle center" width="100%" backgroundColor="white" padding="small"  height={"100%"} >
+
           <hstack gap="small" alignment="start middle" width="100%" height={"20%"}>
             <PixelText scale={2} color="black">Fill in the blanks:</PixelText>
           </hstack>
+          <hstack gap="small" alignment="start middle" width="100%">
+            <PixelText scale={1} color="black">Click on a blank to see an option</PixelText>
+          </hstack>
+
           <spacer size="small" />
           <vstack width="100%" alignment="center middle" height={"80%"}>
             {renderTextWithBlanks()}
@@ -264,7 +269,7 @@ export const PastaPage = (
         
         <hstack width={extraPadding ? "35%" : "55%"} alignment="center middle" height="40px">
           <CustomButton
-            width="70px"
+             width={extraPadding? "85px" : "70px"}
             height="40px"
             label="skip"
             textSize={extraPadding? 2 : 1}
@@ -273,7 +278,7 @@ export const PastaPage = (
           />
           <spacer grow />
           <CustomButton
-            width={extraPadding? "100px" : "70px"}
+            width={extraPadding? "85px" : "70px"}
             height="40px"
             textSize={extraPadding? 2 : 1}
             label="ENTER"

@@ -119,6 +119,10 @@ export const TriviaPage = (
       setTimeLeft(15);
       setTimerActive(true);
       setSubmitted(false);
+    }
+    else if (livesIndex >= INITIAL_MAX_HINTS) {
+
+      onComplete(updateScore(0));
     } else {
       // We've reached the end of the questions
       onFinish();
@@ -243,7 +247,7 @@ export const TriviaPage = (
               <hstack width={extraPadding ? "15%" : "25%"} alignment="center middle"  height="40px" >
       
                   <CustomButton
-                      width="70px"
+                      width={extraPadding? "85px" : "70px"}
                       height="40px"
                       label="skip"
                       textSize={extraPadding? 2 : 1}

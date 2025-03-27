@@ -91,7 +91,7 @@ export const CelebPage = (
 
   const handleSubmit = (name:string):void => {
 
-    const cleanedInput = name.trim().toLowerCase();
+    const cleanedInput = name?.trim().toLowerCase() || '';
 
     const correct = question.answers.some(answer => 
       answer.trim().toLowerCase() === cleanedInput
@@ -268,7 +268,7 @@ const myForm = useForm(
         <hstack width={extraPadding ? "35%" : "55%"} alignment="center middle"  height="40px" >
 
           <CustomButton
-                width="70px"
+                 width={extraPadding? "85px" : "70px"}
                 height="40px"
                 label="skip"
                 textSize={extraPadding? 2 : 1}
@@ -278,7 +278,7 @@ const myForm = useForm(
               <spacer grow />
 
               <CustomButton
-                width={extraPadding? "100px" : "70px"}
+                 width={extraPadding? "85px" : "70px"}
                 height="40px"
                 label="ENTER"
                 textSize={extraPadding? 2 : 1}

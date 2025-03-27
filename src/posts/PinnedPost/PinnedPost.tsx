@@ -85,6 +85,7 @@ function createComponentIndexArray(questionsData) {
   return indexArray;
 }
 
+const AVERAGE_IQ = (Math.floor(Math.random() * (120 - 80 + 1) + 80)).toLocaleString()
 
 export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Element => {
 
@@ -189,7 +190,11 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
 
 
             <vstack alignment="center middle" gap="small">
-              <CustomButton onClick={() => setPage('solve')} label="ENTER"  width="160px" height="60px" color="#FFFFFF" textSize={2.5}/>
+              <CustomButton onClick={() => setPage('solve')} 
+              label="Let's Go!"  width="160px" 
+              height="60px" color="#FFFFFF" 
+              textSize={2.5} 
+              animating={extraPadding} />
             </vstack>
 
      
@@ -204,7 +209,7 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
 
               <PixelText scale={2} color="white">Average IQ</PixelText>
               <spacer size="small" />
-              <PixelText scale={3} color="white">{ (Math.floor(Math.random() * (120 - 80 + 1) + 80)).toLocaleString()}</PixelText>
+              <PixelText scale={3} color="white">{ AVERAGE_IQ}</PixelText>
 
               <spacer grow />
 

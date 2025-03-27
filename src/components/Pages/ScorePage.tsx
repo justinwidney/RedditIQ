@@ -29,7 +29,6 @@ export const StatsPage = (
 
   const { puzzleName, answer } = props;
 
-  console.log(puzzleName, "?")
 
   const engine = new Engine(context);
   const rowCount = 6;

@@ -15,7 +15,7 @@ interface HistorianPageProps extends GameProps {
   question: HistorianQuestion;
 }
 
-const INITIAL_MAX_HINTS = 3;
+const INITIAL_MAX_HINTS = 4;
 
 export const HistorianPage = (
   props: HistorianPageProps,
@@ -41,8 +41,23 @@ export const HistorianPage = (
   const extraPadding = dimensions.width > 450 
 
   const toastMessage = (yearDifference:number, ) =>{
-    const yearDifferenceText = yearDifference > 3 ? "Far" : `Close` ;
-    ui.showToast({ text: `The Year is ${yearDifferenceText}` });
+
+        let temperatureText;
+        if (yearDifference === 0) {
+          temperatureText = "BOILING HOT!";
+        } else if (yearDifference <= 3) {
+          temperatureText = "HOT";
+        } else if (yearDifference <= 5) {
+          temperatureText = "WARM";
+        } else if (yearDifference <= 7) {
+          temperatureText = "COOL";
+        } else if (yearDifference <= 10) {
+          temperatureText = "COLD";
+        } else {
+          temperatureText = "ICE COLD";
+        }
+
+    ui.showToast({ text: `${temperatureText}` });
     
 }
 
@@ -97,12 +112,12 @@ export const HistorianPage = (
       onComplete( updateScore(3));
       return;
 
-    } else if (timeDelta <= 2 && hintIndex === 2) {
+    } else if (timeDelta <= 1 && hintIndex === 2) {
       updateScore(1);
       onComplete( updateScore(1));
       return;
 
-    } else if (hintIndex >= 2) {
+    } else if (hintIndex >= INITIAL_MAX_HINTS - 1) {
       onComplete( updateScore(0));
       return;
     }
@@ -189,10 +204,9 @@ export const HistorianPage = (
 
           </hstack>
 
-          <spacer size="small" />
-
-          <hstack gap="small" alignment="start">
-            <PixelText scale={extraPadding? 1.5 : 0.8} color="black">{question.content.title}</PixelText>
+          <hstack gap="small" alignment="start" width="100%" >
+            <spacer width="4px" />
+            <PixelText scale={extraPadding? 1.3 : 0.8} color="black">{question.content.title}</PixelText>
           </hstack>
 
           <spacer size="small" />
@@ -230,7 +244,7 @@ export const HistorianPage = (
       <hstack width={extraPadding ? "35%" : "55%"} alignment="center middle"  height="40px" >
 
           <CustomButton
-                width="70px"
+                width={extraPadding? "85px" : "70px"}
                 height="40px"
                 label="skip"
                 color={"white"}
@@ -241,7 +255,7 @@ export const HistorianPage = (
               <spacer grow />
 
               <CustomButton
-                width={extraPadding? "100px" : "70px"}
+                width={extraPadding? "85px" : "70px"}
                 height="40px"
                 label="ENTER"
                 color={"white"}
