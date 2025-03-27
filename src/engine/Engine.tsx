@@ -167,19 +167,20 @@ export class Engine {
 
       async incrementUserScore(username: string, IQ: number): Promise<number> {
 
-      if (this.scheduler === undefined) {
-        console.error('Scheduler not available in Service');
-        return 0;
-      }
+        if (this.scheduler === undefined) {
+          console.error('Scheduler not available in Service');
+          return 0;
+        }
 
-      const key = this.keys.scores;
+        const key = this.keys.scores;
 
-      const prevScore = (await this.redis.zScore(key, username)) ?? 0;
-      const diffAmount = IQ - prevScore;
-      const nextScore = await this.redis.zIncrBy(key, username, diffAmount)
-     
-  
-      return nextScore;
+        const prevScore = (await this.redis.zScore(key, username)) ?? 0;
+        const diffAmount = (IQ - prevScore)/2;
+        const nextScore = await this.redis.zIncrBy(key, username, diffAmount)
+
+      
+        return nextScore;
+
     }
 
     
@@ -210,7 +211,11 @@ export class Engine {
       return parsedData;
     }
 
-
+    async getTotalIQ(username: string): Promise<number> {
+      const key = this.keys.scores;
+      const prevScore = (await this.redis.zScore(key, username)) ?? 0;
+      return prevScore;
+    }
 
 
     static getLeaderboard( maxLength: number = 10): PromiseLike<ScoreBoardEntry[]> {

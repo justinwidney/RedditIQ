@@ -35,10 +35,6 @@ export const StatsPage = (
   const rowHeight: Devvit.Blocks.SizeString = `${100 / rowCount}%`;
 
 
-  function calculateScore(sep: string[]) {
-    const sum = sep.reduce((total, current) => total + parseInt(current, 10), 0);         
-    return sum;
-  }
 
   function processIQData(IQScores: { [username: string]: number }) {
     const total = Object.keys(IQScores).length;
@@ -77,10 +73,11 @@ export const StatsPage = (
     playerCount: number;
     userGuess: string;
     playerIQ: number;
+    totalIQ: number;
     IQScores: { [username: string]: number };
   }>(async () => {
 
-    const empty = { playerCount: 0, IQScores: {}, userGuess: "", playerIQ: 0 };
+    const empty = { playerCount: 0, IQScores: {}, userGuess: "", playerIQ: 0, totalIQ: 0 };
 
     if (!props.username) return empty;
 
@@ -88,7 +85,7 @@ export const StatsPage = (
 
       const players = await engine.getPlayerCount(props.postData.postId);
       //const guessScores = await engine.getGuessScores(props.postData.postId);
-
+      const totalIQ = await engine.getTotalIQ(props.username);
       const userGuess = await engine.getGuessScore(props.postData.postId, props.username)
       const playerIQ = await engine.getPostIQ(props.postData.postId, props.username);
       const IQScores = await engine.getAllPostIQ(props.postData.postId)
@@ -97,7 +94,8 @@ export const StatsPage = (
         playerCount: players,
         IQScores: IQScores,
         userGuess: userGuess || "",
-        playerIQ: playerIQ
+        playerIQ: playerIQ,
+        totalIQ: totalIQ
       };
     } catch (error) {
       if (error) {
@@ -131,7 +129,7 @@ export const StatsPage = (
         backgroundColor="rgba(255, 255, 255, 0.2)"
       >
         {/* Progress Bar */}
-        <hstack width={`${percentage}%`} height="100%" backgroundColor="white" />
+        <hstack width={`${percentage}%`} height="100%" backgroundColor={data.playerIQ === score ? "black" : "white"} />
         {/* Score */}
         <hstack height="100%" width="100%" alignment="start middle">
           <spacer width="12px" />
@@ -169,15 +167,18 @@ export const StatsPage = (
     <vstack width="100%" height="100%" padding="medium" backgroundColor="#2ecc71" alignment="center top" gap="medium">
       {/* Header with puzzle name */}
       <vstack width="100%" alignment="middle center" padding="medium">
-        <PixelText scale={1.5} color="white">Statistics</PixelText>
-        <spacer height="12px" />
-        <PixelText scale={3} color="white">{puzzleName}</PixelText>
+        <PixelText scale={2.5} color="white">TOTAL IQ</PixelText>
+        <spacer height="8px" />
+        <PixelText scale={3} color={Settings.theme.primary}>{data.totalIQ.toLocaleString()}</PixelText>      
       </vstack>
       
            {/* Player IQ Score */}
           {props.username && data.playerIQ > 0 && (
         <hstack width="100%" alignment="middle center" padding="small" >
-
+            <PixelText scale={2} color="white">{puzzleName}</PixelText>
+            <spacer width="12px" />
+            <PixelText scale={2} color="white">IQ</PixelText>
+            <spacer width="12px" />
           <PixelText scale={4} color={Settings.theme.primary}>{data.playerIQ.toLocaleString()}</PixelText>
         </hstack>
           )}
