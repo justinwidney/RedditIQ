@@ -35,12 +35,10 @@ export const HistorianPage = (
 
   const dimensions = context.dimensions || { width: 700, height: 500 }; // default dimensions
 
-  const containerWidth = dimensions.width > 600 ? '425px' : '325px';
   const pictureWidth = dimensions.width > 600 ? '390px' : '300px';
-  const padding = dimensions.width > 600 ? 'medium' : 'small';
 
-  const imageWidth:Devvit.Blocks.SizeString = `${dimensions.width}px`
 
+  const extraPadding = dimensions.width > 450 
 
   const toastMessage = (yearDifference:number, ) =>{
     const yearDifferenceText = yearDifference > 3 ? "Far" : `Close` ;
@@ -55,6 +53,7 @@ export const HistorianPage = (
       let guessValue: MultipleChoiceScore;
       if (points === 3) guessValue = "3";
       else if (points === 1) guessValue = "1";
+      else if (points === -1) guessValue = "-1"
       else guessValue = "0";
 
       const newUserGuess = [...userGuess, guessValue]; 
@@ -65,9 +64,14 @@ export const HistorianPage = (
 };
 
   const onFinish = () => {
-   
     onComplete( updateScore(0) );
   };
+
+  const onSkip = () => {
+    onComplete( updateScore(-1) );
+  }
+
+
 
 
 
@@ -165,7 +169,7 @@ export const HistorianPage = (
         <PixelText  scale={1}  color={"black"}>.com</PixelText>
 
         <spacer grow />
-        <PixelText scale={1} color={"black"}>Tries</PixelText>
+        {extraPadding ?  <PixelText scale={1} color={"black"}>Tries</PixelText> : null}
         {renderHintHearts()}
         </hstack>
        </hstack>
@@ -188,19 +192,25 @@ export const HistorianPage = (
           <spacer size="small" />
 
           <hstack gap="small" alignment="start">
-            <PixelText scale={1.5} color="black">{question.content.title}</PixelText>
+            <PixelText scale={extraPadding? 1.5 : 0.8} color="black">{question.content.title}</PixelText>
           </hstack>
 
           <spacer size="small" />
 
-          <image
-            imageHeight={200}
-            imageWidth={pictureWidth}
-            height="100%"
-            width="100%"
-            resizeMode="fill"
-            url={question.image}
-          />
+            <zstack width={"100%"} height={"100%"}>
+
+            <image
+              imageHeight={200}
+              imageWidth={pictureWidth}
+              height="100%"
+              width="100%"
+              resizeMode="cover"
+              url={question.image}
+            />
+
+            {question.link ? (<text size="small" color="blue">{question.link}</text>) : null}
+
+          </zstack>
            
            </vstack>
 
@@ -211,28 +221,31 @@ export const HistorianPage = (
       <spacer size="small" />
       <hstack width="80%" alignment="center middle" >
 
-      <hstack width="60%" alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
+      <hstack width={extraPadding ? "60%" : "40%"} alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
       <PixelText scale={1} color="white">Guess the Date?</PixelText>
       </hstack>
 
       <spacer grow />
 
-      <hstack width="35%" alignment="center middle"  height="40px" >
+      <hstack width={extraPadding ? "35%" : "55%"} alignment="center middle"  height="40px" >
 
           <CustomButton
                 width="70px"
                 height="40px"
                 label="skip"
                 color={"white"}
-                onClick={onFinish}
+                textSize={extraPadding? 2 : 1}
+
+                onClick={onSkip}
               />
               <spacer grow />
 
               <CustomButton
-                width="100px"
+                width={extraPadding? "100px" : "70px"}
                 height="40px"
                 label="ENTER"
                 color={"white"}
+                textSize={extraPadding? 2 : 1}
                 onClick={()=> { if (hintIndex < INITIAL_MAX_HINTS) return context.ui.showForm(guessForm)}}
               />
           </hstack>

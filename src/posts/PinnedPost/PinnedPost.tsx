@@ -37,12 +37,8 @@ function extractDateFromPath(filePath) {
   return null;
 }
 
-async function loadQuestionsFromPath(title: string) {
-
-  console.log("Title: ", title);
- 
+async function loadQuestionsFromPath(title: string) { 
   return (await import(`../../data/Questions/${title}.json`)).default;
-  
 }
 
 type PostData = {
@@ -55,6 +51,7 @@ interface PinnedPostProps {
     userData: UserData | null;
     username: string | null;
     gameSettings: GameSettings;
+    postSettings?: GameSettings;
 }
 
 
@@ -94,7 +91,9 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
     const engine = new Engine(context);
     const isSolved = !!props.userData?.solved;
     //const questions = props.gameSettings.questions;
+    const dimensions = context.dimensions || { width: 700, height: 500 }; 
 
+    const extraPadding = dimensions.width > 450 
 
     const { data:player, loading} = useAsync<{
       playerCount: number;
@@ -105,7 +104,7 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
     }>(async () => {
       const players = await engine.getPlayerCount(props.postData.postId);
       const user = await engine.getUserScore(props.username);
-      const questions = await loadQuestionsFromPath(props.gameSettings.title);
+      const questions = await loadQuestionsFromPath(props.postSettings?.title || props.gameSettings.title);
 
 
       return {
@@ -124,12 +123,11 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
   
     const questions = createComponentIndexArray(player.questions);
 
-
     const [page, setPage] = useState(
        isSolved ? 'score' : 'menu'
     );
 
-    const Title = props.gameSettings.title;
+    const Title = props.postSettings?.title || props.gameSettings.title;
      
 
     const Menu = (
@@ -151,7 +149,7 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
 
                   imageHeight={150}
                   imageWidth={300}
-                  width="341px"
+                  width={extraPadding ? "341px" : "250px"}
                   height="171px"
                           url={`data:image/svg+xml,
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 256 128" shape-rendering="crispEdges">
@@ -168,8 +166,8 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
               <image
                   imageHeight={128}
                   imageWidth={256}
-                  width="140px"    
-                  height="128px"
+                  width={extraPadding ? "140px" : "80px"}   
+                  height={extraPadding ? "128px" : "80px"}   
                           url={`data:image/svg+xml,
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="11 -10 43 43" shape-rendering="crispEdges">
                           <g transform="rotate(-45, 32, 11)">
@@ -200,11 +198,13 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
 
             <hstack alignment="center middle" gap="small" width={"82%"} padding="small">
 
-              <spacer width={"30%"} />
+
+
+              {extraPadding ? <spacer width={"30%"} /> : null}
 
               <PixelText scale={2} color="white">Average IQ</PixelText>
               <spacer size="small" />
-              <PixelText scale={3} color="white">88</PixelText>
+              <PixelText scale={3} color="white">{ (Math.floor(Math.random() * (120 - 80 + 1) + 80)).toLocaleString()}</PixelText>
 
               <spacer grow />
 
@@ -217,8 +217,7 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
             </vstack>
     )
 
-
-   
+       
 
     const onClose = (skip:boolean = false) :void => {
         setPage(  skip? 'score' : 'menu')
@@ -228,7 +227,7 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
         menu: Menu,
         tutorial : <TutorialPage onClose={onClose} />,
         solve: <SolvePageRouter {...props} onCancel={onClose} questions={questions} questionData={player.questions} />,
-        score: <StatsPage puzzleName={""} {...props} answer={player.answer} />
+        score: <StatsPage puzzleName={Title} {...props} answer={player.answer} />
     }
 
 

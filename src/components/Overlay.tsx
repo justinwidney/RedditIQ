@@ -21,7 +21,7 @@ export const IQScoreOverlay = (
   // State for animation
   const [displayIQ, setDisplayIQ] = useState(initialIQ);
   const [animationState, setAnimationState] = useState<'idle' | 'animating' | 'complete'>('idle');
-  const [animationDirection, setAnimationDirection] = useState<'up' | 'down' | 'none'>('none');
+  const [animationDirection, setAnimationDirection] = useState<'up' | 'down' | 'none' | 'same'>('none');
   const [animationStep, setAnimationStep] = useState(0);
   
   const INITIAL_PAUSE = 800; 
@@ -30,12 +30,22 @@ export const IQScoreOverlay = (
   
   // Determine if animation should start
   useInterval(() => {
-    // If there's a new IQ score that's different from the current display and we're not animating
-    if (newIQ !== undefined && newIQ !== initialIQ && animationState === 'idle' && isVisible) {
+
+    if (newIQ !== undefined && animationState === 'idle' && isVisible) {
       setAnimationState('animating');
-      setAnimationDirection(newIQ > initialIQ ? 'up' : 'down');
+    
+      if (newIQ > initialIQ) {
+        setAnimationDirection('up');
+      } else if (newIQ < initialIQ) {
+        setAnimationDirection('down');
+      } else {
+        setAnimationDirection('same');
+      }
+
       setAnimationStep(0);
     }
+
+
   }, 100).start();
   
   // Handle the animation sequence
@@ -73,14 +83,12 @@ export const IQScoreOverlay = (
     }
   }, 100).start();
   
-  // If not visible, render nothing
   if (!isVisible) return <></>;
   
   // Handle tap on the component
   const handlePress = () => {
     if (animationState === 'complete' && onTap) {
       onTap();
-
     }
   };
   
@@ -107,23 +115,47 @@ export const IQScoreOverlay = (
               <PixelText scale={6} color="white">{displayIQ.toLocaleString()}</PixelText>
             </vstack>
             
-            {animationState === 'animating' && (
+            {animationState === 'animating' && animationDirection === 'up' && (
               <text 
-                color={animationDirection === 'up' ? "green" : "red"}
+                color="green"
                 size="xxlarge"
                 weight="bold"
               >
-                {animationDirection === 'up' ? '↑' : '↓'}
+                ↑
+              </text>
+            )}
+            
+            {animationState === 'animating' && animationDirection === 'down' && (
+              <text 
+                color="red"
+                size="xxlarge"
+                weight="bold"
+              >
+                ↓
+              </text>
+            )}
+            
+            {animationState === 'animating' && animationDirection === 'same' && (
+              <text 
+                color="yellow"
+                size="xxlarge"
+                weight="bold"
+              >
+                =
               </text>
             )}
           </hstack>
           
           {animationState === 'animating' && animationDirection === 'up' && (
-            <PixelText scale={2} color="green">GETTING SMARTER!</PixelText>
+            <PixelText scale={2} color="green">BIG BRAIN ACTIVATED!</PixelText>
           )}
           
           {animationState === 'animating' && animationDirection === 'down' && (
-            <PixelText scale={2} color="red">GETTING DUMBER!</PixelText>
+            <PixelText scale={2} color="red">NOW A VERIFIED R/SHOWERTHOUGHTS CONTRIBUTOR!</PixelText>
+          )}
+
+            {animationState === 'animating' && animationDirection === 'same' && (
+            <PixelText scale={2} color="yellow">BRAIN STATUS: STABLE.</PixelText>
           )}
           
           {animationState === 'complete' && (

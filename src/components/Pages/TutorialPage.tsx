@@ -82,9 +82,9 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
             title: "Reddit Historian",
             instructions: [
                 "Read the post titles carefully",
-                "Choose the correct month and year",
+                "Choose the correct year",
                 "Three tries to get the correct date",
-                "Points for getting within 6months or 1 year!"
+                "Points for getting within 2 years!"
             ]
         },
     ];

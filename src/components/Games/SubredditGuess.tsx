@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useState, TextAreaWidget, useForm } from "@devvit/public-api";
-import { GameProps, SubredditQuestion, UserData } from "../../types.js";
+import { GameProps, MultipleChoiceScore, SubredditQuestion, UserData } from "../../types.js";
 import { CustomButton } from "../Addons/CustomButton.js";
 import { PixelText } from "../Addons/PixelText.js";
 import { PixelSymbol } from "../Addons/PixelSymbol.js";
@@ -40,9 +40,14 @@ export const SubredditGuessPage = (
 
   const {ui, reddit} = context;
 
-  const containerWidth = context.dimensions.width > 600 ? '450px' : '300px';
-  const pictureWidth = context.dimensions.width > 600 ? '400px' : '250px';
-  const textSize = context.dimensions.width > 600 ? 1.5 : 1;
+  const dimensions = context.dimensions || { width: 700, height: 500 }; // default dimensions
+
+  const containerWidth = dimensions.width > 600 ? '450px' : '300px';
+  const pictureWidth = dimensions.width > 600 ? '400px' : '250px';
+  const textSize = dimensions.width > 600 ? 1.5 : 1;
+
+  const extraPadding = dimensions.width > 450 
+
   
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -52,27 +57,42 @@ export const SubredditGuessPage = (
   const currentQuestion = question
 
 
-  const onFinish = (sovled:boolean = false) => {
+    const updateScore = (points:number) : MultipleChoiceScore[]  =>  {
 
-    console.log('onFinish', sovled)
+      setScore(prevScore => prevScore + points);
+      let guessValue: MultipleChoiceScore;
+      if (points === 3) guessValue = "3";
+      else if (points === 2) guessValue = "2";
+      else if (points === 1) guessValue = "1";
+      else if (points === -1) guessValue = "-1"
+      else guessValue = "0";
 
-    const score = 3 - hintIndex;
-    const guess = sovled ? '3' : '0';
+      const newUserGuess = [...userGuess, guessValue]; 
+      setUserGuess(newUserGuess);
+      return newUserGuess;
+  };
+  
 
-    setUserGuess(prevState => [...prevState, guess])
-    setScore(prevScore => prevScore + score);
-    onComplete(userGuess);
+  const onFinish = (solved: boolean | object = false) => {
+
+
+    const isSolved = typeof solved === 'object' 
+    ? Object.keys(solved).length > 0 
+    : Boolean(solved);      const score = 3 - hintIndex;
+
+    const guess = isSolved ? score : -1;
+
+    onComplete(updateScore(guess));
 
   }
 
 
 // Handle selecting an option for a blank
-const handleOptionSelect = (option : string[] ) => {
+const handleOptionSelect = (option : string ) => {
 
-    const guess = option[0];
+    const guess = option;
 
     setHintIndex( prev => prev + 1);
-
 
     // Clean up and normalize the input for comparison
     const cleanedInput = guess.trim().toLowerCase();
@@ -108,13 +128,9 @@ const handleOptionSelect = (option : string[] ) => {
       return {
         fields: [
           {
-            type: 'select',
+            type: 'string',
             name: 'answer',
-            label: `Pick an option 'r/' `,
-            options : data.lableOptions ? data.lableOptions.map((option) => ({
-              value: option,
-              label: option,
-            })) : [],
+            label: `Name an option 'r/' `,
           },
         ],
    
@@ -158,7 +174,7 @@ const handleOptionSelect = (option : string[] ) => {
           />
           <PixelText scale={1} color={"black"}>.com</PixelText>
           <spacer grow />
-          <PixelText scale={1} color={"black"}>Tries</PixelText>
+          {extraPadding ?  <PixelText scale={1} color={"black"}>Tries</PixelText> : null}
           {renderHintHearts()}
         </hstack>
       </hstack>
@@ -176,19 +192,16 @@ const handleOptionSelect = (option : string[] ) => {
           <spacer size="small" />
           
           <hstack gap="small" alignment="start" width="100%">
-            <PixelText scale={textSize} color="black">The speakers keep getting bigger</PixelText>
+            <PixelText scale={textSize} color="black">{question.title}</PixelText>
           </hstack>
           
-          <hstack gap="small" alignment="start" width="100%">
-            <PixelText scale={textSize} color="black">and my living room stays the same size</PixelText>
-          </hstack>
           
           <spacer size="small" />
           
           <image
             imageHeight={200}
             imageWidth={400}
-            height="180px"
+            height="200px"
             width="100%"
             resizeMode="fill"
             url={hintIndex > 1 ? currentQuestion.image2 : currentQuestion.image}
@@ -200,25 +213,28 @@ const handleOptionSelect = (option : string[] ) => {
       <spacer size="small" />
       
       <hstack width="80%" alignment="center middle">
-        <hstack width="60%" alignment="center middle" height="40px" padding="small" backgroundColor="#013839">
-          <ProgressBar width={300} onComplete={onFinish} />
+        <hstack width={extraPadding ? "60%" : "40%"} alignment="center middle" height="40px" padding="small" backgroundColor="#013839">
+          <ProgressBar width={extraPadding? 300 : 100} onComplete={onFinish} />
         </hstack>
         
         <spacer grow />
         
-        <hstack width="35%" alignment="center middle" height="40px">
+        <hstack width={extraPadding ? "35%" : "55%"} alignment="center middle" height="40px">
           <CustomButton
             width="70px"
             height="40px"
             label="skip"
+            textSize={extraPadding? 2 : 1}
+
             color={"white"}
             onClick={onFinish}
           />
           <spacer grow />
           <CustomButton
-            width="100px"
+            width={extraPadding? "100px" : "70px"}
             height="40px"
             label="ENTER"
+            textSize={extraPadding? 2 : 1}
             color={"white"}
             onClick={() => context.ui.showForm(myForm, {lableOptions: subredditOptions} )}
           />

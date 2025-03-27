@@ -4,14 +4,6 @@ import { Engine } from "../../engine/Engine.js";
 import { PostData } from "../SolvePageRouter.js";
 import { abbreviateNumber } from "../../utils/utils.js";
 import Settings from "../../Settings.json";
-import { Question } from "../../types.js";
-
-
-
-
-
-
-
 
 
 interface ScoreGroup {
@@ -37,6 +29,7 @@ export const StatsPage = (
 
   const { puzzleName, answer } = props;
 
+  console.log(puzzleName, "?")
 
   const engine = new Engine(context);
   const rowCount = 6;
@@ -48,54 +41,64 @@ export const StatsPage = (
     return sum;
   }
 
-  function processGuessData(guesses: { [guess: string]: string[] }) {
-    const total = Object.keys(guesses).length;
+  function processIQData(IQScores: { [username: string]: number }) {
+    const total = Object.keys(IQScores).length;
     const groups: Record<number, ScoreGroup> = {};
-  
-    // Process guesses and group by score
-    Object.entries(guesses).forEach(([username, guessArray]) => {
-      if (!guessArray || !guessArray.length) return;
-  
-      const sep = guessArray[0].split(',');
-      const score = calculateScore(sep);
+   
+    // Process IQ scores and group by score value
+    Object.entries(IQScores).forEach(([username, score]) => {
+      // Skip if no score (should not happen, but just in case)
+      if (score === undefined || score === null) return;
       
+      // Create group for this score if it doesn't exist
       if (!groups[score]) {
         groups[score] = { count: 0, answers: [] };
       }
       
+      // Increment count for this score
       groups[score].count++;
-      groups[score].answers.push({ username, guessString: guessArray[0] });
+      
+      // Add username to this score group
+      groups[score].answers.push({ 
+        username, 
+        guessString: score.toString() // Store the score as string for compatibility
+      });
     });
     
     // Sort scores in descending order
     const sorted = Object.keys(groups)
       .map(Number)
       .sort((a, b) => b - a);
-    
+   
     return { scoreGroups: groups, sortedScores: sorted, totalGuesses: total };
   }
 
 
   const { data, loading } = useAsync<{
     playerCount: number;
-    guesses: { [guess: string]: string[] };
-    userGuess: string
+    userGuess: string;
+    playerIQ: number;
+    IQScores: { [username: string]: number };
   }>(async () => {
 
-    const empty = { playerCount: 0, guesses: {} as { [guess: string]: string[] }, userGuess: "" };
+    const empty = { playerCount: 0, IQScores: {}, userGuess: "", playerIQ: 0 };
 
     if (!props.username) return empty;
 
     try {
 
       const players = await engine.getPlayerCount(props.postData.postId);
-      const guessScores = await engine.getGuessScores(props.postData.postId);
+      //const guessScores = await engine.getGuessScores(props.postData.postId);
+
       const userGuess = await engine.getGuessScore(props.postData.postId, props.username)
+      const playerIQ = await engine.getPostIQ(props.postData.postId, props.username);
+      const IQScores = await engine.getAllPostIQ(props.postData.postId)
 
       return {
         playerCount: players,
-        guesses : guessScores,
-        userGuess: userGuess || ""
+        IQScores: IQScores,
+        userGuess: userGuess || "",
+        playerIQ: playerIQ
       };
     } catch (error) {
       if (error) {
@@ -112,7 +115,7 @@ export const StatsPage = (
   }
 
   
-  const { scoreGroups, sortedScores, totalGuesses } = processGuessData(data.guesses);
+  const { scoreGroups, sortedScores, totalGuesses } = processIQData(data.IQScores);
 
   // Create score visualization components
   const topGuesses = sortedScores.map((score, index) => {
@@ -167,10 +170,20 @@ export const StatsPage = (
     <vstack width="100%" height="100%" padding="medium" backgroundColor="#2ecc71" alignment="center top" gap="medium">
       {/* Header with puzzle name */}
       <vstack width="100%" alignment="middle center" padding="medium">
-        <PixelText scale={2} color="white">{puzzleName}</PixelText>
         <PixelText scale={1.5} color="white">Statistics</PixelText>
+        <spacer height="12px" />
+        <PixelText scale={3} color="white">{puzzleName}</PixelText>
       </vstack>
       
+           {/* Player IQ Score */}
+          {props.username && data.playerIQ > 0 && (
+        <hstack width="100%" alignment="middle center" padding="small" >
+
+          <PixelText scale={4} color={Settings.theme.primary}>{data.playerIQ.toLocaleString()}</PixelText>
+        </hstack>
+          )}
+
+
         <hstack width="100%" grow>
           <spacer width="24px" />
           <vstack grow gap="small">

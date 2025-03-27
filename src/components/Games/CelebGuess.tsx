@@ -46,6 +46,9 @@ export const CelebPage = (
   const pieceSizeHeight: Devvit.Blocks.SizeString = `${dimensions?.height / 16}px`;
   const pictureWidth:Devvit.Blocks.SizeString = `${dimensions.width}px`
 
+  const extraPadding = dimensions.width > 450 
+
+
 
   useInterval(() => {
 
@@ -69,12 +72,19 @@ export const CelebPage = (
   }, ANIMATION_INTERVAL).start();
 
 
+  const onSkip = () => {
+
+    const newGuess  = [...userGuess, '-1'] as MultipleChoiceScore[];
+    setUserGuess(newGuess)
+    props.onComplete(newGuess);
+
+  }
 
   const onFinish = () => {
 
-    const updateGuess = [...userGuess, '0'] as MultipleChoiceScore[];
-    setUserGuess(updateGuess)
-    props.onComplete(updateGuess);
+    const newGuess  = [...userGuess, '0'] as MultipleChoiceScore[] 
+    setUserGuess(newGuess)
+    props.onComplete(newGuess);
 
   }
 
@@ -217,8 +227,8 @@ const myForm = useForm(
               />
         <PixelText  scale={1}  color={"black"}>.com</PixelText>
 
-        <spacer grow />
-        <PixelText scale={1} color={"black"}>Tries</PixelText>
+        <spacer grow /> 
+        {extraPadding ?  <PixelText scale={1} color={"black"}>Tries</PixelText> : null}
         {renderHintHearts()}
         </hstack>
        </hstack>
@@ -250,26 +260,28 @@ const myForm = useForm(
 
       <hstack width="80%" alignment="center middle" >
             
-      <hstack width="60%" alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
-              <ProgressBar width={300} onComplete={onFinish} />
+      <hstack width={extraPadding ? "60%" : "40%"} alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
+              <ProgressBar width={extraPadding? 300 : 100} onComplete={onFinish} />
             </hstack>
 
       <spacer grow />
-        <hstack width="35%" alignment="center middle"  height="40px" >
+        <hstack width={extraPadding ? "35%" : "55%"} alignment="center middle"  height="40px" >
 
           <CustomButton
                 width="70px"
                 height="40px"
                 label="skip"
+                textSize={extraPadding? 2 : 1}
                 color={"white"}
-                onClick={onFinish}
+                onClick={onSkip}
               />
               <spacer grow />
 
               <CustomButton
-                width="100px"
+                width={extraPadding? "100px" : "70px"}
                 height="40px"
                 label="ENTER"
+                textSize={extraPadding? 2 : 1}
                 color={"white"}
                 onClick={()=> { if (hintIndex < INITIAL_MAX_HINTS) return context.ui.showForm(myForm)}}
               />

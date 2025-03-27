@@ -29,6 +29,7 @@ export class Engine {
 
     readonly tags = {
         scores: 'default',
+        IQ: 'default',
       };
 
       readonly keys = {
@@ -38,10 +39,12 @@ export class Engine {
         postSolved: (postId: PostId) => `posts:${postId}:solved`,
         postSkipped: (postId: PostId) => `posts:${postId}:skipped`,
         gameSettings: 'game-settings',
+        postSettings: (postId: PostId) => `posts:${postId}:settings`,
         difficulties: 'difficulties',
         puzzle: (puzzleName: string) => `puzzle:${puzzleName}`,
         postUserGuessCounter: (postId: PostId) => `user-guess-counter:${postId}`,
         scores: `score:${this.tags.scores}`,
+        postIQ: (postId: PostId) => `posts:${postId}:IQ`,
         guessScores: (postId: string) => `post:${postId}:guessScores`
     }
 
@@ -130,27 +133,30 @@ export class Engine {
           return 0;
         } 
 
-        const IQ = event.IQ;
+          const IQ = event.IQ;
 
-            // Increment the user's guess count
+        await Promise.all([
+
           this.redis.zIncrBy(
               this.keys.postUserGuessCounter(event.postData.postId),
               event.username, // Member
               1, // Score increment
-            )
+            ),
                             
           // Save the postID to the user's solved list
            this.redis.zAdd(this.keys.postSolved(event.postData.postId), {
               member: event.username,
               score: Date.now(),
-           })
-      
+           }),
 
-          const nextScore = this.incrementUserScore(event.username, IQ)
-          
-          this.saveGuessScore(event.postData.postId, event.guess, event.username);
+          this.incrementUserScore(event.username, IQ), // Total IQ,
 
-        return nextScore;
+          this.savePostIQ(event.postData.postId, event.username, IQ), // IQ for the post
+
+          this.saveGuessScore(event.postData.postId, event.guess, event.username)
+        ]);
+
+        return IQ;
       }
 
 
@@ -176,7 +182,33 @@ export class Engine {
       return nextScore;
     }
 
+    
+    /**
+     * Users IQ Section
+    */
 
+    async savePostIQ(postId: PostId, username: string, iqScore: number): Promise<void> {
+      const key = this.keys.postIQ(postId);
+      const score = iqScore.toLocaleString()
+      await this.redis.hSet(key, { [username]: score });
+    }
+
+    async getPostIQ(postId: PostId, username: string): Promise<number> {
+
+      const key = this.keys.postIQ(postId);
+      const data = await this.redis.hGet(key, username);
+      return data ? parseInt(data) : 0;
+    }
+
+    async getAllPostIQ(postId: PostId): Promise<{ [username: string]: number }> {
+      const key = this.keys.postIQ(postId);
+      const data = await this.redis.hGetAll(key);
+      const parsedData: { [username: string]: number } = {};
+      Object.entries(data).forEach(([username, score]) => {
+        parsedData[username] = parseInt(score);
+      });
+      return parsedData;
+    }
 
 
 
@@ -206,9 +238,6 @@ export class Engine {
       }
 
 
-    addPuzzle(difficulty: any, data: any) {
-        throw new Error('Method not implemented.');
-    }
 
 
     async getPuzzlesDifficulties(): Promise<string[]> {
@@ -231,6 +260,20 @@ export class Engine {
   
         const key = this.keys.gameSettings;
         await this.redis.hSet(key, gameSettings)
+    }
+
+    async storePostSettings(postId: PostId, gameSettings: GameSettings): Promise<void> {
+
+        const key = this.keys.postSettings(postId);
+        await this.redis.hSet(key, gameSettings)
+
+    }
+        
+    async getPostSettings(postId: PostId): Promise<GameSettings> {
+        const key = this.keys.postSettings(postId);
+        const settings = await this.redis.hGetAll(key);
+        
+        return settings as GameSettings; 
     }
 
 
@@ -285,19 +328,6 @@ export class Engine {
     }
 
 
-    /*
-    * Get Puzzle Info for Board
-    */
-
-    getPuzzle(postId: PostId): number[][] {
-        
-        return [
-            [0,0,0],
-            [1,0,0],
-            [0,1,0],
-        ]
-
-    }
 
     /*
     * Get User Data
@@ -324,6 +354,7 @@ export class Engine {
 
 
     async getGameSettings(): Promise<GameSettings> {
+
         const key = this.keys.gameSettings;
         const settings = await this.redis.hGetAll(key);
         

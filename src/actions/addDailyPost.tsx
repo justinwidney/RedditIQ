@@ -42,7 +42,7 @@ export const newPinnedPost: MenuItem = {
     const community = await context.reddit.getCurrentSubreddit();
     const todayDate = new Date().toLocaleDateString();
 
-    const title = 'Seinfield'
+    const title = 'Soccer'
 
     const post = await context.reddit.submitPost({
       title: `Reddit IQ - ${title}`,
@@ -53,25 +53,25 @@ export const newPinnedPost: MenuItem = {
     //await post.sticky();
     //await engine.createPinnedPost(post.id);
 
-    engine.storeGameSettings({
+    const gameSettings = {
       subredditName: community.name,
       questions: Settings.questions,
       title: title,
       fileName: `../../data/Questions/March/${title}}.json`
-  } as GameSettings),
+    }
+
+    engine.storeGameSettings(gameSettings as GameSettings),
+
 
   await Promise.all([
     engine.createPinnedPost(post.id),
-
-    engine.storeGameSettings({
-        subredditName: community.name,
-        questions: Settings.questions,
-    } as GameSettings),
+    engine.storePostSettings(post.id,  gameSettings)
+  ])
 
     context.ui.navigateTo(post),
     context.ui.showToast("Game Installed")
 
-])
+
 
     context.ui.navigateTo(post);
   },

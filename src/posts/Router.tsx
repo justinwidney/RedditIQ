@@ -61,6 +61,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         userData: UserData | null;
         username: string | null;
         gameSettings: GameSettings;
+        postSettings: GameSettings;
     }>( async () => {
         
         const [postType, username] = await Promise.all([
@@ -68,10 +69,11 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             getUsername()]
         );
 
-        const [postData, userData, gameSettings] = await Promise.all([
+        const [postData, userData, gameSettings, postSettings] = await Promise.all([
             getPostData(postType, postId),
             gameEngine.getUserData(username, postId),
             gameEngine.getGameSettings(),
+            gameEngine.getPostSettings(postId)
         ]);
 
         return {
@@ -80,6 +82,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             userData,
             username,
             gameSettings,
+            postSettings
         }
     });
         
@@ -92,7 +95,8 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
                 postData={data.postData}
                 userData={data.userData}
                 username={data.username} 
-                gameSettings={data.gameSettings }          
+                gameSettings={data.gameSettings }   
+                postSettings={data.postSettings}       
                   />
         )
         }
@@ -106,7 +110,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             width="100%"
             url="Windows_Screen.png"
             description="custom background"
-            resizeMode="cover"  
+            resizeMode="fill"  
             />
             {postTypes[data.postType] || <text>Post type not found</text>}
 

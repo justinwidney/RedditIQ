@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useInterval, useState } from "@devvit/public-api";
-import { GameProps, GameScore, TriviaQuestion, UserData } from "../../types.js";
+import { GameProps, GameScore, MultipleChoiceScore, TriviaQuestion, UserData } from "../../types.js";
 import { OptionItem } from "./TriviaOption.js";
 
 import Settings from '../../Settings.json';
@@ -20,8 +20,11 @@ export const TriviaPage = (
 ): JSX.Element => {
   const { onComplete, onCancel, userData, setScore, setUserGuess, question, userGuess  } = props;
   
+  const dimensions = context.dimensions || { width: 700, height: 500 }; // default dimensions
 
-  const textSize = context.dimensions.width > 600 ? 1.5 : 1;
+  const textSize = dimensions.width > 600 ? 1.5 : 1;
+  const extraPadding = dimensions.width > 450 
+
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -30,6 +33,7 @@ export const TriviaPage = (
   const [timerActive, setTimerActive] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const [livesIndex, setLivesIndex] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState<number>(0);
 
   const currentQuestion = question.questions[currentIndex];
   const [nextQuestionTime, setNextQuestionTime] = useState(10000);
@@ -47,6 +51,22 @@ export const TriviaPage = (
   }, 500).start();
 
 
+  const updateScore = (points:number) : MultipleChoiceScore[]  =>  {
+
+    setScore(prevScore => prevScore + points);
+    let guessValue: MultipleChoiceScore;
+    if (points === 3) guessValue = "3";
+    else if (points === 2) guessValue = "2";
+    else if (points === 1) guessValue = "1";
+    else if (points === -1) guessValue = "-1"
+    else guessValue = "0";
+
+    const newUserGuess = [...userGuess, guessValue]; 
+    setUserGuess(newUserGuess);
+    return newUserGuess;
+};
+  
+
   const handleOptionSelect = (index: number) => {
 
     if (!submitted){  
@@ -59,15 +79,16 @@ export const TriviaPage = (
   };
 
   const handleSubmit = (index:number) => {
+
     setTimerActive(false);
 
     // Check if the answer is correct
     if (index === currentQuestion.correctAnswer) {
-      setScore( prev => prev + 1);
-      setUserGuess(prevState => [...prevState, '1'])
+      setCorrectAnswers(prev => prev + 1);
+      //setUserGuess(prevState => [...prevState, '1'])
     }
     else {
-      setUserGuess(prevState => [...prevState, '0'])
+      //setUserGuess(prevState => [...prevState, '0'])
       setLivesIndex(prev => prev +1 );
     }
     
@@ -77,11 +98,15 @@ export const TriviaPage = (
 
   const onFinish = () => {
 
-      for(let i = 0; i < currentIndex-question.questions.length; i++){
-        setUserGuess(prevState => [...prevState, "0" as GameScore])
-      }
+      const ratio = correctAnswers / question.questions.length;
+      let gameScore 
+
+      if (ratio >= 0.8) gameScore = 3;
+      else if (ratio >= 0.6) gameScore = 2;
+      else if (ratio >= 0.4) gameScore = 1;
+      else gameScore = -1;
       
-      onComplete(userGuess);
+      onComplete(updateScore(gameScore));
   }
 
 
@@ -102,8 +127,9 @@ export const TriviaPage = (
 
 
 
+  const chunkSize = extraPadding ? 50 : 40;
 
-  const parts = splitTextByWordBoundaries(currentQuestion.question, 50);
+  const parts = splitTextByWordBoundaries(currentQuestion.question, chunkSize);
 
 
   return (
@@ -135,7 +161,7 @@ export const TriviaPage = (
           />
           <PixelText scale={1} color={"black"}>.com</PixelText>
           <spacer grow />
-          <PixelText scale={1} color={"black"}>Tries</PixelText>
+          {extraPadding ?  <PixelText scale={1} color={"black"}>Tries</PixelText> : null}
           {renderHintHearts ? renderHintHearts(livesIndex) : null}
         </hstack>
       </hstack>
@@ -147,7 +173,7 @@ export const TriviaPage = (
             {parts.map((part, index) => {
               return (
                 <hstack gap="small" padding="small">
-                  <PixelText scale={1.5} color={"black"}>{part}</PixelText>
+                  <PixelText scale={ extraPadding? 1.5 : 0.9} color={"black"}>{part}</PixelText>
                 </hstack>
               );
             })}
@@ -166,6 +192,7 @@ export const TriviaPage = (
                 onSelect={handleOptionSelect}
                 correctAnswer={currentQuestion.correctAnswer}
                 selectedOption={selectedOption}
+                textScale={extraPadding? 1.5 : 1}
               />
               
               <OptionItem 
@@ -175,6 +202,7 @@ export const TriviaPage = (
                 onSelect={handleOptionSelect}
                 correctAnswer={currentQuestion.correctAnswer}
                 selectedOption={selectedOption}
+                textScale={extraPadding? 1.5 : 1}
               />
             </hstack>
             
@@ -187,6 +215,7 @@ export const TriviaPage = (
                 onSelect={handleOptionSelect}
                 correctAnswer={currentQuestion.correctAnswer}
                 selectedOption={selectedOption}
+                textScale={extraPadding? 1.5 : 1}
               />
               
               <OptionItem 
@@ -196,6 +225,7 @@ export const TriviaPage = (
                 onSelect={handleOptionSelect}
                 correctAnswer={currentQuestion.correctAnswer}
                 selectedOption={selectedOption}
+                textScale={extraPadding? 1.5 : 1}
               />
             </hstack>
 
@@ -205,17 +235,18 @@ export const TriviaPage = (
       
       <hstack width="80%" alignment="center middle" >
             
-            <hstack width="80%" alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
-                    <ProgressBar width={375} onComplete={onFinish} />
+            <hstack width={extraPadding ? "80%" : "70%"} alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
+                    <ProgressBar width={extraPadding? 375 : 240} onComplete={onFinish} />
                   </hstack>
       
               <spacer grow />
-              <hstack width="15%" alignment="center middle"  height="40px" >
+              <hstack width={extraPadding ? "15%" : "25%"} alignment="center middle"  height="40px" >
       
                   <CustomButton
                       width="70px"
                       height="40px"
                       label="skip"
+                      textSize={extraPadding? 2 : 1}
                       color={"white"}
                       onClick={ ()=> setNextQuestionTime(100)}
                     />

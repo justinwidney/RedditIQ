@@ -133,7 +133,6 @@ export const SolvePageStep = (
             newData[moveIndex].drawn = false;
         });
 
-        console.log(lastMove)
 
         setCurrentPiece(lastMove.piece);
         setCurrentPosition(lastMove.from);

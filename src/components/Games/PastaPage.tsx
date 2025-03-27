@@ -31,46 +31,52 @@ export const PastaPage = (
   const chunkSize = dimensions.width > 500 ? 50 : 25
   const spacerSize = dimensions.width > 500 ? "large" : "small"
 
-  const updateScore = (points:number) => {
+  const extraPadding = dimensions.width > 450 
+
+
+  const updateScore = (points:number) : MultipleChoiceScore[]  =>  {
+
     setScore(prevScore => prevScore + points);
-    // Map score points to appropriate string values for userGuess
     let guessValue: MultipleChoiceScore;
     if (points === 3) guessValue = "3";
-    else if (points === 0.5) guessValue = "1";
+    else if (points === 2) guessValue = "2";
+    else if (points === 1) guessValue = "1";
+    else if (points === -1) guessValue = "-1"
     else guessValue = "0";
-    setUserGuess(prevState => [...prevState, guessValue]);
-  };
+
+    const newUserGuess = [...userGuess, guessValue]; 
+    setUserGuess(newUserGuess);
+    return newUserGuess;
+};
   
   const handleSubmit = (finished:boolean = false) => {
 
-    let correct = 0;
+      let correct = 0;
 
-    if(!finished){
-      currentQuestion.blanks.forEach((answer, index) => {
-      if (userInputs[index].toLowerCase().trim() === answer.toLowerCase()) {
-        correct++;
+      if(!finished){
+        currentQuestion.blanks.forEach((answer, index) => {
+        if (userInputs[index].toLowerCase().trim() === answer.toLowerCase()) {
+          correct++;
+        }
+      });
       }
-    });
-    }
-    
-    else{
-      correct = currentQuestion.blanks.length;
-    }
-    
-
-    const points = Math.round(correct / currentQuestion.blanks.length * 3) 
-
-    updateScore(points);
-    onComplete(userGuess);
-    setShowResult(true);
-
+      
+      else{
+        correct = currentQuestion.blanks.length;
+      }
+      
+      const points = Math.round(correct / currentQuestion.blanks.length * 3) 
+      onComplete(updateScore(points));
   };
-
 
   // SKIP BUTTON
   const onFinish = () => {
-    updateScore(0)
-    onComplete(userGuess);
+    onComplete( updateScore(-1));
+  };
+
+
+  const tapLine = () => {
+    context.ui.showToast("Tap the line to fill in the blanks!",);
   };
 
   // Handle selecting an option for a blank
@@ -97,13 +103,11 @@ export const PastaPage = (
       }
 
       else {
-
         const nextLivesIndex = livesIndex + 1;
         setLivesIndex(nextLivesIndex);
 
         if (nextLivesIndex >= INITIAL_MAX_HINTS ) {
-          setUserGuess(prevState => [...prevState, '0'])
-          onComplete(userGuess);
+          onComplete(updateScore(0));
         }
       }
     
@@ -230,7 +234,7 @@ export const PastaPage = (
           />
           <PixelText scale={1} color={"black"}>.com</PixelText>
           <spacer grow />
-          <PixelText scale={1} color={"black"}>Tries</PixelText>
+          {extraPadding ?  <PixelText scale={1} color={"black"}>Tries</PixelText> : null}
           {renderHintHearts(livesIndex)}
         </hstack>
       </hstack>
@@ -252,27 +256,29 @@ export const PastaPage = (
       <spacer size="small" />
       
       <hstack width="80%" alignment="center middle">
-        <hstack width="60%" alignment="center middle" height="40px" padding="small" backgroundColor="#013839">
-          <ProgressBar width={300} onComplete={handleSubmit} />
+        <hstack width={extraPadding ? "60%" : "40%"} alignment="center middle" height="40px" padding="small" backgroundColor="#013839">
+          <ProgressBar width={extraPadding? 300 : 100} onComplete={handleSubmit} />
         </hstack>
         
         <spacer grow />
         
-        <hstack width="35%" alignment="center middle" height="40px">
+        <hstack width={extraPadding ? "35%" : "55%"} alignment="center middle" height="40px">
           <CustomButton
             width="70px"
             height="40px"
             label="skip"
+            textSize={extraPadding? 2 : 1}
             color={"white"}
             onClick={onFinish} // Finish the game
           />
           <spacer grow />
           <CustomButton
-            width="100px"
+            width={extraPadding? "100px" : "70px"}
             height="40px"
+            textSize={extraPadding? 2 : 1}
             label="ENTER"
             color={"white"}
-            onClick={handleSubmit}
+            onClick={ livesIndex > 0  ? handleSubmit : tapLine}
           />
         </hstack>
       </hstack>

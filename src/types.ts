@@ -12,7 +12,7 @@ export type usernameID = `t1_${string}`;
 * Score Types for the Game to save in redis
 */
 
-export type MultipleChoiceScore = '3' | '2' | '1' | '0';  // Multiple choice answers
+export type MultipleChoiceScore = '-1' | '3' | '2' | '1' | '0';  // Multiple choice answers
 
 export type GameScore =  MultipleChoiceScore;
 export type CompositeScore<T extends GameScore> = string; // Will be formatted as "Y,N,Y" or "F-H-N"
@@ -101,6 +101,7 @@ interface BaseQuestion {
   export interface HistorianQuestion extends BaseQuestion {
     type: 'historian';
     image: string;
+    link?: string;
     content: {
       title: string;
       content: string;
@@ -128,6 +129,7 @@ interface BaseQuestion {
     image: string;
     image2: string;
     answer: string;
+    title : string;
     upvotes: number;
   }
   
@@ -159,6 +161,7 @@ interface BaseQuestion {
   export interface UpvotesQuestion extends BaseQuestion {
     type: 'upvotes';
     comparisons: PostComparison[];
+    link?: string;
   }
 
   export type Question = 

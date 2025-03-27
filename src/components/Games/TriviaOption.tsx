@@ -8,6 +8,7 @@ interface OptionItemProps {
     correctAnswer: number;
     showResult: boolean;
     onSelect: (index: number) => void;
+    textScale?: number;
     }
 
 
@@ -15,7 +16,7 @@ interface OptionItemProps {
 // OptionItem component for Reddit Devvit
 export const OptionItem = (props: OptionItemProps) => {
 
-    const { index, option, selectedOption, correctAnswer, showResult, onSelect } = props;
+    const { index, option, selectedOption, correctAnswer, showResult, onSelect, textScale=1.5 } = props;
 
     const backgroundColor = 
       showResult
@@ -37,7 +38,7 @@ export const OptionItem = (props: OptionItemProps) => {
         onPress={() => onSelect(index)}
       >
          <vstack alignment="middle center" width="100%" backgroundColor={backgroundColor} padding="small" height={"50px"}>
-        <PixelText scale={1.5} color="#000000">{option}</PixelText>
+        <PixelText scale={textScale} color="#000000">{option}</PixelText>
         </vstack>
       </vstack>
     );

@@ -1,5 +1,5 @@
 import { Context, Devvit, JSONObject, useInterval, useState } from "@devvit/public-api";
-import { GameProps, PostComparison, UpvotesQuestion, UserData } from "../../types.js";
+import { GameProps, MultipleChoiceScore, PostComparison, UpvotesQuestion, UserData } from "../../types.js";
 
 import Settings from '../../Settings.json';
 import { PixelText } from "../Addons/PixelText.js";
@@ -22,12 +22,16 @@ export const UpvotesPage = (
 
   const { onComplete, onCancel, userData, setScore, setUserGuess, question, userGuess } = props;
   
- 
+  const dimensions = context.dimensions || { width: 700, height: 500 }; // default dimensions
+
+  const extraPadding = dimensions.width > 450 
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [selectedPost, setSelectedPost] = useState<'A' | 'B' | null>(null);
   const [correct, setCorrect] = useState<boolean>(false);
+  const [livesIndex, setLivesIndex] = useState(0);
+  const [correctAmount, setCorrectAmount] = useState(0);
 
   const [nextQuestionTime, setNextQuestionTime] = useState(100000) // Large number ;
   const [locked, setLocked] = useState(false);
@@ -62,12 +66,14 @@ export const UpvotesPage = (
       (choice === 'B' && postBUpvotes > postAUpvotes);
     
     if (correct) {
-      setScore(prevScore => prevScore + 1);
-      setUserGuess(prevState => [...prevState, '1'])
+      //setScore(prevScore => prevScore + 1);
+      //setUserGuess(prevState => [...prevState, '1'])
+      setCorrectAmount(correctAmount + 1);
       setCorrect(true);
     }
     else {
-      setUserGuess(prevState => [...prevState, '0'])
+      setLivesIndex(prev => prev + 1);
+      //setUserGuess(prevState => [...prevState, '0'])
     }
 
     setLocked(true);
@@ -83,24 +89,38 @@ export const UpvotesPage = (
       setCorrect(false);
     } else {
       // We've reached the end of the questions
-      onComplete(userGuess);
+      onFinish();
     }
   };
 
-  const onFinish = () => {
 
-    for(let i = 0; i < (currentIndex-question.comparisons.length); i++){
-      setUserGuess(prevState => [...prevState, "0"])
-    }
-    
-    onComplete();
+  const updateScore = (points:number) : MultipleChoiceScore[]  =>  {
+
+    setScore(prevScore => prevScore + points);
+    let guessValue: MultipleChoiceScore;
+    if (points === 3) guessValue = "3";
+    else if (points === 2) guessValue = "2";
+    else if (points === 1) guessValue = "1";
+    else if (points === -1) guessValue = "-1"
+    else guessValue = "0";
+
+    const newUserGuess = [...userGuess, guessValue]; 
+    setUserGuess(newUserGuess);
+    return newUserGuess;
+};
+  
+
+  const onFinish = () => {
+    const score = correctAmount;
+    onComplete(updateScore(score));
 }
 
 
   const renderPostCard = (post: PostComparison['postA'], label: string, isSelected: boolean) => {
 
 
-    const parts = splitTextByWordBoundaries(post.title, 35);
+    const chunkSize = extraPadding ? 35 : 50;
+    const parts = splitTextByWordBoundaries(post.title, chunkSize);
 
 
     return (
@@ -111,8 +131,9 @@ export const UpvotesPage = (
           isSelected && correct ? "rgba(255, 140, 0, 0.2)" : isSelected && !correct? "rgba(255, 50, 50, 0.5)" : "#013839"
         }
         padding="small"
-        width="40%"
-        height="100%"
+        width={ extraPadding ? "40%" : "80%"}
+        height={extraPadding ? "100%" : "20%"}
+
         onPress={() => handleSelection(label as 'A' | 'B')}
       >
         <vstack alignment="middle center" width="100%" backgroundColor="white" height="100%" >
@@ -122,7 +143,8 @@ export const UpvotesPage = (
           <PixelText scale={1} color="#FFFFFF"> upvotes ?</PixelText>
         </hstack>
 
-        <spacer size="small" />
+        {extraPadding ? null : <spacer size="small" /> }
+        
 
         <vstack gap="small" alignment="start">
           {parts.map((part, index) => {
@@ -134,15 +156,16 @@ export const UpvotesPage = (
             })}
           </vstack>
 
-        <spacer size="small" />
+          {extraPadding ? null : <spacer size="small" /> }
+
         <zstack border="thin" borderColor="#000000">
         <image
           url={post.image}
-          imageHeight={225}
-          imageWidth={250}
+          imageHeight={ extraPadding ? 250 : 100}
+          imageWidth={ extraPadding ? 250 : 300 }
           height="100%"
           width="100%"
-          resizeMode="fill"
+          resizeMode={extraPadding ? "cover" : "fill"}
         />
         </zstack>
 
@@ -165,21 +188,32 @@ export const UpvotesPage = (
             width="96px"
             height="32px"
             url={GAME_SVG.upvotes}
+            resizeMode="fill"
           />
           <PixelText scale={1} color={"black"}>.com</PixelText>
           <spacer grow />
           <PixelText scale={1} color={"black"}>Tries</PixelText>
-          {renderHintHearts ? renderHintHearts(0) : null}
+          {renderHintHearts ? renderHintHearts(livesIndex) : null}
         </hstack>
       </hstack>
       
       <spacer size="small" />
       
+
+          {extraPadding ?
+
           <hstack width="100%" gap="medium" alignment="middle center" height={"325px"}>
             {renderPostCard(currentComparison.postA, 'A', selectedPost === 'A')}
             {renderPostCard(currentComparison.postB, 'B', selectedPost === 'B')}
           </hstack>
 
+          :
+
+          <vstack width="100%" gap="medium" alignment="middle center" >
+            {renderPostCard(currentComparison.postA, 'A', selectedPost === 'A')}
+            {renderPostCard(currentComparison.postB, 'B', selectedPost === 'B')}
+          </vstack>
+          }
       
       <spacer size="small" />
       
