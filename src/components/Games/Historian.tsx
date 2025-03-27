@@ -156,7 +156,7 @@ export const HistorianPage = (
           <PieceSymbol 
             type="heart" 
             color="red" 
-            scale={1} 
+            scale={extraPadding ? 1 : 0.5} 
           />
         );
       }
@@ -205,8 +205,8 @@ export const HistorianPage = (
           </hstack>
 
           <hstack gap="small" alignment="start" width="100%" >
-            <spacer width="4px" />
-            <PixelText scale={extraPadding? 1.3 : 0.8} color="black">{question.content.title}</PixelText>
+            <spacer width="2px" />
+            <PixelText scale={extraPadding? 1.2 : 0.8} color="black">{question.content.title}</PixelText>
           </hstack>
 
           <spacer size="small" />

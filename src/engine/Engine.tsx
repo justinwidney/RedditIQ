@@ -13,6 +13,8 @@ export type ScoreBoardEntry = {
 
 export class Engine {
 
+  
+
     readonly redis: RedisClient;
     readonly reddit?: RedditAPIClient
     readonly scheduler?: Scheduler;
@@ -182,6 +184,21 @@ export class Engine {
         return nextScore;
 
     }
+
+    async submitComment(playerIQ: number, totalIq:number, postId: PostId): Promise<void> {
+    
+      if(!this.reddit) {
+        console.error('Reddit API client not available in Service');
+        return
+      }
+
+      this.reddit.submitComment({
+        id: postId,
+        text: `I got **${playerIQ}** but don't worry, I'm still at **${totalIq}**!`,
+      })
+  
+    }
+  
 
     
     /**

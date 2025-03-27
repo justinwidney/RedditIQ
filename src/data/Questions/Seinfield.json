@@ -2,8 +2,9 @@
     "questions": [
       {
         "type": "celebrity",
-        "image": "seinfield/kramer.png",
-        "answers": ["Michael Richards", "Cosmo Kramer", "Kramer"]
+        "image": "",
+        "images" : ["seinfield/door.png", "seinfield/coat.png"],
+        "answers": ["Michael Richards", "Cosmo Kramer", "Kramer", "Cosmo"]
       },
       {
         "type": "historian",
@@ -114,7 +115,8 @@
       },
       {
         "type": "celebrity",
-        "image": "seinfield/newman.png",
+        "image": "",
+        "images" : ["seinfield/new.png", "seinfield/man.png"],
         "answers": ["Wayne Knight", "Newman", "The Mailman"]
       }
     ],

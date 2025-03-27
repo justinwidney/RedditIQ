@@ -20,6 +20,9 @@ export const UpvotesPage = (
   context: Context
 ): JSX.Element => {
 
+
+  const MAX_LIVES = 2
+
   const { onComplete, onCancel, userData, setScore, setUserGuess, question, userGuess } = props;
   
   const dimensions = context.dimensions || { width: 700, height: 500 }; // default dimensions
@@ -82,7 +85,7 @@ export const UpvotesPage = (
   };
 
   const handleNextQuestion = () => {
-    if (currentIndex < question.comparisons.length - 1) {
+    if (currentIndex < question.comparisons.length - 1 || livesIndex > MAX_LIVES) {
       setCurrentIndex(currentIndex + 1);
       setShowResults(false);
       setSelectedPost(null);
@@ -158,11 +161,11 @@ export const UpvotesPage = (
 
           {extraPadding ? null : <spacer size="small" /> }
 
-        <zstack border="thin" borderColor="#000000">
+        <zstack  padding="small">
         <image
           url={post.image}
-          imageHeight={ extraPadding ? 250 : 100}
-          imageWidth={ extraPadding ? 250 : 300 }
+          imageHeight={ extraPadding ? 200 : 100}
+          imageWidth={ extraPadding ? 225 : 300 }
           height="100%"
           width="100%"
           resizeMode={extraPadding ? "cover" : "fill"}

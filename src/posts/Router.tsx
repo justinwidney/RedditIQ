@@ -21,7 +21,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         if (!context.userId) return null;
 
         const cacheKey = `cache:userId-username`;
-
         const cache = await context.redis.hGet(cacheKey, context.userId);
 
         if (cache) {return cache;}
@@ -74,6 +73,8 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             gameEngine.getPostSettings(postId)
         ]);
 
+
+
         return {
             postData,
             postType,
@@ -84,7 +85,8 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         }
     });
         
-    
+    const backgroundURL = data.postSettings.title + ".png";
+
 
     const postTypes: Record<string, JSX.Element> = {
 
@@ -100,7 +102,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         }
 
     return (
-        <zstack width="100%" height="100%" alignment="top start">
+        <zstack width="100%" height="100%" alignment="center middle">
             <image 
             imageHeight={1024}
             imageWidth={2048}
@@ -110,7 +112,19 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
             description="custom background"
             resizeMode="fill"  
             />
+             <image 
+            imageHeight={1024}
+            imageWidth={2048}
+            height="76%"
+            width="84%"
+            url= {backgroundURL}
+            description="custom background"
+            resizeMode="fill"  
+            />
             {postTypes[data.postType] || <text>Post type not found</text>}
+
+
+
 
         </zstack>
     )

@@ -91,6 +91,7 @@ interface BaseQuestion {
   export interface CelebrityQuestion extends BaseQuestion {
     type: 'celebrity';
     image: string;
+    images?: string[];
     answers: string[];
     name?: string;
     hint?: string;

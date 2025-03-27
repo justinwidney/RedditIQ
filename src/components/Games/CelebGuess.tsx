@@ -172,7 +172,7 @@ const myForm = useForm(
         {
           type: 'string',
           name: 'answer',
-          label: 'Name a Celebrity',
+          label: 'Name a Person/Character',
         },
       ],
  
@@ -200,6 +200,78 @@ const myForm = useForm(
     return hearts;
   };
 
+  const MainDisplay = () => {
+    // Determine if we're in single or multi-image mode
+    const hasMultipleImages = question.images && question.images.length > 1;
+    
+    // For single image + pixel grid mode
+    const renderSingleImageWithGrid = () => {
+      return (
+        <zstack width="100%" backgroundColor="white" alignment="center middle">
+          <image
+            imageHeight={GRID_SIZE_HEIGHT}
+            imageWidth={pictureWidth}
+            height={"100%"}                
+            width={"100%"}
+            url={question.image ? question.image : "pxArt(9)"}
+            resizeMode="cover"
+          />
+          {renderPixelGrid()}
+        </zstack>
+      );
+    };
+    
+    // For multiple images side by side
+    const renderMultipleImages = () => {
+
+      return (
+        <vstack width="100%" backgroundColor="white" alignment="center middle" height="250px">
+          <spacer height="10px" />
+        <PixelText scale={2} color={"black"}>Clues:</PixelText>
+          <spacer grow />
+             <hstack width="100%" alignment="center middle" >
+            {question.images?.map((imageUrl, index) => (
+              
+              <image
+                imageHeight={32}
+                imageWidth={64}
+                height={"150px"}
+                width={"30%"}
+                url={imageUrl}
+                resizeMode="cover"
+              />
+
+            ))}
+          </hstack>
+          <spacer grow />
+          <text color="black" size="small"> All emojis designed by https://openmoji.org/ License: CC BY-SA 4.0 </text>
+        </vstack>
+      );
+    };
+    
+    // The pixel grid rendering function remains unchanged
+    const renderPixelGrid = () => {
+      const pixels = drawingData.map((pixel, index) => (
+        <hstack
+          key={`pixel-${index}`}
+          height={pieceSizeHeight}
+          width={pieceSize}
+          backgroundColor={pixel.drawn ? "transparent" : "black"}
+        />
+      ));
+      return (
+        <vstack height={GRID_SIZE_HEIGHT} width="100%" padding="none">
+          {splitArray(pixels, 16).map((row, rowIndex) => (
+            <hstack key={`row-${rowIndex}`}>{row}</hstack>
+          ))}
+        </vstack>
+      );
+    };
+    
+    // Render based on mode
+    return hasMultipleImages ? renderMultipleImages() : renderSingleImageWithGrid();
+  };
+  
 
 
   return (
@@ -242,17 +314,7 @@ const myForm = useForm(
       
       <vstack alignment="middle center" width="100%">
       <hstack width="80%" alignment="center middle" padding="small" backgroundColor="#013839">
-        <zstack width="100%" backgroundColor="white" alignment="center middle">
-            <image
-                imageHeight={GRID_SIZE_HEIGHT}
-                imageWidth={pictureWidth}
-                height={"100%"}                
-                width={"100%"}
-                url={question.image ? question.image : "pxArt(9)"}
-                resizeMode="cover"
-            />
-          {renderPixelGrid()}
-        </zstack>
+        {MainDisplay()}
         </hstack>
       </vstack>
 

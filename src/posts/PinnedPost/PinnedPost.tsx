@@ -13,29 +13,6 @@ import { Shadow } from "../../components/Addons/Shadow.js";
 
 
 
-function extractDateFromPath(filePath) {
-
-  const datePattern = /(\d{2})-(\d{2})-(\d{4})\.json$/;
-  const match = filePath.match(datePattern);
-
-  const monthPattern = /Questions\/([A-Za-z]+)\//;
-  const monthMatch = filePath.match(monthPattern);
-  
-  
-  if (match) {
-    const monthName = monthMatch[1];
-    const [_, day, month, year] = match;
-    return {
-      monthName,
-      day,
-      month,
-      year,
-      formatted: `${day}-${month}-${year}`
-    };
-  }
-  
-  return null;
-}
 
 async function loadQuestionsFromPath(title: string) { 
   return (await import(`../../data/Questions/${title}.json`)).default;
@@ -188,7 +165,6 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
             
 
 
-
             <vstack alignment="center middle" gap="small">
               <CustomButton onClick={() => setPage('solve')} 
               label="Let's Go!"  width="160px" 
@@ -199,7 +175,7 @@ export const  PinnedPost = (props: PinnedPostProps, context: Context): JSX.Eleme
 
      
 
-          <spacer size="medium" />
+          <spacer size="small" />
 
             <hstack alignment="center middle" gap="small" width={"82%"} padding="small">
 

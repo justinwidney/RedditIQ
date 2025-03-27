@@ -7,10 +7,9 @@ import Settings from '../Settings.json';
 
 const DAILY_POST_JOB = 'dailyPost';
 
-
-
 export const dailyPost = Devvit.addSchedulerJob({
     name: DAILY_POST_JOB,
+
     onRun: async (event, context) => {
         try {
 

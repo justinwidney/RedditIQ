@@ -240,7 +240,7 @@ export const TriviaPage = (
       <hstack width="80%" alignment="center middle" >
             
             <hstack width={extraPadding ? "80%" : "70%"} alignment="center middle"  height="40px" padding="small" backgroundColor="#013839">
-                    <ProgressBar width={extraPadding? 375 : 240} onComplete={onFinish} />
+                    <ProgressBar width={extraPadding? 375 : 180} onComplete={onFinish} />
                   </hstack>
       
               <spacer grow />

@@ -4,6 +4,7 @@ import { Engine } from "../../engine/Engine.js";
 import { PostData } from "../SolvePageRouter.js";
 import { abbreviateNumber } from "../../utils/utils.js";
 import Settings from "../../Settings.json";
+import { CustomButton } from "../Addons/CustomButton.js";
 
 
 interface ScoreGroup {
@@ -33,6 +34,10 @@ export const StatsPage = (
   const engine = new Engine(context);
   const rowCount = 6;
   const rowHeight: Devvit.Blocks.SizeString = `${100 / rowCount}%`;
+
+
+
+
 
 
 
@@ -111,6 +116,12 @@ export const StatsPage = (
     </>
   }
 
+  const submitComment = async () => {
+
+    engine.submitComment(data.playerIQ, data.totalIQ, props.postData.postId)
+    context.ui.showToast("Comment Submitted");
+
+  }
   
   const { scoreGroups, sortedScores, totalGuesses } = processIQData(data.IQScores);
 
@@ -167,7 +178,7 @@ export const StatsPage = (
     <vstack width="100%" height="100%" padding="medium" backgroundColor="#2ecc71" alignment="center top" gap="medium">
       {/* Header with puzzle name */}
       <vstack width="100%" alignment="middle center" padding="medium">
-        <PixelText scale={2.5} color="white">TOTAL IQ</PixelText>
+        <PixelText scale={2.5} color="white">REDDIT IQ</PixelText>
         <spacer height="8px" />
         <PixelText scale={3} color={Settings.theme.primary}>{data.totalIQ.toLocaleString()}</PixelText>      
       </vstack>
@@ -175,11 +186,11 @@ export const StatsPage = (
            {/* Player IQ Score */}
           {props.username && data.playerIQ > 0 && (
         <hstack width="100%" alignment="middle center" padding="small" >
-            <PixelText scale={2} color="white">{puzzleName}</PixelText>
-            <spacer width="12px" />
-            <PixelText scale={2} color="white">IQ</PixelText>
-            <spacer width="12px" />
+            <CustomButton label="Post" onClick={submitComment} />
+            <spacer width="16px" />
           <PixelText scale={4} color={Settings.theme.primary}>{data.playerIQ.toLocaleString()}</PixelText>
+          <spacer width="22px" />
+         
         </hstack>
           )}
 

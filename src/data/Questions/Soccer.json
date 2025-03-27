@@ -3,12 +3,12 @@
       {
         "type": "celebrity",
         "image": "soccer/messi.png",
+        
         "answers": ["Lionel Messi", "Leo Messi", "Messi"]
       },
       {
         "type": "historian",
-        "image": "soccer/zidane.png",
-        "link": "https://www.flickr.com/photos/49309262@N07/6324961127",
+        "image": "soccer/head-butt.gif",
         "content": {
           "title": "Zidane's headbutt in the World Cup Final",
           "content": "Still can't believe this happened in the final. One of the most shocking moments in World Cup history!",
@@ -21,14 +21,13 @@
       },
       {
         "type": "pasta",
-        "text": "Despite my _____ efforts, that _____ Ronaldo scored again. He can't keep getting away with this! He's just a _____ merchant who only scores _____.",
-        "blanks": ["team's", "tap-in", "penalty", "headers"],
+        "text": "Roma fans greet players with 50kg of _____ at a training session for being shite. 50,000 _____ fans set to protest against Alexis Sanchez's girlfriend amid 'fatter than normal' claims. Nathan Redmond: ______ did not call me a wanker.",
+        "blanks": ["carrots", "Chile", "Pep Guardiola"],
         "reference": "Common football fan rivalry copypasta",
         "options": [
-          [["team's", "club's", "country's", "manager's"], 0],
-          [["tap-in", "penalty", "diving", "selfish"], 0],
-          [["tap-in", "diving", "penalty", "ego"], 2],
-          [["penalties", "tap-ins", "headers", "lucky goals"], 2]
+          [["carrots", "potatoes", "bananas", "onions"], 0],
+          [["Argentina", "Chile", "Peru", "Mexio"], 1],
+          [["Pep Guardiola", "Jürgen Klopp", "José Mourinho", "Thomas Tuchel"], 0]
         ]
       },
       {
@@ -125,8 +124,9 @@
       },
       {
         "type": "celebrity",
-        "image": "soccer/ronaldo.png",
-        "answers": ["Cristiano Ronaldo", "CR7", "Ronaldo"]
+        "image": "",
+        "images" : ["soccer/man.png", "soccer/turtle.png"],
+        "answers": ["Kylian", "Mbappé", "Mbappe", "Kylian Mbappe"]
       }
     ],
     "answer": ["3", "3", "3", "3", "1", "3", "0", "3", "0", "0", "3"]

@@ -1,6 +1,6 @@
 import { Context, Devvit, useInterval, useState } from "@devvit/public-api";
 import { Engine } from "../engine/Engine.js"
-import { CelebrityQuestion, CompositeScore, GameScore, GameSettings, GradedScore, HistorianQuestion, MultipleChoiceScore, PastaQuestion, PostId, PuzzlePostData, Question, SubredditQuestion, TriviaQuestion, UpvotesQuestion, UserData } from "../types.js";
+import { CelebrityQuestion,  GameScore, GameSettings, HistorianQuestion, MultipleChoiceScore, PastaQuestion, PostId, Question, SubredditQuestion, TriviaQuestion, UpvotesQuestion, UserData } from "../types.js";
 import { UpvotesPage } from "./Games/Upvotes.js";
 import { SubredditGuessPage } from "./Games/SubredditGuess.js";
 import { TriviaPage } from "./Games/Trivia.js";

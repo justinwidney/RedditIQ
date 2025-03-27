@@ -26,7 +26,7 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
             image: GAME_SVG.celebGuess, // Placeholder for SVG data
             title: "Celebrity Guess",
             instructions: [
-                "Look at the image of a celebrity",
+                "Look at the image or the clues given",
                 "Type your guess in the text field",
                 "Submit your answer before time runs out",
                 "Get points for how fast you answer!"
