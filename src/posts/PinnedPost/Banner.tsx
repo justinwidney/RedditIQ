@@ -37,24 +37,13 @@ export const Banner = ( props: RowProps): JSX.Element => {
           <image
             imageHeight={64}
             imageWidth={64}
-            width="96px"
-            height="32px"
+            width="128px"
+            height="64px"
             url={logoSvgUrl}
           />
         </hstack>
         
-        <spacer height={"25px"} />
-        
-        {/* Second text row */}
-        <hstack backgroundColor="#2B2B2B" width={"100%"} alignment="center middle" height={"40px"} >
-          <text
-            size="medium"
-            color="white"
-            weight="bold"
-          >
-            {exampleText}
-          </text>
-        </hstack>
+      
       </vstack>
     </zstack>
   );

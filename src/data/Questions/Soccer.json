@@ -1,17 +1,14 @@
 {
   "templateQuestions": [
     {
-      "type": "trivia",
-      "backgroundImageUrl": "soccer/uefa.png",
-      "exampleText": "EX: Fastest goal in Premier League history?",
-      "questions": [
-        {
-          "question": "What is the fastest goal in Premier League history?",
-          "options": ["7.69 seconds", "9.82 seconds", "12.94 seconds", "15.01 seconds"],
-          "correctAnswer": 0
-        }
-      ],
-      "image": "soccer/field.png"
+      "type": "subredditGuess",
+      "backgroundImageUrl": "soccer/mancity.png",
+      "exampleText": "EX: ___ MOON and BOYS IN ___ ",
+      "image": "soccer/liverpool.png",
+      "image2": "soccer/istanbul.png",
+      "answer": "LiverpoolFC",
+      "title": "ON THIS DAY: Liverpool came back from 3-0 down to beat AC Milan on penalties in the 2005 Champions League final",
+      "upvotes": 8542
     },
     {
       "type": "celebGuess",
@@ -35,14 +32,17 @@
       }
     },
     {
-      "type": "subredditGuess",
-      "backgroundImageUrl": "soccer/mancity.png",
-      "exampleText": "EX: ___ MOON and BOYS IN ___ ",
-      "image": "soccer/liverpool.png",
-      "image2": "soccer/istanbul.png",
-      "answer": "LiverpoolFC",
-      "title": "ON THIS DAY: Liverpool came back from 3-0 down to beat AC Milan on penalties in the 2005 Champions League final",
-      "upvotes": 8542
+      "type": "trivia",
+      "backgroundImageUrl": "soccer/uefa.png",
+      "exampleText": "EX: Fastest goal in Premier League history?",
+      "questions": [
+        {
+          "question": "What is the fastest goal in Premier League history?",
+          "options": ["7.69 seconds", "9.82 seconds", "12.94 seconds", "15.01 seconds"],
+          "correctAnswer": 0
+        }
+      ],
+      "image": "soccer/field.png"
     }
   ],
   "questions": [

@@ -54,66 +54,6 @@
         "answers": ["Michael Richards", "Cosmo Kramer", "Kramer", "Cosmo"]
       },
       {
-        "type": "historian",
-        "image": "seinfield/soup_nazi.png",
-        "content": {
-          "title": "First appearance of the iconic character",
-          "content": "Just watched the episode where the Soup Nazi first appeared. His delivery was perfect! Anyone remember when this aired?",
-          "subreddit": "Seinfeld"
-        },
-        "answer": {
-          "month": 11,
-          "year": 1995
-        }
-      },
-      {
-        "type": "pasta",
-        "text": "I was in the _____ yesterday. The _____... shrinkage! I don't know how you guys walk around with those _____. It's like you're carrying a _____ around.",
-        "blanks": ["pool", "water was cold", "things", "extra limb"],
-        "reference": "Famous George Costanza shrinkage quote",
-        "options": [
-          [["bathroom", "sauna", "pool", "ocean"], 2],
-          [["water was cold", "temperature dropped", "AC was on", "fan was blowing"], 0],
-          [["things", "parts", "organs", "appendages"], 0],
-          [["extra limb", "burden", "package", "liability"], 0]
-        ]
-      },
-      {
-        "type": "trivia",
-        "questions": [
-          {
-            "question": "What food item does George pull out of the trash?",
-            "options": ["Eclair", "Chocolate cake", "Donut", "Muffin top"],
-            "correctAnswer": 0
-          },
-          {
-            "question": "Jerry's girlfriend whose name rhymed with a female body part?",
-            "options": ["Aretha", "Mulva", "Celeste", "Delores"],
-            "correctAnswer": 3
-          },
-          {
-            "question": "What was Kramer's first name revealed to be?",
-            "options": ["Conrad", "Cosmo", "Calvin", "Curtis"],
-            "correctAnswer": 1
-          },
-          {
-            "question": "What Episode did Jerry and Elaine create 'The Junior Mint incident'?",
-            "options": ["The Junior Mint", "The Operation", "The Surgery", "The Hospital"],
-            "correctAnswer": 0
-          },
-          {
-            "question": "What song is playing when Elaine shows off her “little kicks” dance moves?",
-            "options": ["Shining Star", "Dancing in the Street", "Super Freak", "Stayin' Alive"],
-            "correctAnswer": 0
-          },
-          {
-            "question": "Patient receiving surgery in 'The Junior Mint' episode?",
-            "options": ["Roy", "Bob", "Crazy Joe Davola", "The Drake"],
-            "correctAnswer": 0
-          }
-        ]
-      },
-      {
         "type": "upvotes",
         "comparisons": [
           {
@@ -161,10 +101,70 @@
         ]
       },
       {
+        "type": "historian",
+        "image": "seinfield/soup_nazi.png",
+        "content": {
+          "title": "First appearance of the iconic character",
+          "content": "Just watched the episode where the Soup Nazi first appeared. His delivery was perfect! Anyone remember when this aired?",
+          "subreddit": "Seinfeld"
+        },
+        "answer": {
+          "month": 11,
+          "year": 1995
+        }
+      },
+      {
+        "type": "pasta",
+        "text": "I was in the _____ yesterday. The _____... shrinkage! I don't know how you guys walk around with those _____. It's like you're carrying a _____ around.",
+        "blanks": ["pool", "water was cold", "things", "extra limb"],
+        "reference": "Famous George Costanza shrinkage quote",
+        "options": [
+          [["bathroom", "sauna", "pool", "ocean"], 2],
+          [["water was cold", "temperature dropped", "AC was on", "fan was blowing"], 0],
+          [["things", "parts", "organs", "appendages"], 0],
+          [["extra limb", "burden", "package", "liability"], 0]
+        ]
+      },
+      {
         "type": "celebrity",
         "image": "",
         "images" : ["seinfield/new.png", "seinfield/man.png"],
         "answers": ["Wayne Knight", "Newman", "The Mailman"]
+      },
+      {
+        "type": "trivia",
+        "questions": [
+          {
+            "question": "What food item does George pull out of the trash?",
+            "options": ["Eclair", "Chocolate cake", "Donut", "Muffin top"],
+            "correctAnswer": 0
+          },
+          {
+            "question": "Jerry's girlfriend whose name rhymed with a female body part?",
+            "options": ["Aretha", "Mulva", "Celeste", "Delores"],
+            "correctAnswer": 3
+          },
+          {
+            "question": "What was Kramer's first name revealed to be?",
+            "options": ["Conrad", "Cosmo", "Calvin", "Curtis"],
+            "correctAnswer": 1
+          },
+          {
+            "question": "What Episode did Jerry and Elaine create 'The Junior Mint incident'?",
+            "options": ["The Junior Mint", "The Operation", "The Surgery", "The Hospital"],
+            "correctAnswer": 0
+          },
+          {
+            "question": "What song is playing when Elaine shows off her “little kicks” dance moves?",
+            "options": ["Shining Star", "Dancing in the Street", "Super Freak", "Stayin' Alive"],
+            "correctAnswer": 0
+          },
+          {
+            "question": "Patient receiving surgery in 'The Junior Mint' episode?",
+            "options": ["Roy", "Bob", "Crazy Joe Davola", "The Drake"],
+            "correctAnswer": 0
+          }
+        ]
       }
     ],
     "answer": ["3", "3", "3", "3", "1", "1", "1", "1", "1", "1", "3"]

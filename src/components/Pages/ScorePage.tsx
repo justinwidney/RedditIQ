@@ -180,7 +180,7 @@ export const StatsPage = (
            {/* Player IQ Score */}
           {props.username && data.playerIQ > 0 && (
         <hstack width="100%" alignment="middle center" padding="small" >
-            <CustomButton label="Post" onClick={submitComment} />
+            <CustomButton label="Post" onClick={submitComment} width={"100px"} height={"50px"} />
             <spacer width="16px" />
           <PixelText scale={4} color={Settings.theme.primary}>{data.playerIQ.toLocaleString()}</PixelText>
           <spacer width="22px" />
