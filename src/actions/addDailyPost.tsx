@@ -42,7 +42,7 @@ export const newPinnedPost: MenuItem = {
     const community = await context.reddit.getCurrentSubreddit();
     const todayDate = new Date().toLocaleDateString();
 
-    const title = 'Soccer'
+    const title = 'Seinfield'
 
     const post = await context.reddit.submitPost({
       title: `Reddit IQ - ${title}`,

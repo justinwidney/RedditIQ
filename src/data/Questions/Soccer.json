@@ -1,133 +1,178 @@
 {
-    "questions": [
-      {
-        "type": "celebrity",
-        "image": "soccer/messi.png",
-        
-        "answers": ["Lionel Messi", "Leo Messi", "Messi"]
-      },
-      {
-        "type": "historian",
-        "image": "soccer/head-butt.gif",
-        "content": {
-          "title": "Zidane's headbutt in the World Cup Final",
-          "content": "Still can't believe this happened in the final. One of the most shocking moments in World Cup history!",
-          "subreddit": "soccer"
-        },
-        "answer": {
-          "month": 7,
-          "year": 2006
+  "templateQuestions": [
+    {
+      "type": "trivia",
+      "backgroundImageUrl": "soccer/uefa.png",
+      "exampleText": "EX: Fastest goal in Premier League history?",
+      "questions": [
+        {
+          "question": "What is the fastest goal in Premier League history?",
+          "options": ["7.69 seconds", "9.82 seconds", "12.94 seconds", "15.01 seconds"],
+          "correctAnswer": 0
         }
+      ],
+      "image": "soccer/field.png"
+    },
+    {
+      "type": "celebGuess",
+      "backgroundImageUrl": "soccer/turtle.png",
+      "exampleText": "EX: Who is this player?",
+      "image": "soccer/ronaldo.png",
+      "answers": ["Cristiano Ronaldo", "CR7", "Ronaldo"]
+    },
+    {
+      "type": "historian",
+      "backgroundImageUrl": "soccer/goal2.png",
+      "exampleText": "EX: When was the first FIFA World Cup held?",
+      "image": "soccer/goal1.png",
+      "content": {
+        "title": "The first FIFA World Cup",
+        "content": "The inaugural FIFA World Cup tournament was one of the most significant moments in soccer history!",
+        "subreddit": "soccer"
       },
-      {
-        "type": "pasta",
-        "text": "Roma fans greet players with 50kg of _____ at a training session for being shite. 50,000 _____ fans set to protest against Alexis Sanchez's girlfriend amid 'fatter than normal' claims. Nathan Redmond: ______ did not call me a wanker.",
-        "blanks": ["carrots", "Chile", "Pep Guardiola"],
-        "reference": "Common football fan rivalry copypasta",
-        "options": [
-          [["carrots", "potatoes", "bananas", "onions"], 0],
-          [["Argentina", "Chile", "Peru", "Mexio"], 1],
-          [["Pep Guardiola", "Jürgen Klopp", "José Mourinho", "Thomas Tuchel"], 0]
-        ]
-      },
-      {
-        "type": "subreddit",
-        "image": "soccer/mancity.png",
-        "image2": "soccer/mancity.png",
-        "answer": "MCFC",
-        "title" : "RODRI IS THE 2024 MEN'S BALLON D'OR!",
-        "upvotes": 2541
-      },
-      {
-        "type": "trivia",
-        "questions": [
-          {
-            "question": "Which player has won the most Ballon d'Or awards?",
-            "options": ["Cristiano Ronaldo", "Lionel Messi", "Michel Platini", "Johan Cruyff"],
-            "correctAnswer": 1
-          },
-          {
-            "question": "Which country has won the most World Cup tournaments?",
-            "options": ["Germany", "Italy", "Argentina", "Brazil"],
-            "correctAnswer": 3
-          },
-          {
-            "question": "The famous 'Hand of God' goal was scored by?",
-            "options": ["Diego Maradona", "Pelé", "Zinedine Zidane", "Thierry Henry"],
-            "correctAnswer": 0
-          },
-          {
-            "question": "Which club has won the most UEFA Champions League titles?",
-            "options": ["Barcelona", "Bayern Munich", "Liverpool", "Real Madrid"],
-            "correctAnswer": 3
-          },
-          {
-            "question": "The fastest goal in Premier League history was scored in how many seconds?",
-            "options": ["7.69 seconds", "9.82 seconds", "12.94 seconds", "15.01 seconds"],
-            "correctAnswer": 0
-          },
-          {
-            "question": "Which player is known as 'The Egyptian King'?",
-            "options": ["Mohamed Salah", "Mohamed Elneny", "Ahmed Hegazi", "Trezeguet"],
-            "correctAnswer": 0
-          }
-        ]
-      },
-      {
-        "type": "upvotes",
-        "comparisons": [
-          {
-            "postA": {
-              "image": "soccer/goal1.png",
-              "subreddit": "r/soccer",
-              "title": "Juventus 0-2 Real Madrid - Cristiano Ronaldo 64'",
-              "upvotes": 52000
-            },
-            "postB": {
-              "image": "soccer/goal2.png",
-              "subreddit": "r/soccer",
-              "title": "Kroos goal vs Sweden [2]-1 Free kick ",
-              "upvotes": 60000,
-              "link" : "https://www.flickr.com/photos/55504888@N00/16141160487"
-            }
-          },
-          {
-            "postA": {
-              "image": "soccer/barcelona.png",
-              "subreddit": "r/soccer",
-              "title": "Messi will not renew with FC Barcelona ",
-              "upvotes": 59000
-            },
-            "postB": {
-              "image": "soccer/fifa.png",
-              "subreddit": "r/soccer",
-              "title": "Argentina have won their third World Cup title",
-              "upvotes": 50000,
-              "link": "https://www.fcbarcelona.es/es/futbol/primer-equipo/noticias/2207655/leo-messi-no-seguira-ligado-al-fc-barcelona"
-            }
-          },
-          {
-            "postA": {
-              "image": "soccer/uefa.png",
-              "subreddit": "r/soccer",
-              "title": " [Italy] have won the UEFA EURO 2020",
-              "upvotes": 48000
-            },
-            "postB": {
-              "image": "soccer/Leicester.png",
-              "subreddit": "r/soccer",
-              "title": "Leicester City Are Premier League Champion",
-              "upvotes": 70000
-            }
-          }
-        ]
-      },
-      {
-        "type": "celebrity",
-        "image": "",
-        "images" : ["soccer/man.png", "soccer/turtle.png"],
-        "answers": ["Kylian", "Mbappé", "Mbappe", "Kylian Mbappe"]
+      "answer": {
+        "year": 1930
       }
-    ],
-    "answer": ["3", "3", "3", "3", "1", "3", "0", "3", "0", "0", "3"]
-  }
+    },
+    {
+      "type": "subredditGuess",
+      "backgroundImageUrl": "soccer/mancity.png",
+      "exampleText": "EX: ___ MOON and BOYS IN ___ ",
+      "image": "soccer/liverpool.png",
+      "image2": "soccer/istanbul.png",
+      "answer": "LiverpoolFC",
+      "title": "ON THIS DAY: Liverpool came back from 3-0 down to beat AC Milan on penalties in the 2005 Champions League final",
+      "upvotes": 8542
+    }
+  ],
+  "questions": [
+    {
+      "type": "celebrity",
+      "image": "soccer/messi.png",
+      "answers": ["Lionel Messi", "Leo Messi", "Messi"]
+    },
+    {
+      "type": "historian",
+      "image": "soccer/head-butt.gif",
+      "content": {
+        "title": "Zidane's headbutt in the World Cup Final",
+        "content": "Still can't believe this happened in the final. One of the most shocking moments in World Cup history!",
+        "subreddit": "soccer"
+      },
+      "answer": {
+        "month": 7,
+        "year": 2006
+      }
+    },
+    {
+      "type": "pasta",
+      "text": "Roma fans greet players with 50kg of _____ at a training session for being shite. 50,000 _____ fans set to protest against Alexis Sanchez's girlfriend amid 'fatter than normal' claims. Nathan Redmond: ______ did not call me a wanker.",
+      "blanks": ["carrots", "Chile", "Pep Guardiola"],
+      "reference": "Common football fan rivalry copypasta",
+      "options": [
+        [["carrots", "potatoes", "bananas", "onions"], 0],
+        [["Argentina", "Chile", "Peru", "Mexio"], 1],
+        [["Pep Guardiola", "Jürgen Klopp", "José Mourinho", "Thomas Tuchel"], 0]
+      ]
+    },
+    {
+      "type": "subreddit",
+      "image": "soccer/mancity.png",
+      "image2": "soccer/mancity.png",
+      "answer": "MCFC",
+      "title": "RODRI IS THE 2024 MEN'S BALLON D'OR!",
+      "upvotes": 2541
+    },
+    {
+      "type": "trivia",
+      "questions": [
+        {
+          "question": "Which player has won the most Ballon d'Or awards?",
+          "options": ["Cristiano Ronaldo", "Lionel Messi", "Michel Platini", "Johan Cruyff"],
+          "correctAnswer": 1
+        },
+        {
+          "question": "Which country has won the most World Cup tournaments?",
+          "options": ["Germany", "Italy", "Argentina", "Brazil"],
+          "correctAnswer": 3
+        },
+        {
+          "question": "The famous 'Hand of God' goal was scored by?",
+          "options": ["Diego Maradona", "Pelé", "Zinedine Zidane", "Thierry Henry"],
+          "correctAnswer": 0
+        },
+        {
+          "question": "Which club has won the most UEFA Champions League titles?",
+          "options": ["Barcelona", "Bayern Munich", "Liverpool", "Real Madrid"],
+          "correctAnswer": 3
+        },
+        {
+          "question": "The fastest goal in Premier League history was scored in how many seconds?",
+          "options": ["7.69 seconds", "9.82 seconds", "12.94 seconds", "15.01 seconds"],
+          "correctAnswer": 0
+        },
+        {
+          "question": "Which player is known as 'The Egyptian King'?",
+          "options": ["Mohamed Salah", "Mohamed Elneny", "Ahmed Hegazi", "Trezeguet"],
+          "correctAnswer": 0
+        }
+      ]
+    },
+    {
+      "type": "upvotes",
+      "comparisons": [
+        {
+          "postA": {
+            "image": "soccer/goal1.png",
+            "subreddit": "r/soccer",
+            "title": "Juventus 0-2 Real Madrid - Cristiano Ronaldo 64'",
+            "upvotes": 52000
+          },
+          "postB": {
+            "image": "soccer/goal2.png",
+            "subreddit": "r/soccer",
+            "title": "Kroos goal vs Sweden [2]-1 Free kick ",
+            "upvotes": 60000,
+            "link": "https://www.flickr.com/photos/55504888@N00/16141160487"
+          }
+        },
+        {
+          "postA": {
+            "image": "soccer/barcelona.png",
+            "subreddit": "r/soccer",
+            "title": "Messi will not renew with FC Barcelona ",
+            "upvotes": 59000
+          },
+          "postB": {
+            "image": "soccer/fifa.png",
+            "subreddit": "r/soccer",
+            "title": "Argentina have won their third World Cup title",
+            "upvotes": 50000,
+            "link": "https://www.fcbarcelona.es/es/futbol/primer-equipo/noticias/2207655/leo-messi-no-seguira-ligado-al-fc-barcelona"
+          }
+        },
+        {
+          "postA": {
+            "image": "soccer/uefa.png",
+            "subreddit": "r/soccer",
+            "title": " [Italy] have won the UEFA EURO 2020",
+            "upvotes": 48000
+          },
+          "postB": {
+            "image": "soccer/Leicester.png",
+            "subreddit": "r/soccer",
+            "title": "Leicester City Are Premier League Champion",
+            "upvotes": 70000
+          }
+        }
+      ]
+    },
+    {
+      "type": "celebrity",
+      "image": "",
+      "images": ["soccer/man.png", "soccer/turtle.png"],
+      "answers": ["Kylian", "Mbappé", "Mbappe", "Kylian Mbappe"]
+    }
+  ],
+  "answer": ["3", "3", "3", "3", "1", "3", "0", "3", "0", "0", "3"]
+}

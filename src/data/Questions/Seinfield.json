@@ -1,4 +1,51 @@
 {
+  "templateQuestions": [
+  {
+    "type": "trivia",
+    "backgroundImageUrl": "seinfield/cake.png",
+    "exampleText": "EX: What food item does George pull out of the trash?",
+    "questions": [
+      {
+        "question": "What food item does George pull out of the trash?",
+        "options": ["Eclair", "Chocolate cake", "Donut", "Muffin top"],
+        "correctAnswer": 0
+      }
+    ],
+    "image": "seinfield/shirt.png"
+  },
+  {
+    "type": "celebGuess",
+    "backgroundImageUrl": "seinfield/door.png",
+    "exampleText": "EX: Who is this character?",
+    "image": "seinfield/coat.png",
+    "answers": ["Michael Richards", "Cosmo Kramer", "Kramer", "Cosmo"]
+  },
+  {
+    "type": "historian",
+    "backgroundImageUrl": "seinfield/soup_nazi.png",
+    "exampleText": "EX: When did the Soup Nazi first appear?",
+    "image": "seinfield/soup_nazi.png",
+    "content": {
+      "title": "First appearance of the iconic character",
+      "content": "Just watched the episode where the Soup Nazi first appeared. His delivery was perfect! Anyone remember when this aired?",
+      "subreddit": "Seinfeld"
+    },
+    "answer": {
+      "month": 11,
+      "year": 1995
+    }
+  },
+  {
+    "type": "subredditGuess",
+    "backgroundImageUrl": "seinfield/tree.png",
+    "exampleText": "EX: ___ about ___ ",
+    "image": "seinfield/portland.png",
+    "image2": "seinfield/age.png",
+    "answer": "Seinfeld",
+    "title": "Newman aged the best out of all the Seinfeld characters",
+    "upvotes": 26000
+  }
+],
     "questions": [
       {
         "type": "celebrity",

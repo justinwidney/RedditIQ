@@ -145,6 +145,9 @@ export const PastaPage = (
     }
   );
 
+
+
+  
   const handleTextClick = (index: number) => {
 
     // Don't allow clicking on blanks that have been answered incorrectly

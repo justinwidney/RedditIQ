@@ -98,25 +98,8 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         }
 
     return (
-        <zstack width="100%" height="100%" alignment="center middle">
-            <image 
-            imageHeight={1024}
-            imageWidth={2048}
-            height="100%"
-            width="100%"
-            url="Windows_Screen.png"
-            description="custom background"
-            resizeMode="fill"  
-            />
-             <image 
-            imageHeight={1024}
-            imageWidth={2048}
-            height="76%"
-            width="84%"
-            url= {backgroundURL}
-            description="custom background"
-            resizeMode="fill"  
-            />
+        <zstack width="100%" height="100%" alignment="center middle" backgroundColor="#EAEAEA">
+       
             {postTypes[data.postType] || <text>Post type not found</text>}
 
 

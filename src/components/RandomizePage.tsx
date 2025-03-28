@@ -18,8 +18,7 @@ type PageData = {
 
 const PAGE_SIZE = 150;
 const ANIMATION_INTERVAL = 125;
-const COMPLETION_DELAY = 2500;
-const INITIAL_TIMEOUT = 25000;
+
 
 export const PageCarousel = (
   props: PageCarouselProps,
@@ -70,7 +69,7 @@ export const PageCarousel = (
   
   const [ nextQuestionTime, setNextQuestionTime] = useState(25000);
 
-
+  console.log(targetPageIndex, "AIMING FOR THIS PAGE")
 
   // Set up interval to change highlighted page
   useInterval(() => {
@@ -85,7 +84,6 @@ export const PageCarousel = (
     if (!isAnimating) return;
 
 
-    
     const nextIndex = (currentIndex + 1) % pages.length;
     setCurrentIndex(nextIndex);
     

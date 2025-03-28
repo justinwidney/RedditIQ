@@ -10,20 +10,27 @@ interface ShadowProps {
 
 export const Shadow = (props: ShadowProps): JSX.Element => {
   const { height, width, children, onPress } = props;
-
   return (
-    <zstack alignment="start top" onPress={onPress}>
-      {/* Shadow */}
-      <vstack width="100%" height="100%">
-        <spacer height="4px" />
-        <hstack width="100%" height="100%">
-          <spacer width="4px" />
-          <hstack height={height} width={width} backgroundColor="#000000" />
-        </hstack>
-      </vstack>
-
-      {/* Card */}
-      {children}
-    </zstack>
+    <vstack 
+      height={height} 
+      width={width} 
+      backgroundColor="#E8E8E8" 
+      onPress={onPress}
+    >
+      {/* Inner shadow effect */}
+      <zstack alignment="start top" width="100%" height="100%">
+        {/* Content container */}
+        <vstack width="100%" height="100%">
+          {children}
+        </vstack>
+        
+        {/* Top and left shadow */}
+        <hstack width="100%" height="4px" backgroundColor="rgba(0,0,0,0.25)" />
+        <vstack width="4px" height="100%" backgroundColor="rgba(0,0,0,0.25)" />
+        
+        {/* Alternative approach with absolute positioned elements if needed */}
+        {/* You can adjust the opacity values (0.2) to control shadow intensity */}
+      </zstack>
+    </vstack>
   );
 };

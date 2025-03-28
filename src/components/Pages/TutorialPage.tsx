@@ -112,7 +112,7 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
                 <spacer width="24px" />
                 <PixelText > Tutorial </PixelText>
                 <spacer grow />
-                <CustomButton label="Close" textSize={1} height="32px" width="64px" onClick={handleSkip} />
+                <CustomButton label="Close" textSize={1} height="32px" width="64px" onClick={handleSkip} color='white' />
                 <spacer width="24px" />
             </hstack>
             
@@ -167,6 +167,7 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
                                         textSize={1} 
                                         height="32px" 
                                         width="80px" 
+                                        color='white'
                                         onClick={handlePrev} 
                                     />
                                     <text size="xsmall">
@@ -177,6 +178,7 @@ export const TutorialPage = (props: TutorialPageProps, context: Context): JSX.El
                                         textSize={1} 
                                         height="32px" 
                                         width="80px" 
+                                        color='white'
                                         onClick={handleNext} 
                                     />
                                 </hstack>
